@@ -1,0 +1,17 @@
+Admin:
+    Usuario: a
+    Contraseña: a
+
+Cliente principal (el que utilizo yo):
+    Usuario: cliente1
+    Contraseña: cliente123
+
+
+
+
+
+
+
+
+
+    

@@ -1,0 +1,64 @@
+python manage.py shell
+
+from django.contrib.auth.models import User
+from app_Libreria.models import Cliente
+
+# Crear usuarios de cliente
+usuarios_clientes = [
+    {
+        'username': 'cliente1',
+        'password': 'cliente123',
+        'email': 'cliente1@email.com',
+        'first_name': 'Ana',
+        'last_name': 'García',
+        'telefono': '555-0101',
+        'direccion': 'Calle Principal 123, Ciudad'
+    },
+    {
+        'username': 'cliente2', 
+        'password': 'cliente123',
+        'email': 'cliente2@email.com',
+        'first_name': 'Carlos',
+        'last_name': 'López',
+        'telefono': '555-0102',
+        'direccion': 'Avenida Central 456, Ciudad'
+    },
+    {
+        'username': 'cliente3',
+        'password': 'cliente123',
+        'email': 'cliente3@email.com', 
+        'first_name': 'María',
+        'last_name': 'Rodríguez',
+        'telefono': '555-0103',
+        'direccion': 'Plaza Mayor 789, Ciudad'
+    }
+]
+
+for usuario_data in usuarios_clientes:
+    # Crear usuario
+    user = User.objects.create_user(
+        username=usuario_data['username'],
+        password=usuario_data['password'],
+        email=usuario_data['email'],
+        first_name=usuario_data['first_name'],
+        last_name=usuario_data['last_name'],
+        is_staff=False  # Importante: NO es administrador
+    )
+    
+    # Crear perfil de cliente
+    cliente = Cliente.objects.create(
+        user=user,
+        telefono=usuario_data['telefono'],
+        direccion=usuario_data['direccion'],
+        preferencias_genero='Ficción, Romance'
+    )
+    
+    print(f"✅ Cliente creado: {usuario_data['username']}")
+
+print("\n🎉 Usuarios de cliente creados exitosamente!")
+print("\n📋 CREDENCIALES DE ACCESO:")
+for usuario in usuarios_clientes:
+    print(f"Usuario: {usuario['username']} | Contraseña: {usuario['password']}")
+
+# Salir del shell
+exit()

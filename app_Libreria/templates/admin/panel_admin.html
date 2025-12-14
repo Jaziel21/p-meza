@@ -1,0 +1,462 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel de Administración - Librería AJMG{% endblock %}
+
+{% block page_title %}⚙️ Panel de Administración{% endblock %}
+{% block page_subtitle %}
+<p style="font-size: 1.1rem; color: var(--gris-medio); margin-top: var(--espacio-sm);">
+    Bienvenido al panel de control. Aquí puedes gestionar todos los aspectos de la librería.
+</p>
+{% endblock %}
+
+{% block content %}
+<!-- Estadísticas -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--espacio-md); margin-bottom: var(--espacio-xl);">
+    <div style="background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro)); color: white; border-radius: var(--radio-lg); padding: var(--espacio-md); text-align: center; box-shadow: var(--sombra-mediana);">
+        <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: var(--espacio-xs);">
+            {{ stats.total_libros }}
+        </div>
+        <div style="font-size: 2rem; margin-bottom: var(--espacio-xs);">
+            <i class="fas fa-book"></i>
+        </div>
+        <div style="font-size: 1rem; opacity: 0.9;">Libros</div>
+    </div>
+    
+    <div style="background: linear-gradient(135deg, #28a745, #218838); color: white; border-radius: var(--radio-lg); padding: var(--espacio-md); text-align: center; box-shadow: var(--sombra-mediana);">
+        <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: var(--espacio-xs);">
+            {{ stats.total_ventas }}
+        </div>
+        <div style="font-size: 2rem; margin-bottom: var(--espacio-xs);">
+            <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div style="font-size: 1rem; opacity: 0.9;">Ventas</div>
+    </div>
+    
+    <div style="background: linear-gradient(135deg, #17a2b8, #138496); color: white; border-radius: var(--radio-lg); padding: var(--espacio-md); text-align: center; box-shadow: var(--sombra-mediana);">
+        <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: var(--espacio-xs);">
+            {{ stats.total_usuarios }}
+        </div>
+        <div style="font-size: 2rem; margin-bottom: var(--espacio-xs);">
+            <i class="fas fa-users"></i>
+        </div>
+        <div style="font-size: 1rem; opacity: 0.9;">Usuarios</div>
+    </div>
+    
+    <div style="background: linear-gradient(135deg, #ffc107, #e0a800); color: var(--verde-oscuro); border-radius: var(--radio-lg); padding: var(--espacio-md); text-align: center; box-shadow: var(--sombra-mediana);">
+        <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: var(--espacio-xs);">
+            {{ stats.total_eventos }}
+        </div>
+        <div style="font-size: 2rem; margin-bottom: var(--espacio-xs);">
+            <i class="fas fa-calendar-alt"></i>
+        </div>
+        <div style="font-size: 1rem; opacity: 0.9;">Eventos</div>
+    </div>
+</div>
+
+<!-- Gestión de Contenido y Ventas -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: var(--espacio-lg); margin-bottom: var(--espacio-xl);">
+    <!-- Gestión de Contenido -->
+    <div style="background-color: white; border-radius: var(--radio-lg); overflow: hidden; box-shadow: var(--sombra-mediana);">
+        <div style="background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal)); color: white; padding: var(--espacio-md);">
+            <h3 style="margin: 0; font-size: 1.3rem; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-cogs"></i> GESTIÓN DE CONTENIDO
+            </h3>
+        </div>
+        
+        <div style="padding: var(--espacio-md);">
+            <div style="display: grid; grid-template-columns: 1fr; gap: var(--espacio-sm);">
+                <a href="{% url 'admin_libros' %}" class="admin-btn-primary">
+                    <i class="fas fa-book"></i> Gestionar Libros
+                </a>
+                
+                <a href="{% url 'admin_autores' %}" class="admin-btn-primary">
+                    <i class="fas fa-user-edit"></i> Gestionar Autores
+                </a>
+                
+                <a href="{% url 'admin_editoriales' %}" class="admin-btn-primary">
+                    <i class="fas fa-building"></i> Gestionar Editoriales
+                </a>
+                
+                <a href="{% url 'admin_ventas' %}" class="admin-btn-primary">
+                    <i class="fas fa-chart-line"></i> Gestionar Ventas
+                </a>
+                
+                <a href="{% url 'admin_eventos' %}" class="admin-btn-primary">
+                    <i class="fas fa-calendar"></i> Gestionar Eventos
+                </a>
+                
+                <a href="{% url 'admin_blog' %}" class="admin-btn-primary">
+                    <i class="fas fa-blog"></i> Gestionar Blog
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Ventas Recientes -->
+    <div style="background-color: white; border-radius: var(--radio-lg); overflow: hidden; box-shadow: var(--sombra-mediana);">
+        <div style="background: linear-gradient(135deg, #17a2b8, #138496); color: white; padding: var(--espacio-md);">
+            <h3 style="margin: 0; font-size: 1.3rem; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-chart-bar"></i> VENTAS RECIENTES
+            </h3>
+        </div>
+        
+        <div style="padding: var(--espacio-md); max-height: 400px; overflow-y: auto;">
+            {% if ventas_recientes %}
+            <div style="display: flex; flex-direction: column; gap: var(--espacio-sm);">
+                {% for venta in ventas_recientes|slice:":5" %}
+                <a href="{% url 'detalle_venta_admin' venta.ventaid %}" 
+                   style="background-color: var(--gris-claro); border-radius: var(--radio-md); padding: var(--espacio-sm); text-decoration: none; color: var(--gris-oscuro); display: block; transition: var(--transicion-rapida); border-left: 4px solid var(--verde-principal);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px;">
+                        <div style="font-weight: 600; color: var(--verde-oscuro);">
+                            Venta #{{ venta.ventaid }}
+                        </div>
+                        <div style="font-weight: bold; color: var(--verde-principal);">
+                            ${{ venta.montototal }}
+                        </div>
+                    </div>
+                    
+                    <div style="color: var(--gris-medio); margin-bottom: 5px; font-size: 0.9rem;">
+                        <i class="fas fa-user"></i> {{ venta.clienteid.username }}
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="font-size: 0.85rem; color: var(--gris-medio);">
+                            <i class="far fa-clock"></i> {{ venta.fechaventa|date:"d M H:i" }}
+                        </div>
+                        <div style="font-size: 0.75rem; padding: 3px 8px; border-radius: 12px; background-color: {% if venta.estadoventa == 'COMPLETADA' %}#28a74520{% else %}#ffc10720{% endif %}; color: {% if venta.estadoventa == 'COMPLETADA' %}#28a745{% else %}#ffc107{% endif %};">
+                            {{ venta.estadoventa }}
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            
+            {% if ventas_recientes.count > 5 %}
+            <div style="text-align: center; margin-top: var(--espacio-md);">
+                <a href="{% url 'admin_ventas' %}" style="color: var(--verde-principal); text-decoration: none; font-weight: 600;">
+                    Ver todas las ventas <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            {% endif %}
+            
+            {% else %}
+            <div style="text-align: center; padding: var(--espacio-lg); color: var(--gris-medio);">
+                <div style="font-size: 3rem; margin-bottom: var(--espacio-sm); opacity: 0.3;">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <p style="margin: 0;">No hay ventas recientes</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Acciones Rápidas -->
+<div style="background-color: white; border-radius: var(--radio-lg); overflow: hidden; box-shadow: var(--sombra-mediana); margin-bottom: var(--espacio-xl);">
+    <div style="background: linear-gradient(135deg, #ffc107, #e0a800); color: var(--verde-oscuro); padding: var(--espacio-md);">
+        <h3 style="margin: 0; font-size: 1.3rem; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-bolt"></i> ACCIONES RÁPIDAS
+        </h3>
+    </div>
+    
+    <div style="padding: var(--espacio-md);">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--espacio-sm);">
+            <a href="{% url 'agregar_libro' %}" class="admin-btn-secondary">
+                <i class="fas fa-plus"></i> Nuevo Libro
+            </a>
+            
+            <a href="{% url 'agregar_autor' %}" class="admin-btn-secondary">
+                <i class="fas fa-user-plus"></i> Nuevo Autor
+            </a>
+            
+            <a href="{% url 'agregar_evento' %}" class="admin-btn-secondary">
+                <i class="fas fa-calendar-plus"></i> Nuevo Evento
+            </a>
+            
+            <a href="{% url 'agregar_entrada_blog' %}" class="admin-btn-secondary">
+                <i class="fas fa-edit"></i> Nuevo Blog
+            </a>
+            
+            <a href="{% url 'agregar_venta' %}" class="admin-btn-secondary">
+                <i class="fas fa-cash-register"></i> Nueva Venta
+            </a>
+            
+            <a href="{% url 'agregar_editorial' %}" class="admin-btn-secondary">
+                <i class="fas fa-building"></i> Nueva Editorial
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas de hoy -->
+<div style="background: linear-gradient(135deg, var(--verde-muy-claro), var(--gris-claro)); border-radius: var(--radio-lg); padding: var(--espacio-lg); margin-bottom: var(--espacio-xl);">
+    <h3 style="color: var(--verde-oscuro); margin-bottom: var(--espacio-md); text-align: center; font-size: 1.3rem;">
+        <i class="fas fa-chart-pie"></i> ESTADÍSTICAS DE HOY
+    </h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--espacio-md);">
+        <div style="text-align: center; background-color: white; padding: var(--espacio-md); border-radius: var(--radio-md); box-shadow: var(--sombra-suave);">
+            <div style="font-size: 2rem; color: var(--verde-principal); margin-bottom: var(--espacio-xs);">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div style="font-size: 1.8rem; font-weight: bold; color: var(--verde-oscuro); margin-bottom: 5px;">
+                {{ stats.ventas_hoy }}
+            </div>
+            <div style="color: var(--gris-medio); font-size: 0.9rem;">Ventas Hoy</div>
+        </div>
+        
+        <div style="text-align: center; background-color: white; padding: var(--espacio-md); border-radius: var(--radio-md); box-shadow: var(--sombra-suave);">
+            <div style="font-size: 2rem; color: #28a745; margin-bottom: var(--espacio-xs);">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div style="font-size: 1.8rem; font-weight: bold; color: var(--verde-oscuro); margin-bottom: 5px;">
+                ${{ stats.ingresos_hoy }}
+            </div>
+            <div style="color: var(--gris-medio); font-size: 0.9rem;">Ingresos Hoy</div>
+        </div>
+        
+        <div style="text-align: center; background-color: white; padding: var(--espacio-md); border-radius: var(--radio-md); box-shadow: var(--sombra-suave);">
+            <div style="font-size: 2rem; color: #17a2b8; margin-bottom: var(--espacio-xs);">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <div style="font-size: 1.8rem; font-weight: bold; color: var(--verde-oscuro); margin-bottom: 5px;">
+                0
+            </div>
+            <div style="color: var(--gris-medio); font-size: 0.9rem;">Nuevos Usuarios</div>
+        </div>
+        
+        <div style="text-align: center; background-color: white; padding: var(--espacio-md); border-radius: var(--radio-md); box-shadow: var(--sombra-suave);">
+            <div style="font-size: 2rem; color: #ffc107; margin-bottom: var(--espacio-xs);">
+                <i class="fas fa-bookmark"></i>
+            </div>
+            <div style="font-size: 1.8rem; font-weight: bold; color: var(--verde-oscuro); margin-bottom: 5px;">
+                0
+            </div>
+            <div style="color: var(--gris-medio); font-size: 0.9rem;">Reservas Hoy</div>
+        </div>
+    </div>
+</div>
+
+<!-- Acceso Directo -->
+<div>
+    <h3 style="color: var(--verde-oscuro); margin-bottom: var(--espacio-md); font-size: 1.3rem;">
+        <i class="fas fa-external-link-alt"></i> ACCESO DIRECTO
+    </h3>
+    
+    <div style="display: flex; gap: var(--espacio-sm); flex-wrap: wrap;">
+        <a href="/admin/" target="_blank" class="admin-access-btn" style="background-color: #dc3545; color: white;">
+            <i class="fas fa-cog"></i> Django Admin
+        </a>
+        
+        <a href="{% url 'inicio' %}" class="admin-access-btn" style="background-color: var(--verde-principal); color: white;">
+            <i class="fas fa-home"></i> Sitio Público
+        </a>
+        
+        <a href="#" onclick="exportarDatos()" class="admin-access-btn" style="background-color: #17a2b8; color: white;">
+            <i class="fas fa-download"></i> Exportar Datos
+        </a>
+        
+        <a href="#" onclick="generarReporte()" class="admin-access-btn" style="background-color: #6c757d; color: white;">
+            <i class="fas fa-chart-line"></i> Generar Reporte
+        </a>
+    </div>
+</div>
+
+<script>
+// Funciones del panel
+function exportarDatos() {
+    if (confirm('¿Deseas exportar los datos de la librería?')) {
+        // Simulación de exportación
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exportando...';
+        btn.disabled = true;
+        
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-check"></i> ¡Exportado!';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 1500);
+            
+            alert('Los datos han sido exportados exitosamente.');
+        }, 2000);
+    }
+}
+
+function generarReporte() {
+    if (confirm('¿Generar reporte mensual?')) {
+        // Simulación de generación de reporte
+        alert('Reporte generado. Se descargará automáticamente.');
+        // En producción, redirigirías a una vista que genera el reporte
+    }
+}
+
+// Estilos CSS para el panel de administración
+const adminStyle = document.createElement('style');
+adminStyle.textContent = `
+    .admin-btn-primary {
+        background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro));
+        color: white;
+        padding: 12px 20px;
+        border-radius: var(--radio-md);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        transition: var(--transicion-media);
+        border: none;
+        cursor: pointer;
+        text-align: left;
+    }
+    
+    .admin-btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--sombra-mediana);
+        background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal));
+    }
+    
+    .admin-btn-secondary {
+        background-color: white;
+        color: var(--verde-principal);
+        padding: 12px 20px;
+        border-radius: var(--radio-md);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font-weight: 600;
+        transition: var(--transicion-media);
+        border: 2px solid var(--verde-principal);
+        cursor: pointer;
+        text-align: center;
+    }
+    
+    .admin-btn-secondary:hover {
+        background-color: var(--verde-principal);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: var(--sombra-suave);
+    }
+    
+    .admin-access-btn {
+        padding: 10px 20px;
+        border-radius: var(--radio-md);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        transition: var(--transicion-media);
+    }
+    
+    .admin-access-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--sombra-suave);
+        opacity: 0.9;
+    }
+    
+    /* Estilos para tarjetas de ventas */
+    a[style*="background-color: var(--gris-claro)"]:hover {
+        background-color: var(--verde-muy-claro) !important;
+        transform: translateX(5px);
+        transition: var(--transicion-media);
+    }
+    
+    /* Scrollbar personalizado */
+    div[style*="overflow-y: auto"]::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    div[style*="overflow-y: auto"]::-webkit-scrollbar-track {
+        background: var(--gris-claro);
+        border-radius: 3px;
+    }
+    
+    div[style*="overflow-y: auto"]::-webkit-scrollbar-thumb {
+        background: var(--verde-principal);
+        border-radius: 3px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .admin-grid {
+            grid-template-columns: 1fr !important;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+        
+        .quick-actions-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: 1fr !important;
+        }
+        
+        .quick-actions-grid {
+            grid-template-columns: 1fr !important;
+        }
+    }
+    
+    /* Animaciones */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .admin-btn-primary:active, .admin-btn-secondary:active {
+        animation: pulse 0.2s ease;
+    }
+`;
+document.head.appendChild(adminStyle);
+
+// Inicialización de efectos
+document.addEventListener('DOMContentLoaded', function() {
+    // Efecto hover en estadísticas
+    const statCards = document.querySelectorAll('div[style*="background: linear-gradient"]');
+    statCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.transition = 'transform 0.3s ease';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+    
+    // Actualizar hora actual en tiempo real
+    function actualizarHora() {
+        const ahora = new Date();
+        const horaElement = document.getElementById('hora-actual');
+        if (horaElement) {
+            horaElement.textContent = ahora.toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+    }
+    
+    // Crear elemento de hora si no existe
+    const horaContainer = document.createElement('div');
+    horaContainer.style.cssText = 'text-align: center; margin-top: var(--espacio-md); color: var(--gris-medio); font-size: 0.9rem;';
+    horaContainer.innerHTML = '<i class="far fa-clock"></i> Hora actual: <span id="hora-actual"></span>';
+    
+    const contentBlock = document.querySelector('div[style*="ESTADÍSTICAS DE HOY"]').parentElement;
+    contentBlock.parentElement.insertBefore(horaContainer, contentBlock.nextElementSibling);
+    
+    actualizarHora();
+    setInterval(actualizarHora, 1000);
+});
+</script>
+{% endblock %}

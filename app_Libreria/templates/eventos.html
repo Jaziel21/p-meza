@@ -1,0 +1,644 @@
+{% extends 'base.html' %}
+
+{% block title %}Eventos Literarios - Librería AJMG{% endblock %}
+
+{% block page_title %}📅 Eventos Literarios{% endblock %}
+{% block page_subtitle %}
+<p style="font-size: 1.1rem; color: var(--gris-medio); margin-top: var(--espacio-sm); max-width: 800px; margin-left: auto; margin-right: auto;">
+    Participa en nuestras actividades culturales: presentaciones de libros, talleres, clubes de lectura y más. 
+    Conoce a autores, aprende nuevas técnicas y comparte con otros amantes de la lectura.
+</p>
+{% endblock %}
+
+{% block content %}
+<!-- Filtros de eventos -->
+<div style="background-color: var(--gris-claro); padding: var(--espacio-sm); border-radius: var(--radio-md); margin-bottom: var(--espacio-xl);">
+    <div style="display: flex; justify-content: center; gap: var(--espacio-sm); flex-wrap: wrap;">
+        <a href="?filtro=todos" 
+           style="padding: 10px 20px; border-radius: var(--radio-md); text-decoration: none; display: flex; align-items: center; gap: 8px; 
+                  {% if filtro_actual == 'todos' or not filtro_actual %}
+                  background-color: var(--verde-principal); color: white; border: 2px solid var(--verde-oscuro); box-shadow: var(--sombra-suave);
+                  {% else %}
+                  background-color: white; color: var(--verde-principal); border: 1px solid var(--gris-medio);
+                  {% endif %}">
+            <i class="fas fa-calendar-alt"></i>Todos los Eventos
+        </a>
+        
+        <a href="?filtro=proximos" 
+           style="padding: 10px 20px; border-radius: var(--radio-md); text-decoration: none; display: flex; align-items: center; gap: 8px;
+                  {% if filtro_actual == 'proximos' %}
+                  background-color: var(--verde-principal); color: white; border: 2px solid var(--verde-oscuro); box-shadow: var(--sombra-suave);
+                  {% else %}
+                  background-color: white; color: var(--verde-principal); border: 1px solid var(--gris-medio);
+                  {% endif %}">
+            <i class="fas fa-clock"></i>Próximos
+        </a>
+        
+        <a href="?filtro=pasados" 
+           style="padding: 10px 20px; border-radius: var(--radio-md); text-decoration: none; display: flex; align-items: center; gap: 8px;
+                  {% if filtro_actual == 'pasados' %}
+                  background-color: var(--verde-principal); color: white; border: 2px solid var(--verde-oscuro); box-shadow: var(--sombra-suave);
+                  {% else %}
+                  background-color: white; color: var(--verde-principal); border: 1px solid var(--gris-medio);
+                  {% endif %}">
+            <i class="fas fa-history"></i>Pasados
+        </a>
+    </div>
+</div>
+
+<!-- Contador de eventos -->
+<div style="text-align: center; margin-bottom: var(--espacio-xl);">
+    <div style="display: inline-flex; align-items: center; gap: var(--espacio-md); background-color: var(--verde-muy-claro); padding: var(--espacio-sm) var(--espacio-md); border-radius: var(--radio-lg);">
+        <div style="text-align: center;">
+            <div style="font-size: 2rem; color: var(--verde-principal); font-weight: bold;">{{ eventos|length }}</div>
+            <div style="font-size: 0.9rem; color: var(--gris-medio);">Eventos</div>
+        </div>
+        <div style="height: 40px; width: 1px; background-color: var(--gris-medio); opacity: 0.3;"></div>
+        <div style="text-align: center;">
+            <div style="font-size: 2rem; color: #28a745; font-weight: bold;">{{ eventos_proximos }}</div>
+            <div style="font-size: 0.9rem; color: var(--gris-medio);">Próximos</div>
+        </div>
+        <div style="height: 40px; width: 1px; background-color: var(--gris-medio); opacity: 0.3;"></div>
+        <div style="text-align: center;">
+            <div style="font-size: 2rem; color: #6c757d; font-weight: bold;">{{ eventos_pasados }}</div>
+            <div style="font-size: 0.9rem; color: var(--gris-medio);">Pasados</div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de eventos -->
+{% if eventos %}
+<div class="eventos-grid">
+    {% for evento in eventos %}
+    <div class="evento-card" data-fecha="{{ evento.fecha|date:'c' }}">
+        <!-- Badge de fecha -->
+        <div class="evento-fecha-badge">
+            <div style="font-size: 0.9rem; font-weight: bold; color: var(--verde-oscuro);">
+                {{ evento.fecha|date:"d" }}
+            </div>
+            <div style="font-size: 0.8rem; color: var(--gris-medio);">
+                {{ evento.fecha|date:"M" }}
+            </div>
+        </div>
+        
+        <!-- Badge de categoría -->
+        <div class="evento-categoria-badge">
+            {{ evento.get_categoria_display }}
+        </div>
+        
+        <!-- Badge de estado -->
+        {% if evento.fecha > now %}
+        <div style="position: absolute; top: 70px; left: 15px; background-color: #28a745; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; z-index: 2;">
+            <i class="fas fa-clock"></i> Próximo
+        </div>
+        {% else %}
+        <div style="position: absolute; top: 70px; left: 15px; background-color: #6c757d; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; z-index: 2;">
+            <i class="fas fa-history"></i> Realizado
+        </div>
+        {% endif %}
+        
+        <!-- Imagen del evento -->
+        <div class="evento-imagen-container">
+            {% if evento.imagen %}
+            <img src="{{ evento.imagen.url }}" alt="{{ evento.titulo }}" class="evento-imagen">
+            {% else %}
+            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro)); display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem;">
+                <i class="fas fa-calendar-day"></i>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="evento-contenido">
+            <!-- Título -->
+            <h3 class="evento-titulo">{{ evento.titulo }}</h3>
+            
+            <!-- Descripción -->
+            <p class="evento-descripcion">{{ evento.descripcion|truncatewords:30 }}</p>
+            
+            <!-- Detalles del evento -->
+            <div class="evento-detalles">
+                <div class="evento-detalle-item">
+                    <i class="far fa-calendar-alt"></i>
+                    <span>{{ evento.fecha|date:"d M Y, H:i" }}</span>
+                </div>
+                
+                <div class="evento-detalle-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>{{ evento.ubicacion }}</span>
+                </div>
+                
+                <div class="evento-detalle-item">
+                    <i class="fas fa-users"></i>
+                    <span>{{ evento.capacidad }} personas</span>
+                </div>
+                
+                <div class="evento-detalle-item">
+                    <i class="fas fa-tag"></i>
+                    <span>
+                        {% if evento.precio > 0 %}
+                            ${{ evento.precio }}
+                        {% else %}
+                            Gratuito
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="evento-acciones">
+                <button class="btn-ver-detalles" onclick="verDetallesEvento({{ forloop.counter }})">
+                    <i class="fas fa-info-circle"></i> Ver Detalles
+                </button>
+                
+                {% if evento.fecha > now and evento.activo %}
+                <button class="btn-reservar" onclick="reservarEvento({{ evento.eventoid }})">
+                    <i class="fas fa-ticket-alt"></i> Reservar
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Modal para detalles del evento (oculto) -->
+        <div id="modal-evento-{{ forloop.counter }}" style="display: none;">
+            <div class="modal-header">
+                <span class="modal-categoria">{{ evento.get_categoria_display }}</span>
+                <h2 class="modal-titulo">{{ evento.titulo }}</h2>
+                <div class="modal-fecha">
+                    <i class="far fa-calendar-alt"></i>
+                    <span>{{ evento.fecha|date:"l, d F Y, H:i" }}</span>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-imagen-container">
+                    {% if evento.imagen %}
+                    <img src="{{ evento.imagen.url }}" alt="{{ evento.titulo }}" class="modal-imagen">
+                    {% else %}
+                    <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro)); display: flex; align-items: center; justify-content: center; color: white; font-size: 4rem;">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="modal-descripcion">{{ evento.descripcion|linebreaks }}</div>
+                
+                <div class="modal-detalles-grid">
+                    <div class="modal-detalle-card">
+                        <div class="modal-detalle-titulo">Ubicación</div>
+                        <div class="modal-detalle-valor">{{ evento.ubicacion }}</div>
+                    </div>
+                    <div class="modal-detalle-card">
+                        <div class="modal-detalle-titulo">Capacidad</div>
+                        <div class="modal-detalle-valor">{{ evento.capacidad }} personas</div>
+                    </div>
+                    <div class="modal-detalle-card">
+                        <div class="modal-detalle-titulo">Precio</div>
+                        <div class="modal-detalle-valor">
+                            {% if evento.precio > 0 %}
+                                ${{ evento.precio }}
+                            {% else %}
+                                Gratuito
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="modal-detalle-card">
+                        <div class="modal-detalle-titulo">Estado</div>
+                        <div class="modal-detalle-valor">
+                            {% if evento.fecha > now %}
+                                <span style="color: #28a745;">● Activo</span>
+                            {% else %}
+                                <span style="color: #6c757d;">● Realizado</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<!-- Mensaje cuando no hay eventos -->
+<div style="text-align: center; padding: var(--espacio-xl);">
+    <div style="font-size: 5rem; color: var(--verde-claro); margin-bottom: var(--espacio-md); opacity: 0.5;">
+        <i class="fas fa-calendar-times"></i>
+    </div>
+    <h3 style="color: var(--gris-oscuro); margin-bottom: var(--espacio-sm);">No hay eventos programados</h3>
+    <p style="color: var(--gris-medio); margin-bottom: var(--espacio-lg); max-width: 500px; margin-left: auto; margin-right: auto;">
+        Pronto anunciaremos nuevas actividades literarias. 
+        Mientras tanto, puedes explorar nuestro catálogo de libros o leer nuestro blog.
+    </p>
+    <div style="display: flex; gap: var(--espacio-sm); justify-content: center; flex-wrap: wrap;">
+        <a href="{% url 'libros' %}" style="background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro)); color: white; padding: 12px 24px; border-radius: var(--radio-md); text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+            <i class="fas fa-book"></i> Ver Libros
+        </a>
+        <a href="{% url 'blog' %}" style="background-color: var(--verde-claro); color: var(--verde-oscuro); padding: 12px 24px; border-radius: var(--radio-md); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border: 2px solid var(--verde-principal);">
+            <i class="fas fa-blog"></i> Ver Blog
+        </a>
+        <a href="{% url 'inicio' %}" style="background-color: white; color: var(--verde-principal); padding: 12px 24px; border-radius: var(--radio-md); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border: 2px solid var(--gris-medio);">
+            <i class="fas fa-home"></i> Inicio
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Calendario de eventos por mes -->
+{% if eventos_por_mes and eventos %}
+<div style="margin-top: var(--espacio-xl);">
+    <h3 style="color: var(--verde-oscuro); margin-bottom: var(--espacio-lg); text-align: center; font-size: 1.8rem;">
+        <span style="font-size: 1.5rem; margin-right: 10px;">📆</span>
+        Eventos por Mes
+    </h3>
+    
+    {% for mes, eventos_mes in eventos_por_mes.items %}
+    <div style="background-color: white; border-radius: var(--radio-md); margin-bottom: var(--espacio-lg); box-shadow: var(--sombra-suave); overflow: hidden; border: 1px solid var(--verde-claro);">
+        <div style="background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal)); color: white; padding: var(--espacio-sm) var(--espacio-md);">
+            <h4 style="margin: 0; font-size: 1.3rem;">{{ mes }}</h4>
+        </div>
+        
+        <div style="padding: var(--espacio-md);">
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--espacio-md);">
+                {% for evento_mes in eventos_mes %}
+                <div style="display: flex; gap: var(--espacio-sm); padding: var(--espacio-sm); background-color: var(--gris-claro); border-radius: var(--radio-sm);">
+                    <div style="flex-shrink: 0; text-align: center; min-width: 70px;">
+                        <div style="background-color: var(--verde-principal); color: white; padding: 8px; border-radius: var(--radio-sm);">
+                            <div style="font-size: 1.2rem; font-weight: bold;">{{ evento_mes.fecha|date:"d" }}</div>
+                            <div style="font-size: 0.85rem;">{{ evento_mes.fecha|date:"M" }}</div>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--gris-medio); margin-top: 5px;">
+                            {{ evento_mes.fecha|date:"H:i" }}
+                        </div>
+                    </div>
+                    
+                    <div style="flex-grow: 1;">
+                        <h5 style="color: var(--verde-oscuro); margin-bottom: 5px; font-size: 1rem;">{{ evento_mes.titulo }}</h5>
+                        <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 5px;">
+                            <i class="fas fa-map-marker-alt" style="color: var(--gris-medio); font-size: 0.8rem;"></i>
+                            <span style="font-size: 0.85rem; color: var(--gris-medio);">{{ evento_mes.ubicacion }}</span>
+                        </div>
+                        <div style="display: inline-block; background-color: rgba(46, 139, 87, 0.1); color: var(--verde-principal); padding: 3px 8px; border-radius: 12px; font-size: 0.75rem;">
+                            {{ evento_mes.get_categoria_display }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Botón para sugerir eventos -->
+{% if user.is_authenticated %}
+<div style="text-align: center; margin-top: var(--espacio-xl); padding-top: var(--espacio-xl); border-top: 1px solid var(--gris-claro);">
+    <h4 style="color: var(--verde-oscuro); margin-bottom: var(--espacio-sm);">¿Tienes ideas para eventos?</h4>
+    <p style="color: var(--gris-medio); margin-bottom: var(--espacio-md); max-width: 600px; margin-left: auto; margin-right: auto;">
+        Nos encanta escuchar a nuestra comunidad. Si tienes sugerencias para talleres, presentaciones o actividades, 
+        ¡háznoslo saber!
+    </p>
+    <button onclick="sugerirEvento()" style="background-color: var(--dorado); color: var(--verde-oscuro); border: none; padding: 12px 24px; border-radius: var(--radio-md); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+        <i class="fas fa-lightbulb"></i> Sugerir un Evento
+    </button>
+</div>
+{% endif %}
+
+<script>
+// Funciones para eventos
+function verDetallesEvento(eventoIndex) {
+    const modalContent = document.getElementById(`modal-evento-${eventoIndex}`).innerHTML;
+    const modal = document.getElementById('modalEvento');
+    
+    // Insertar contenido en el modal
+    const modalEvento = modal.querySelector('.modal-evento');
+    modalEvento.innerHTML = modalContent;
+    
+    // Añadir botón de cerrar
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'btn-cerrar-modal';
+    closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+    closeBtn.onclick = cerrarModal;
+    
+    const header = modalEvento.querySelector('.modal-header');
+    header.appendChild(closeBtn);
+    
+    // Añadir botones de acción
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'modal-acciones';
+    actionsDiv.innerHTML = `
+        <button class="btn btn-primary btn-lg" onclick="compartirEvento()">
+            <i class="fas fa-share-alt"></i> Compartir
+        </button>
+        <button class="btn btn-secondary btn-lg" onclick="cerrarModal()">
+            <i class="fas fa-times"></i> Cerrar
+        </button>
+    `;
+    
+    modalEvento.appendChild(actionsDiv);
+    
+    // Mostrar modal
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function reservarEvento(eventoId) {
+    if (!{% if user.is_authenticated %}true{% else %}false{% endif %}) {
+        alert('Debes iniciar sesión para reservar en eventos.');
+        window.location.href = "{% url 'login_selector' %}";
+        return;
+    }
+    
+    const confirmar = confirm('¿Deseas reservar tu lugar en este evento?');
+    if (confirmar) {
+        // Aquí iría la lógica para reservar el evento
+        alert('¡Reserva realizada! Recibirás un correo con los detalles.');
+        // En producción, harías una petición AJAX al backend
+    }
+}
+
+function compartirEvento() {
+    const modal = document.getElementById('modalEvento');
+    const titulo = modal.querySelector('.modal-titulo').textContent;
+    const fecha = modal.querySelector('.modal-fecha span').textContent;
+    
+    const textoCompartir = `¡Te invito al evento "${titulo}" en Librería AJMG!\n📅 ${fecha}\n\nMás información en nuestra página web.`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: titulo,
+            text: textoCompartir,
+            url: window.location.href
+        });
+    } else {
+        navigator.clipboard.writeText(textoCompartir).then(() => {
+            alert('Enlace copiado al portapapeles. ¡Compártelo con tus amigos!');
+        });
+    }
+}
+
+function sugerirEvento() {
+    if (!{% if user.is_authenticated %}true{% else %}false{% endif %}) {
+        alert('Debes iniciar sesión para sugerir eventos.');
+        return;
+    }
+    
+    const sugerencia = prompt('¿Qué tipo de evento te gustaría ver en nuestra librería? (talleres, presentaciones, clubes de lectura, etc.)');
+    if (sugerencia) {
+        alert('¡Gracias por tu sugerencia! La tendremos en cuenta para futuros eventos.');
+        // En producción, enviarías esto al backend
+    }
+}
+
+// Filtro por estado (próximos/pasados)
+document.addEventListener('DOMContentLoaded', function() {
+    // Actualizar contadores
+    const eventosCards = document.querySelectorAll('.evento-card');
+    let proximos = 0;
+    let pasados = 0;
+    
+    eventosCards.forEach(card => {
+        const fechaEvento = new Date(card.getAttribute('data-fecha'));
+        const ahora = new Date("{{ now|date:'c' }}");
+        
+        if (fechaEvento > ahora) {
+            proximos++;
+        } else {
+            pasados++;
+        }
+    });
+    
+    // Si hay filtro en la URL, aplicar filtro automático
+    const urlParams = new URLSearchParams(window.location.search);
+    const filtro = urlParams.get('filtro');
+    
+    if (filtro) {
+        aplicarFiltro(filtro);
+    }
+});
+
+function aplicarFiltro(tipo) {
+    const eventosCards = document.querySelectorAll('.evento-card');
+    const ahora = new Date("{{ now|date:'c' }}");
+    
+    eventosCards.forEach(card => {
+        const fechaEvento = new Date(card.getAttribute('data-fecha'));
+        
+        switch(tipo) {
+            case 'proximos':
+                card.style.display = fechaEvento > ahora ? 'block' : 'none';
+                break;
+            case 'pasados':
+                card.style.display = fechaEvento <= ahora ? 'block' : 'none';
+                break;
+            case 'todos':
+                card.style.display = 'block';
+                break;
+        }
+    });
+}
+
+// Estilos adicionales
+const eventosStyle = document.createElement('style');
+eventosStyle.textContent = `
+    .eventos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: var(--espacio-lg);
+        padding: var(--espacio-md) 0;
+    }
+    
+    .evento-card {
+        background: var(--blanco);
+        border-radius: var(--radio-lg);
+        overflow: hidden;
+        box-shadow: var(--sombra-mediana);
+        transition: var(--transicion-media);
+        border: 1px solid var(--verde-claro);
+        position: relative;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .evento-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--sombra-fuerte);
+        border-color: var(--verde-principal);
+    }
+    
+    .evento-imagen-container {
+        height: 220px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .evento-imagen {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: var(--transicion-lenta);
+    }
+    
+    .evento-card:hover .evento-imagen {
+        transform: scale(1.08);
+    }
+    
+    .evento-fecha-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(5px);
+        color: var(--verde-oscuro);
+        padding: 10px 15px;
+        border-radius: var(--radio-md);
+        font-weight: 700;
+        text-align: center;
+        min-width: 60px;
+        box-shadow: var(--sombra-suave);
+        z-index: 2;
+    }
+    
+    .evento-categoria-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: var(--verde-principal);
+        color: var(--blanco);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        z-index: 2;
+    }
+    
+    .evento-contenido {
+        padding: var(--espacio-md);
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .evento-titulo {
+        font-size: 1.4rem;
+        margin-bottom: var(--espacio-xs);
+        color: var(--verde-oscuro);
+        line-height: 1.3;
+    }
+    
+    .evento-descripcion {
+        color: var(--gris-medio);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: var(--espacio-sm);
+        flex-grow: 1;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .evento-detalles {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--espacio-sm);
+        margin-bottom: var(--espacio-md);
+        padding: var(--espacio-sm) 0;
+        border-top: 1px solid var(--gris-claro);
+        border-bottom: 1px solid var(--gris-claro);
+    }
+    
+    .evento-detalle-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.9rem;
+    }
+    
+    .evento-detalle-item i {
+        color: var(--verde-principal);
+        width: 20px;
+        text-align: center;
+    }
+    
+    .evento-acciones {
+        display: flex;
+        gap: var(--espacio-sm);
+        margin-top: auto;
+    }
+    
+    .btn-ver-detalles {
+        flex: 1;
+        background: var(--verde-principal);
+        color: var(--blanco);
+        border: none;
+        padding: 12px;
+        border-radius: var(--radio-md);
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transicion-media);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .btn-ver-detalles:hover {
+        background: var(--verde-oscuro);
+        transform: translateY(-2px);
+        box-shadow: var(--sombra-suave);
+    }
+    
+    .btn-reservar {
+        background: var(--dorado);
+        color: var(--verde-oscuro);
+        border: none;
+        padding: 12px 20px;
+        border-radius: var(--radio-md);
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transicion-media);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .btn-reservar:hover {
+        background: #c69500;
+        transform: translateY(-2px);
+        box-shadow: var(--sombra-suave);
+    }
+    
+    @media (max-width: 1200px) {
+        .eventos-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .eventos-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .evento-detalles {
+            grid-template-columns: 1fr;
+        }
+        
+        .evento-acciones {
+            flex-direction: column;
+        }
+    }
+    
+    a:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--sombra-suave);
+        transition: var(--transicion-media);
+    }
+    
+    button:hover {
+        transform: translateY(-2px);
+        transition: var(--transicion-media);
+    }
+`;
+document.head.appendChild(eventosStyle);
+</script>
+{% endblock %}

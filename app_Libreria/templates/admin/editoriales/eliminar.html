@@ -1,0 +1,605 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h3>Eliminar Editorial</h3>
+        </div>
+        <div class="card-body">
+            <div class="warning-box">
+                <h4>⚠️ ¿Estás seguro de que quieres eliminar la editorial?</h4>
+                <div class="editorial-details">
+                    <div class="detail-item">
+                        <strong>Nombre:</strong> {{ editorial.nombre }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>País:</strong> {{ editorial.pais }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Email:</strong> {{ editorial.email }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>ID:</strong> #{{ editorial.editorialid }}
+                    </div>
+                </div>
+                
+                <div class="warning-message">
+                    <p>Esta acción <strong class="highlight">NO SE PUEDE DESHACER</strong> y afectará a todos los libros asociados a esta editorial.</p>
+                    <p>Los libros que pertenecen a esta editorial <strong>perderán su referencia</strong> y podrían no mostrarse correctamente.</p>
+                </div>
+            </div>
+            
+            <form method="post" id="deleteForm">
+                {% csrf_token %}
+                <div class="confirmation-prompt">
+                    <p>Para confirmar, escribe <strong>"ELIMINAR"</strong> en el siguiente campo:</p>
+                    <input type="text" class="confirmation-input" id="confirmationInput" placeholder="Escribe ELIMINAR aquí" required>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-danger" id="deleteBtn" disabled>
+                        <span class="btn-text">Sí, eliminar editorial</span>
+                        <span class="btn-icon">🗑️</span>
+                    </button>
+                    <a href="{% url 'admin_editoriales' %}" class="btn btn-secondary">
+                        <span class="btn-text">Cancelar</span>
+                        <span class="btn-icon">↩️</span>
+                    </a>
+                </div>
+            </form>
+        </div>
+        
+        <div class="card-footer">
+            <div class="additional-info">
+                <div class="info-box">
+                    <strong>📋 Recomendación:</strong>
+                    <p>Considera editar la editorial en lugar de eliminarla, o asigna los libros a otra editorial primero.</p>
+                    <a href="{% url 'editar_editorial' editorial.editorialid %}" class="btn btn-outline">✏️ Editar en lugar de eliminar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos específicos para la página de eliminar editorial */
+.container {
+    width: 90%;
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+/* Tarjeta */
+.card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin-bottom: 30px;
+    border: 1px solid #e9ecef;
+    animation: slideIn 0.4s ease-out;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+    color: white;
+    padding: 25px 30px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 1.6rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-header h3::before {
+    content: "🗑️";
+}
+
+.card-body {
+    padding: 30px;
+}
+
+.card-footer {
+    background: #f8f9fa;
+    padding: 25px 30px;
+    border-top: 1px solid #e9ecef;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Caja de advertencia */
+.warning-box {
+    background: #fff9e6;
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 30px;
+    animation: pulse 2s infinite;
+}
+
+.warning-box h4 {
+    color: #856404;
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+@keyframes pulse {
+    0% { border-color: #ffc107; }
+    50% { border-color: #ffca2c; }
+    100% { border-color: #ffc107; }
+}
+
+/* Detalles de la editorial */
+.editorial-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+    background: white;
+    padding: 20px;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.detail-item strong {
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.detail-item span {
+    color: #2e8b57;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+/* Mensaje de advertencia */
+.warning-message {
+    background: #fff5f5;
+    border-left: 4px solid #dc3545;
+    padding: 15px 20px;
+    border-radius: 0 5px 5px 0;
+}
+
+.warning-message p {
+    margin: 10px 0;
+    color: #721c24;
+    line-height: 1.5;
+}
+
+.highlight {
+    color: #dc3545;
+    font-weight: 700;
+    text-transform: uppercase;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Confirmación */
+.confirmation-prompt {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 25px 0;
+}
+
+.confirmation-prompt p {
+    margin-bottom: 15px;
+    color: #495057;
+    font-size: 0.95rem;
+}
+
+.confirmation-prompt strong {
+    color: #dc3545;
+    background: #fff5f5;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.confirmation-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: monospace;
+    text-transform: uppercase;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.confirmation-input:focus {
+    outline: none;
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+.confirmation-input.error {
+    border-color: #dc3545;
+    background: #fff5f5;
+    animation: shake 0.5s;
+}
+
+.confirmation-input.success {
+    border-color: #28a745;
+    background: #f8fff9;
+}
+
+/* Botones */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 14px 28px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+    min-width: 200px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #c82333 0%, #dc3545 100%);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+}
+
+.btn-danger:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #868e96 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #6c757d 100%);
+}
+
+.btn-outline {
+    background: transparent;
+    color: #2e8b57;
+    border-color: #2e8b57;
+}
+
+.btn-outline:hover {
+    background: #2e8b57;
+    color: white;
+}
+
+.btn-text {
+    font-weight: 500;
+}
+
+.btn-icon {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Información adicional */
+.additional-info {
+    margin-top: 20px;
+}
+
+.info-box {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.info-box strong {
+    color: #495057;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.info-box p {
+    color: #6c757d;
+    margin: 10px 0 15px 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Efectos de shake para errores */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* Efecto de carga */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-top: -10px;
+    margin-left: -10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .card-header,
+    .card-body,
+    .card-footer {
+        padding: 20px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .editorial-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .warning-box {
+        padding: 20px;
+    }
+    
+    .warning-box h4 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-header h3 {
+        font-size: 1.4rem;
+    }
+    
+    .btn {
+        padding: 12px 20px;
+        font-size: 0.95rem;
+    }
+    
+    .confirmation-prompt {
+        padding: 15px;
+    }
+    
+    .confirmation-input {
+        padding: 10px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('deleteForm');
+    const confirmationInput = document.getElementById('confirmationInput');
+    const deleteBtn = document.getElementById('deleteBtn');
+    const requiredText = 'ELIMINAR';
+    
+    // Validar confirmación en tiempo real
+    confirmationInput.addEventListener('input', function() {
+        const inputValue = this.value.trim().toUpperCase();
+        
+        if (inputValue === requiredText) {
+            this.classList.remove('error');
+            this.classList.add('success');
+            deleteBtn.disabled = false;
+        } else {
+            this.classList.remove('success');
+            this.classList.add('error');
+            deleteBtn.disabled = true;
+        }
+    });
+    
+    // Validación final al enviar
+    form.addEventListener('submit', function(e) {
+        const inputValue = confirmationInput.value.trim().toUpperCase();
+        
+        if (inputValue !== requiredText) {
+            e.preventDefault();
+            
+            // Mostrar error
+            confirmationInput.classList.add('error');
+            confirmationInput.focus();
+            
+            // Crear mensaje de error
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'error-message';
+            errorMsg.style.cssText = `
+                background: #fff5f5;
+                color: #721c24;
+                padding: 10px 15px;
+                border-radius: 5px;
+                margin-top: 10px;
+                border-left: 4px solid #dc3545;
+                animation: slideIn 0.3s ease-out;
+            `;
+            errorMsg.innerHTML = `
+                <strong>Error de confirmación:</strong> 
+                Debes escribir exactamente <strong>"${requiredText}"</strong> para poder eliminar.
+            `;
+            
+            // Remover mensajes anteriores
+            const existingError = form.querySelector('.error-message');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            form.insertBefore(errorMsg, form.querySelector('.form-actions'));
+            
+            return false;
+        }
+        
+        // Confirmación final
+        if (!confirm('⚠️ ADVERTENCIA FINAL\n\n¿Estás absolutamente seguro de que quieres eliminar esta editorial?\n\n✅ Todos los libros asociados perderán su referencia\n✅ Esta acción NO se puede deshacer\n✅ Los datos serán eliminados permanentemente')) {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Mostrar estado de carga
+        deleteBtn.classList.add('btn-loading');
+        deleteBtn.disabled = true;
+        deleteBtn.querySelector('.btn-text').textContent = 'Eliminando...';
+        
+        // Cambiar color del botón durante el proceso
+        setTimeout(() => {
+            deleteBtn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+            deleteBtn.querySelector('.btn-text').textContent = '¡Eliminado!';
+            deleteBtn.querySelector('.btn-icon').textContent = '✅';
+        }, 1000);
+    });
+    
+    // Prevenir teclas no deseadas
+    confirmationInput.addEventListener('keydown', function(e) {
+        // Permitir solo letras, backspace, delete, tab, flechas
+        if (!/[a-zA-Z]|Backspace|Delete|Tab|ArrowLeft|ArrowRight|ArrowUp|ArrowDown/.test(e.key)) {
+            e.preventDefault();
+        }
+    });
+    
+    // Convertir automáticamente a mayúsculas
+    confirmationInput.addEventListener('input', function() {
+        this.value = this.value.toUpperCase();
+    });
+    
+    // Contador de intentos
+    let attempts = 0;
+    const originalSubmit = form.onsubmit;
+    
+    form.onsubmit = function(e) {
+        if (confirmationInput.value.trim().toUpperCase() === requiredText) {
+            attempts++;
+            
+            // Después de 3 intentos, mostrar mensaje especial
+            if (attempts >= 3) {
+                if (!confirm(`⚠️ Has intentado eliminar ${attempts} veces.\n\n¿Estás realmente seguro?\n\nConsidera que puedes:\n1. Editar la editorial\n2. Contactar al administrador\n3. Revisar los libros asociados`)) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+            
+            // Mostrar cuenta regresiva
+            if (attempts >= 2) {
+                const countdown = 3;
+                const originalText = deleteBtn.querySelector('.btn-text').textContent;
+                
+                for (let i = countdown; i > 0; i--) {
+                    setTimeout(() => {
+                        deleteBtn.querySelector('.btn-text').textContent = `Eliminando en ${i}...`;
+                    }, (countdown - i) * 1000);
+                }
+                
+                setTimeout(() => {
+                    deleteBtn.querySelector('.btn-text').textContent = originalText;
+                }, countdown * 1000);
+            }
+        }
+    };
+    
+    // Bloquear clic derecho en la página
+    document.addEventListener('contextmenu', function(e) {
+        if (e.target.closest('.card')) {
+            e.preventDefault();
+            alert('⚠️ Acción de eliminación en progreso. No se permiten acciones secundarias.');
+        }
+    });
+    
+    // Bloquear atajos de teclado peligrosos
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+Z (deshacer) y Ctrl+Y (rehacer)
+        if ((e.ctrlKey && e.key === 'z') || (e.ctrlKey && e.key === 'y')) {
+            e.preventDefault();
+            alert('⚠️ Esta acción no se puede deshacer. Por favor, verifica cuidadosamente antes de eliminar.');
+        }
+        
+        // Escape para cancelar
+        if (e.key === 'Escape' && confirmationInput.value) {
+            if (confirm('¿Cancelar la eliminación?')) {
+                window.location.href = "{% url 'admin_editoriales' %}";
+            }
+        }
+    });
+    
+    // Inicializar
+    confirmationInput.focus();
+});
+</script>
+{% endblock %}

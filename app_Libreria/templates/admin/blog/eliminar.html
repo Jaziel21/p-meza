@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Entrada - Librería AJMG{% endblock %}
+
+{% block content %}
+<style>
+    .confirmacion-container {
+        max-width: 600px;
+        margin: var(--espacio-xl) auto;
+        padding: 0 var(--espacio-sm);
+    }
+    
+    .confirmacion-card {
+        background-color: white;
+        border-radius: var(--radio-lg);
+        overflow: hidden;
+        box-shadow: var(--sombra-fuerte);
+    }
+    
+    .confirmacion-header {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: white;
+        padding: var(--espacio-md);
+        text-align: center;
+    }
+    
+    .confirmacion-body {
+        padding: var(--espacio-lg);
+    }
+    
+    .advertencia-box {
+        background-color: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: var(--espacio-md);
+        border-radius: var(--radio-md);
+        margin-bottom: var(--espacio-lg);
+    }
+    
+    .btn-danger-custom {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: var(--radio-md);
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transicion-media);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        font-size: 1rem;
+    }
+    
+    .btn-secondary-custom {
+        background-color: var(--gris-medio);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: var(--radio-md);
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transicion-media);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        font-size: 1rem;
+    }
+    
+    .btn-danger-custom:hover {
+        background: linear-gradient(135deg, #c82333, #dc3545);
+        transform: translateY(-2px);
+        box-shadow: var(--sombra-mediana);
+    }
+    
+    .btn-secondary-custom:hover {
+        background-color: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: var(--sombra-suave);
+    }
+    
+    .detalles-entrada {
+        background-color: var(--gris-claro);
+        padding: var(--espacio-md);
+        border-radius: var(--radio-md);
+        margin-bottom: var(--espacio-md);
+    }
+    
+    .detalle-item {
+        display: flex;
+        margin-bottom: var(--espacio-xs);
+    }
+    
+    .detalle-label {
+        font-weight: 600;
+        color: var(--verde-oscuro);
+        min-width: 100px;
+    }
+    
+    .detalle-value {
+        color: var(--gris-medio);
+    }
+    
+    .acciones-container {
+        display: flex;
+        gap: var(--espacio-sm);
+        margin-top: var(--espacio-lg);
+    }
+    
+    @media (max-width: 768px) {
+        .acciones-container {
+            flex-direction: column;
+        }
+        
+        .btn-danger-custom, .btn-secondary-custom {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="confirmacion-container">
+    <div class="confirmacion-card">
+        <div class="confirmacion-header">
+            <h2 style="margin: 0; font-size: 1.5rem;">
+                <i class="fas fa-exclamation-triangle"></i> Eliminar Entrada del Blog
+            </h2>
+        </div>
+        
+        <div class="confirmacion-body">
+            <!-- Advertencia -->
+            <div class="advertencia-box">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: var(--espacio-sm);">
+                    <div style="font-size: 1.5rem; color: #856404;">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <h3 style="margin: 0; color: #856404; font-size: 1.3rem;">
+                        ¡Atención! Esta acción es permanente
+                    </h3>
+                </div>
+                <p style="margin: 0; color: #856404; line-height: 1.6;">
+                    Estás a punto de eliminar permanentemente esta entrada del blog. 
+                    Una vez eliminada, no podrás recuperarla.
+                </p>
+            </div>
+            
+            <!-- Detalles de la entrada -->
+            <div class="detalles-entrada">
+                <h4 style="color: var(--verde-oscuro); margin-bottom: var(--espacio-md); border-bottom: 2px solid var(--verde-claro); padding-bottom: var(--espacio-xs);">
+                    <i class="fas fa-info-circle"></i> Detalles de la entrada
+                </h4>
+                
+                <div class="detalle-item">
+                    <span class="detalle-label">Título:</span>
+                    <span class="detalle-value">{{ entrada.titulo }}</span>
+                </div>
+                
+                <div class="detalle-item">
+                    <span class="detalle-label">Autor:</span>
+                    <span class="detalle-value">{{ entrada.autor.username }}</span>
+                </div>
+                
+                <div class="detalle-item">
+                    <span class="detalle-label">Categoría:</span>
+                    <span class="detalle-value">{{ entrada.get_categoria_display }}</span>
+                </div>
+                
+                <div class="detalle-item">
+                    <span class="detalle-label">Fecha:</span>
+                    <span class="detalle-value">{{ entrada.fechapublicacion|date:"d M Y H:i" }}</span>
+                </div>
+                
+                {% if entrada.imagen %}
+                <div class="detalle-item">
+                    <span class="detalle-label">Imagen:</span>
+                    <span class="detalle-value">Sí</span>
+                </div>
+                {% endif %}
+                
+                <div style="margin-top: var(--espacio-md); padding-top: var(--espacio-sm); border-top: 1px dashed var(--gris-medio);">
+                    <div class="detalle-item">
+                        <span class="detalle-label">Contenido:</span>
+                        <span class="detalle-value">{{ entrada.contenido|truncatechars:100 }}...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Consecuencias -->
+            <div style="background-color: #f8d7da; color: #721c24; padding: var(--espacio-md); border-radius: var(--radio-md); margin-bottom: var(--espacio-lg); border-left: 4px solid #dc3545;">
+                <div style="display: flex; align-items: flex-start; gap: 10px;">
+                    <div style="color: #dc3545; font-size: 1.2rem;">
+                        <i class="fas fa-ban"></i>
+                    </div>
+                    <div>
+                        <h4 style="margin: 0 0 5px 0; color: #721c24;">Consecuencias de esta acción:</h4>
+                        <ul style="margin: 0; padding-left: 20px;">
+                            <li>La entrada será eliminada permanentemente de la base de datos</li>
+                            <li>Los lectores no podrán acceder más a esta entrada</li>
+                            <li>Los enlaces a esta entrada dejarán de funcionar</li>
+                            <li>La imagen asociada será eliminada del servidor</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formulario de confirmación -->
+            <form method="post" id="formEliminar">
+                {% csrf_token %}
+                
+                <div class="acciones-container">
+                    <button type="submit" class="btn-danger-custom" onclick="return confirmarEliminacion()">
+                        <i class="fas fa-trash-alt"></i> Sí, eliminar entrada
+                    </button>
+                    
+                    <a href="{% url 'admin_blog' %}" class="btn-secondary-custom">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+                
+                <!-- Checkbox de confirmación adicional -->
+                <div style="margin-top: var(--espacio-md); padding: var(--espacio-sm); background-color: var(--gris-claro); border-radius: var(--radio-md);">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="confirmCheckbox" 
+                               style="width: 20px; height: 20px; accent-color: #dc3545; cursor: pointer;">
+                        <span style="color: var(--gris-oscuro);">
+                            Confirmo que he leído las consecuencias y deseo proceder con la eliminación
+                        </span>
+                    </label>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Confirmación de eliminación
+function confirmarEliminacion() {
+    const checkbox = document.getElementById('confirmCheckbox');
+    
+    if (!checkbox.checked) {
+        alert('Debes marcar la casilla de confirmación para proceder con la eliminación.');
+        return false;
+    }
+    
+    const confirmacion = confirm('¿ESTÁS ABSOLUTAMENTE SEGURO/A de eliminar esta entrada?\n\nEsta acción NO se puede deshacer.');
+    return confirmacion;
+}
+
+// Deshabilitar botón de eliminar hasta que se marque el checkbox
+document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('confirmCheckbox');
+    const btnEliminar = document.querySelector('.btn-danger-custom');
+    
+    // Inicialmente deshabilitado
+    btnEliminar.style.opacity = '0.5';
+    btnEliminar.style.cursor = 'not-allowed';
+    btnEliminar.disabled = true;
+    
+    checkbox.addEventListener('change', function() {
+        if (this.checked) {
+            btnEliminar.style.opacity = '1';
+            btnEliminar.style.cursor = 'pointer';
+            btnEliminar.disabled = false;
+        } else {
+            btnEliminar.style.opacity = '0.5';
+            btnEliminar.style.cursor = 'not-allowed';
+            btnEliminar.disabled = true;
+        }
+    });
+    
+    // Efecto hover en la tarjeta
+    const card = document.querySelector('.confirmacion-card');
+    card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-5px)';
+        this.style.transition = 'transform 0.3s ease';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+    });
+    
+    // Animación de entrada
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    
+    setTimeout(() => {
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+    }, 100);
+});
+
+// Prevenir envío accidental con tecla Enter
+document.getElementById('formEliminar').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        alert('Presiona el botón para confirmar la eliminación.');
+    }
+});
+</script>
+{% endblock %}

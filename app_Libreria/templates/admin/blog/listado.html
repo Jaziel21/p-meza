@@ -1,0 +1,751 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestión del Blog - Librería AJMG{% endblock %}
+
+{% block content %}
+<style>
+    /* ============================================
+       ESTILOS ESPECÍFICOS - LISTADO DE BLOG
+       ============================================ */
+    .listado-container {
+        max-width: 1400px;
+        margin: var(--espacio-xl) auto;
+        padding: 0 var(--espacio-sm);
+    }
+    
+    /* Header principal */
+    .listado-header {
+        background-color: white;
+        padding: var(--espacio-lg);
+        border-radius: var(--radio-lg);
+        margin-bottom: var(--espacio-lg);
+        box-shadow: var(--sombra-mediana);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--espacio-md);
+    }
+    
+    .titulo-principal {
+        color: var(--verde-oscuro);
+        margin: 0;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: var(--espacio-sm);
+    }
+    
+    .titulo-principal i {
+        color: var(--verde-claro);
+    }
+    
+    /* Botón principal */
+    .btn-principal {
+        background: linear-gradient(135deg, var(--verde-claro), var(--verde-oscuro));
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: var(--radio-md);
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transicion-media);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        font-size: 1rem;
+    }
+    
+    .btn-principal:hover {
+        background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-claro));
+        transform: translateY(-2px);
+        box-shadow: var(--sombra-mediana);
+    }
+    
+    /* Mensajes del sistema */
+    .mensajes-container {
+        margin-bottom: var(--espacio-lg);
+    }
+    
+    .mensaje-alerta {
+        padding: var(--espacio-md);
+        border-radius: var(--radio-md);
+        margin-bottom: var(--espacio-sm);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        animation: slideInMensaje 0.3s ease-out;
+    }
+    
+    @keyframes slideInMensaje {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .mensaje-success {
+        background-color: #d4edda;
+        color: #155724;
+        border-left: 4px solid #c3e6cb;
+    }
+    
+    .mensaje-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border-left: 4px solid #f5c6cb;
+    }
+    
+    .mensaje-warning {
+        background-color: #fff3cd;
+        color: #856404;
+        border-left: 4px solid #ffeaa7;
+    }
+    
+    .mensaje-info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border-left: 4px solid #bee5eb;
+    }
+    
+    .btn-cerrar-mensaje {
+        background: none;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: var(--transicion-rapida);
+    }
+    
+    .btn-cerrar-mensaje:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Tarjeta de contenido principal */
+    .contenido-card {
+        background-color: white;
+        border-radius: var(--radio-lg);
+        overflow: hidden;
+        box-shadow: var(--sombra-fuerte);
+        margin-bottom: var(--espacio-lg);
+    }
+    
+    /* Tabla de entradas */
+    .tabla-contenedor {
+        overflow-x: auto;
+        border-radius: var(--radio-md);
+    }
+    
+    .tabla-entradas {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        min-width: 1000px;
+    }
+    
+    .tabla-header {
+        background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-claro));
+    }
+    
+    .tabla-header th {
+        color: white;
+        font-weight: 600;
+        text-align: left;
+        padding: var(--espacio-md);
+        border: none;
+        position: relative;
+        white-space: nowrap;
+    }
+    
+    .tabla-header th:first-child {
+        border-top-left-radius: var(--radio-md);
+    }
+    
+    .tabla-header th:last-child {
+        border-top-right-radius: var(--radio-md);
+    }
+    
+    .tabla-body tr {
+        transition: var(--transicion-rapida);
+        border-bottom: 1px solid var(--gris-claro);
+    }
+    
+    .tabla-body tr:last-child {
+        border-bottom: none;
+    }
+    
+    .tabla-body tr:hover {
+        background-color: rgba(46, 125, 50, 0.05);
+    }
+    
+    .tabla-body td {
+        padding: var(--espacio-md);
+        color: var(--gris-oscuro);
+        vertical-align: middle;
+    }
+    
+    /* Columnas específicas */
+    .col-id {
+        font-weight: 600;
+        color: var(--verde-oscuro);
+        font-family: monospace;
+    }
+    
+    .col-titulo {
+        max-width: 300px;
+    }
+    
+    .titulo-entrada {
+        font-weight: 600;
+        color: var(--verde-oscuro);
+        margin-bottom: 4px;
+        display: block;
+    }
+    
+    .resumen-entrada {
+        font-size: 0.875rem;
+        color: var(--gris-medio);
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .col-autor {
+        color: var(--gris-oscuro);
+    }
+    
+    .col-categoria .badge {
+        background: linear-gradient(135deg, #17a2b8, #138496);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+    
+    .col-fecha {
+        color: var(--gris-medio);
+        font-size: 0.875rem;
+        white-space: nowrap;
+    }
+    
+    .col-estado .badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+    
+    .badge-activo {
+        background: linear-gradient(135deg, #28a745, #218838);
+        color: white;
+    }
+    
+    .badge-inactivo {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: white;
+    }
+    
+    /* Acciones */
+    .col-acciones {
+        white-space: nowrap;
+    }
+    
+    .grupo-acciones {
+        display: flex;
+        gap: var(--espacio-xs);
+    }
+    
+    .btn-accion {
+        padding: 6px 12px;
+        border-radius: var(--radio-sm);
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transicion-rapida);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        border: 1px solid transparent;
+    }
+    
+    .btn-editar {
+        background-color: white;
+        color: #ffc107;
+        border-color: #ffc107;
+    }
+    
+    .btn-editar:hover {
+        background-color: #ffc107;
+        color: white;
+        transform: translateY(-1px);
+    }
+    
+    .btn-eliminar {
+        background-color: white;
+        color: #dc3545;
+        border-color: #dc3545;
+    }
+    
+    .btn-eliminar:hover {
+        background-color: #dc3545;
+        color: white;
+        transform: translateY(-1px);
+    }
+    
+    /* Estado vacío */
+    .estado-vacio {
+        text-align: center;
+        padding: var(--espacio-xl) var(--espacio-lg);
+        background-color: var(--gris-claro);
+        border-radius: var(--radio-md);
+    }
+    
+    .icono-vacio {
+        font-size: 3rem;
+        color: var(--gris-medio);
+        margin-bottom: var(--espacio-md);
+    }
+    
+    .estado-vacio h5 {
+        color: var(--gris-oscuro);
+        margin-bottom: var(--espacio-sm);
+    }
+    
+    .estado-vacio p {
+        color: var(--gris-medio);
+        margin-bottom: var(--espacio-lg);
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    /* Estadísticas */
+    .estadisticas-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--espacio-md);
+        margin-top: var(--espacio-lg);
+        padding: var(--espacio-lg);
+        background-color: var(--gris-claro);
+        border-radius: var(--radio-md);
+    }
+    
+    .estadistica-card {
+        background-color: white;
+        padding: var(--espacio-md);
+        border-radius: var(--radio-md);
+        text-align: center;
+        box-shadow: var(--sombra-suave);
+        transition: var(--transicion-media);
+    }
+    
+    .estadistica-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--sombra-mediana);
+    }
+    
+    .estadistica-valor {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--verde-oscuro);
+        margin-bottom: var(--espacio-xs);
+        line-height: 1;
+    }
+    
+    .estadistica-label {
+        color: var(--gris-medio);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .estadistica-total {
+        border-top: 3px solid var(--verde-oscuro);
+    }
+    
+    .estadistica-activas {
+        border-top: 3px solid #28a745;
+    }
+    
+    .estadistica-categorias {
+        border-top: 3px solid #17a2b8;
+    }
+    
+    .estadistica-recientes {
+        border-top: 3px solid #ffc107;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .listado-header {
+            flex-direction: column;
+            text-align: center;
+            gap: var(--espacio-sm);
+        }
+        
+        .grupo-acciones {
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .btn-accion {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .estadisticas-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .titulo-principal {
+            font-size: 1.5rem;
+        }
+        
+        .btn-principal {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+    
+    /* Animaciones de entrada */
+    .contenido-card {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: slideInCard 0.5s ease-out forwards;
+    }
+    
+    @keyframes slideInCard {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .tabla-body tr {
+        opacity: 0;
+        transform: translateX(-10px);
+        animation: slideInRow 0.3s ease-out forwards;
+    }
+    
+    .tabla-body tr:nth-child(1) { animation-delay: 0.1s; }
+    .tabla-body tr:nth-child(2) { animation-delay: 0.2s; }
+    .tabla-body tr:nth-child(3) { animation-delay: 0.3s; }
+    .tabla-body tr:nth-child(4) { animation-delay: 0.4s; }
+    .tabla-body tr:nth-child(5) { animation-delay: 0.5s; }
+    .tabla-body tr:nth-child(6) { animation-delay: 0.6s; }
+    .tabla-body tr:nth-child(7) { animation-delay: 0.7s; }
+    .tabla-body tr:nth-child(8) { animation-delay: 0.8s; }
+    .tabla-body tr:nth-child(9) { animation-delay: 0.9s; }
+    .tabla-body tr:nth-child(10) { animation-delay: 1.0s; }
+    
+    @keyframes slideInRow {
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+</style>
+
+<div class="listado-container">
+    <!-- Header principal -->
+    <div class="listado-header">
+        <h1 class="titulo-principal">
+            <i class="fas fa-blog"></i> Gestión del Blog
+        </h1>
+        <a href="{% url 'agregar_entrada_blog' %}" class="btn-principal">
+            <i class="fas fa-plus"></i> Nueva Entrada
+        </a>
+    </div>
+    
+    <!-- Mensajes del sistema -->
+    {% if messages %}
+    <div class="mensajes-container">
+        {% for message in messages %}
+        <div class="mensaje-alerta mensaje-{{ message.tags }}">
+            <span>{{ message }}</span>
+            <button type="button" class="btn-cerrar-mensaje" onclick="this.parentElement.style.display='none'">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Tarjeta principal con tabla -->
+    <div class="contenido-card">
+        <div class="tabla-contenedor">
+            {% if entradas %}
+            <table class="tabla-entradas">
+                <thead class="tabla-header">
+                    <tr>
+                        <th>ID</th>
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Categoría</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="tabla-body">
+                    {% for entrada in entradas %}
+                    <tr>
+                        <td class="col-id">#{{ entrada.blogid }}</td>
+                        <td class="col-titulo">
+                            <span class="titulo-entrada">{{ entrada.titulo }}</span>
+                            {% if entrada.resumen %}
+                            <span class="resumen-entrada">{{ entrada.resumen|truncatewords:15 }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="col-autor">{{ entrada.autor.username }}</td>
+                        <td class="col-categoria">
+                            <span class="badge">{{ entrada.get_categoria_display|default:"General" }}</span>
+                        </td>
+                        <td class="col-fecha">{{ entrada.fechapublicacion|date:"d M Y" }}</td>
+                        <td class="col-estado">
+                            {% if entrada.activo %}
+                            <span class="badge badge-activo">Activo</span>
+                            {% else %}
+                            <span class="badge badge-inactivo">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td class="col-acciones">
+                            <div class="grupo-acciones">
+                                <a href="{% url 'editar_entrada_blog' entrada.blogid %}" 
+                                   class="btn-accion btn-editar" 
+                                   title="Editar entrada">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <a href="{% url 'eliminar_entrada_blog' entrada.blogid %}" 
+                                   class="btn-accion btn-eliminar" 
+                                   title="Eliminar entrada">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <!-- Estadísticas -->
+            <div class="estadisticas-grid">
+                <div class="estadistica-card estadistica-total">
+                    <div class="estadistica-valor">{{ entradas.count }}</div>
+                    <div class="estadistica-label">Total Entradas</div>
+                </div>
+                
+                <div class="estadistica-card estadistica-activas">
+                    <div class="estadistica-valor">{{ entradas_activas|default:entradas.count }}</div>
+                    <div class="estadistica-label">Activas</div>
+                </div>
+                
+                <div class="estadistica-card estadistica-categorias">
+                    <div class="estadistica-valor">{{ categorias_count|default:"1" }}</div>
+                    <div class="estadistica-label">Categorías</div>
+                </div>
+                
+                <div class="estadistica-card estadistica-recientes">
+                    <div class="estadistica-valor">{{ ultimo_mes|default:"0" }}</div>
+                    <div class="estadistica-label">Último Mes</div>
+                </div>
+            </div>
+            
+            {% else %}
+            <!-- Estado vacío -->
+            <div class="estado-vacio">
+                <div class="icono-vacio">
+                    <i class="fas fa-blog"></i>
+                </div>
+                <h5>No hay entradas en el blog</h5>
+                <p>Comienza creando la primera entrada para compartir contenido con tus lectores.</p>
+                <a href="{% url 'agregar_entrada_blog' %}" class="btn-principal">
+                    <i class="fas fa-plus"></i> Crear Primera Entrada
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================
+// FUNCIONALIDADES DEL LISTADO
+// ============================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar efectos
+    initializeHoverEffects();
+    initializeTableInteractions();
+    initializeAnimations();
+    
+    // Confirmación antes de eliminar
+    initializeDeleteConfirmations();
+});
+
+// ============================================
+// EFECTOS HOVER
+// ============================================
+function initializeHoverEffects() {
+    // Efecto hover en botones de acción
+    const actionButtons = document.querySelectorAll('.btn-accion');
+    actionButtons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+        });
+        
+        button.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Efecto hover en tarjetas de estadísticas
+    const statCards = document.querySelectorAll('.estadistica-card');
+    statCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-3px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+}
+
+// ============================================
+// INTERACCIONES CON LA TABLA
+// ============================================
+function initializeTableInteractions() {
+    // Resaltar fila al pasar el mouse
+    const tableRows = document.querySelectorAll('.tabla-body tr');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = 'rgba(46, 125, 50, 0.08)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+        });
+    });
+    
+    // Hacer clic en la fila (excepto en acciones)
+    tableRows.forEach(row => {
+        row.addEventListener('click', function(e) {
+            // Solo si no se hace clic en un botón de acción
+            if (!e.target.closest('.btn-accion') && !e.target.closest('a')) {
+                const editLink = this.querySelector('.btn-editar');
+                if (editLink) {
+                    editLink.style.transform = 'scale(1.05)';
+                    setTimeout(() => {
+                        editLink.style.transform = '';
+                    }, 200);
+                }
+            }
+        });
+    });
+}
+
+// ============================================
+// ANIMACIONES
+// ============================================
+function initializeAnimations() {
+    // Animar estadísticas al cargar
+    const statValues = document.querySelectorAll('.estadistica-valor');
+    statValues.forEach(value => {
+        const originalText = value.textContent;
+        const number = parseInt(originalText.replace(/\D/g, ''));
+        
+        if (!isNaN(number)) {
+            // Efecto de conteo
+            animateCounter(value, number);
+        }
+    });
+    
+    // Animar entrada de tarjeta principal
+    const mainCard = document.querySelector('.contenido-card');
+    if (mainCard) {
+        mainCard.style.animationDelay = '0.1s';
+    }
+}
+
+function animateCounter(element, finalValue) {
+    let currentValue = 0;
+    const duration = 1000; // 1 segundo
+    const increment = finalValue / (duration / 16); // 60fps
+    
+    const timer = setInterval(() => {
+        currentValue += increment;
+        if (currentValue >= finalValue) {
+            currentValue = finalValue;
+            clearInterval(timer);
+        }
+        element.textContent = Math.round(currentValue);
+    }, 16);
+}
+
+// ============================================
+// CONFIRMACIÓN DE ELIMINACIÓN
+// ============================================
+function initializeDeleteConfirmations() {
+    const deleteButtons = document.querySelectorAll('.btn-eliminar');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            // Obtener título de la entrada
+            const row = this.closest('tr');
+            const titulo = row.querySelector('.titulo-entrada').textContent;
+            const id = row.querySelector('.col-id').textContent;
+            
+            // Mostrar confirmación
+            const confirmacion = confirm(
+                `¿Eliminar entrada del blog?\n\n` +
+                `ID: ${id}\n` +
+                `Título: ${titulo}\n\n` +
+                `Esta acción eliminará permanentemente la entrada.`
+            );
+            
+            if (!confirmacion) {
+                e.preventDefault();
+            }
+        });
+    });
+}
+
+// ============================================
+// BÚSQUEDA Y FILTRADO (PARA IMPLEMENTACIÓN FUTURA)
+// ============================================
+function initializeSearch() {
+    // Esto se puede implementar más adelante
+    console.log('Funcionalidad de búsqueda lista para implementar');
+}
+
+// ============================================
+// ORDENAMIENTO DE TABLA (PARA IMPLEMENTACIÓN FUTURA)
+// ============================================
+function initializeSorting() {
+    // Esto se puede implementar más adelante
+    console.log('Funcionalidad de ordenamiento lista para implementar');
+}
+</script>
+{% endblock %}

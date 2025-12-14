@@ -1,0 +1,739 @@
+<!-- app_Libreria/templates/admin/eventos/listado.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1 class="page-title">Gestión de Eventos</h1>
+        <a href="{% url 'agregar_evento' %}" class="btn btn-primary">
+            <span class="btn-icon">➕</span> Nuevo Evento
+        </a>
+    </div>
+    
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            <span>{{ message }}</span>
+            <button type="button" class="alert-close" onclick="this.parentElement.style.display='none'">×</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="card">
+        <div class="card-content">
+            <!-- Filtros -->
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label for="filtroEventos" class="filter-label">Filtrar por:</label>
+                    <select class="filter-select" id="filtroEventos">
+                        <option value="todos">Todos los eventos</option>
+                        <option value="proximos">Próximos eventos</option>
+                        <option value="pasados">Eventos pasados</option>
+                        <option value="activos">Solo activos</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="ordenEventos" class="filter-label">Ordenar por:</label>
+                    <select class="filter-select" id="ordenEventos">
+                        <option value="fecha_asc">Fecha (ascendente)</option>
+                        <option value="fecha_desc">Fecha (descendente)</option>
+                        <option value="titulo">Título A-Z</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="table-wrapper">
+                <table class="data-table" id="tablaEventos">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Imagen</th>
+                            <th>Título</th>
+                            <th>Fecha y Hora</th>
+                            <th>Ubicación</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for evento in eventos %}
+                        <tr class="table-row fila-evento" 
+                            data-fecha="{{ evento.fecha|date:'Y-m-d H:i' }}"
+                            data-activo="{{ evento.activo }}">
+                            <td class="cell-id"><strong>#{{ evento.eventoid }}</strong></td>
+                            <td class="cell-image">
+                                {% if evento.imagen %}
+                                <img src="{{ evento.imagen.url }}" alt="{{ evento.titulo }}" class="event-image">
+                                {% else %}
+                                <div class="event-image-placeholder">E</div>
+                                {% endif %}
+                            </td>
+                            <td class="cell-title">
+                                <strong>{{ evento.titulo }}</strong>
+                                {% if evento.descripcion %}
+                                <p class="event-description">{{ evento.descripcion|truncatewords:5 }}</p>
+                                {% endif %}
+                            </td>
+                            <td class="cell-date">
+                                <span class="event-date">{{ evento.fecha|date:"d M Y" }}</span>
+                                <br>
+                                <span class="event-time">{{ evento.fecha|time:"H:i" }}</span>
+                            </td>
+                            <td class="cell-location">{{ evento.ubicacion }}</td>
+                            <td class="cell-status">
+                                {% if evento.activo %}
+                                <span class="status-badge status-active">Activo</span>
+                                {% else %}
+                                <span class="status-badge status-inactive">Inactivo</span>
+                                {% endif %}
+                                <br>
+                                <span class="event-timeline">
+                                    {% if evento.fecha|date:'Y-m-d' > hoy %}
+                                    Próximo
+                                    {% else %}
+                                    Pasado
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td class="cell-actions">
+                                <div class="action-buttons">
+                                    <a href="{% url 'editar_evento' evento.eventoid %}" class="btn-action btn-edit" title="Editar">
+                                        <span class="action-icon">✏️</span> Editar
+                                    </a>
+                                    <a href="{% url 'eliminar_evento' evento.eventoid %}" class="btn-action btn-delete" title="Eliminar">
+                                        <span class="action-icon">🗑️</span> Eliminar
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                <div class="empty-content">
+                                    <div class="empty-icon">📅</div>
+                                    <h3>No hay eventos registrados</h3>
+                                    <p>Comienza creando el primer evento.</p>
+                                    <a href="{% url 'agregar_evento' %}" class="btn btn-primary">Crear Primer Evento</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Estadísticas -->
+            {% if eventos %}
+            <div class="stats-container">
+                <div class="stats-grid">
+                    <div class="stat-card stat-primary">
+                        <div class="stat-content">
+                            <h3 class="stat-number">{{ eventos.count }}</h3>
+                            <p class="stat-label">Total Eventos</p>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-success">
+                        <div class="stat-content">
+                            <h3 class="stat-number">{{ eventos_proximos|default:"0" }}</h3>
+                            <p class="stat-label">Próximos</p>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-info">
+                        <div class="stat-content">
+                            <h3 class="stat-number">{{ eventos_activos|default:"0" }}</h3>
+                            <p class="stat-label">Activos</p>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-warning">
+                        <div class="stat-content">
+                            <h3 class="stat-number">{{ eventos_pasados|default:"0" }}</h3>
+                            <p class="stat-label">Pasados</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+/* Variables CSS */
+:root {
+    --verde-principal: #2e8b57;
+    --verde-claro: rgba(46, 139, 87, 0.1);
+    --blanco: #ffffff;
+    --gris-claro: #f8f9fa;
+    --gris-medio: #e9ecef;
+    --gris-oscuro: #343a40;
+    --texto: #212529;
+    --texto-secundario: #6c757d;
+    --primario: #2e8b57;
+    --secundario: #28a745;
+    --peligro: #dc3545;
+    --advertencia: #ffc107;
+    --info: #17a2b8;
+    --sombra: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --sombra-hover: 0 4px 8px rgba(0, 0, 0, 0.15);
+    --radio-borde: 8px;
+}
+
+/* Contenedor principal */
+.admin-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Encabezado */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.page-title {
+    color: var(--verde-principal);
+    font-size: 28px;
+    margin: 0;
+}
+
+/* Botones */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    border-radius: var(--radio-borde);
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--verde-principal);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #247449;
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-hover);
+}
+
+.btn-icon {
+    margin-right: 8px;
+}
+
+/* Alertas */
+.messages-container {
+    margin-bottom: 20px;
+}
+
+.alert {
+    padding: 15px 20px;
+    border-radius: var(--radio-borde);
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.alert-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.7;
+    padding: 0 5px;
+}
+
+.alert-close:hover {
+    opacity: 1;
+}
+
+/* Card */
+.card {
+    background: var(--blanco);
+    border-radius: var(--radio-borde);
+    box-shadow: var(--sombra);
+    overflow: hidden;
+}
+
+.card-content {
+    padding: 25px;
+}
+
+/* Filtros */
+.filters-container {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--texto);
+}
+
+.filter-select {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid var(--gris-medio);
+    border-radius: var(--radio-borde);
+    background-color: var(--blanco);
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--verde-principal);
+    box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);
+}
+
+/* Tabla */
+.table-wrapper {
+    overflow-x: auto;
+    border-radius: var(--radio-borde);
+    border: 1px solid var(--gris-medio);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.data-table thead {
+    background-color: var(--verde-principal);
+}
+
+.data-table th {
+    padding: 15px;
+    text-align: left;
+    color: white;
+    font-weight: 600;
+    border-bottom: 2px solid var(--verde-principal);
+}
+
+.data-table td {
+    padding: 15px;
+    border-bottom: 1px solid var(--gris-medio);
+}
+
+.table-row:hover {
+    background-color: var(--verde-claro);
+}
+
+/* Celdas específicas */
+.cell-id {
+    font-weight: 600;
+    color: var(--verde-principal);
+}
+
+.cell-image {
+    width: 70px;
+}
+
+.event-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.event-image-placeholder {
+    width: 50px;
+    height: 50px;
+    background-color: var(--verde-principal);
+    color: white;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.event-description {
+    margin: 5px 0 0;
+    color: var(--texto-secundario);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.cell-date {
+    min-width: 120px;
+}
+
+.event-date {
+    font-weight: 500;
+    color: var(--texto);
+}
+
+.event-time {
+    color: var(--texto-secundario);
+    font-size: 13px;
+}
+
+.cell-location {
+    max-width: 200px;
+    word-wrap: break-word;
+}
+
+/* Badges de estado */
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-active {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-inactive {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.event-timeline {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 12px;
+    color: var(--texto-secundario);
+}
+
+/* Botones de acción */
+.cell-actions {
+    min-width: 180px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-action {
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid transparent;
+}
+
+.btn-edit {
+    background-color: transparent;
+    border-color: var(--advertencia);
+    color: var(--advertencia);
+}
+
+.btn-edit:hover {
+    background-color: var(--advertencia);
+    color: white;
+}
+
+.btn-delete {
+    background-color: transparent;
+    border-color: var(--peligro);
+    color: var(--peligro);
+}
+
+.btn-delete:hover {
+    background-color: var(--peligro);
+    color: white;
+}
+
+.action-icon {
+    margin-right: 5px;
+}
+
+/* Estado vacío */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px !important;
+}
+
+.empty-content {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.empty-content h3 {
+    color: var(--texto);
+    margin-bottom: 10px;
+}
+
+.empty-content p {
+    color: var(--texto-secundario);
+    margin-bottom: 20px;
+}
+
+/* Estadísticas */
+.stats-container {
+    margin-top: 30px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    border-radius: var(--radio-borde);
+    padding: 20px;
+    color: white;
+    text-align: center;
+    box-shadow: var(--sombra);
+}
+
+.stat-primary {
+    background-color: var(--verde-principal);
+}
+
+.stat-success {
+    background-color: var(--secundario);
+}
+
+.stat-info {
+    background-color: var(--info);
+}
+
+.stat-warning {
+    background-color: var(--advertencia);
+}
+
+.stat-number {
+    font-size: 32px;
+    margin: 0 0 10px;
+    font-weight: 700;
+}
+
+.stat-label {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-container {
+        padding: 15px;
+    }
+    
+    .admin-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .page-title {
+        font-size: 24px;
+    }
+    
+    .filters-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .filter-group {
+        min-width: 100%;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .btn-action {
+        justify-content: center;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .data-table {
+        font-size: 14px;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 10px;
+    }
+    
+    .btn-action {
+        font-size: 12px;
+        padding: 5px 8px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const hoy = new Date().toISOString().split('T')[0];
+    
+    // Filtro de eventos
+    const filtroSelect = document.getElementById('filtroEventos');
+    if (filtroSelect) {
+        filtroSelect.addEventListener('change', function() {
+            const filtro = this.value;
+            const filas = document.querySelectorAll('.fila-evento');
+            
+            filas.forEach(fila => {
+                const fecha = fila.getAttribute('data-fecha');
+                const activo = fila.getAttribute('data-activo') === 'True';
+                const fechaEvento = new Date(fecha);
+                const hoyDate = new Date();
+                
+                let mostrar = true;
+                
+                switch(filtro) {
+                    case 'proximos':
+                        mostrar = fechaEvento > hoyDate && activo;
+                        break;
+                    case 'pasados':
+                        mostrar = fechaEvento <= hoyDate;
+                        break;
+                    case 'activos':
+                        mostrar = activo;
+                        break;
+                    case 'todos':
+                    default:
+                        mostrar = true;
+                }
+                
+                fila.style.display = mostrar ? '' : 'none';
+            });
+        });
+    }
+    
+    // Ordenamiento
+    const ordenSelect = document.getElementById('ordenEventos');
+    if (ordenSelect) {
+        ordenSelect.addEventListener('change', function() {
+            const orden = this.value;
+            const tabla = document.getElementById('tablaEventos');
+            const filas = Array.from(document.querySelectorAll('.fila-evento'));
+            
+            if (filas.length === 0) return;
+            
+            filas.sort((a, b) => {
+                const tituloA = a.cells[2].textContent.toLowerCase();
+                const tituloB = b.cells[2].textContent.toLowerCase();
+                const fechaA = new Date(a.getAttribute('data-fecha'));
+                const fechaB = new Date(b.getAttribute('data-fecha'));
+                
+                switch(orden) {
+                    case 'fecha_asc':
+                        return fechaA - fechaB;
+                    case 'fecha_desc':
+                        return fechaB - fechaA;
+                    case 'titulo':
+                        return tituloA.localeCompare(tituloB);
+                    default:
+                        return 0;
+                }
+            });
+            
+            // Reordenar filas en la tabla
+            const tbody = tabla.querySelector('tbody');
+            filas.forEach(fila => tbody.appendChild(fila));
+        });
+    }
+    
+    // Animación para estadísticas
+    const statCards = document.querySelectorAll('.stat-card');
+    statCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.2)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'var(--sombra)';
+        });
+    });
+    
+    // Efecto hover mejorado para filas
+    const tableRows = document.querySelectorAll('.table-row');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateX(5px)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateX(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

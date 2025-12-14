@@ -1,0 +1,930 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Editar Editorial</h1>
+    
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+            <button type="button" class="alert-close" onclick="this.parentElement.remove()">×</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="card">
+        <div class="card-header">
+            <h2>{{ editorial.nombre }}</h2>
+            <p class="card-subtitle">ID: #{{ editorial.editorialid }}</p>
+        </div>
+        
+        <div class="card-body">
+            <form method="post" id="editEditorialForm">
+                {% csrf_token %}
+                
+                <div class="form-section">
+                    <h3>Información Básica</h3>
+                    
+                    <div class="form-group">
+                        <label>Nombre Editorial *</label>
+                        <input type="text" class="form-control" name="nombre" value="{{ editorial.nombre }}" required id="nombreInput">
+                        <div class="form-help">Nombre oficial de la editorial</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>País de Origen *</label>
+                        <select class="form-control" name="pais" required id="paisSelect">
+                            <option value="">Seleccionar país</option>
+                            <option value="México" {% if editorial.pais == 'México' %}selected{% endif %}>México</option>
+                            <option value="España" {% if editorial.pais == 'España' %}selected{% endif %}>España</option>
+                            <option value="Argentina" {% if editorial.pais == 'Argentina' %}selected{% endif %}>Argentina</option>
+                            <option value="Colombia" {% if editorial.pais == 'Colombia' %}selected{% endif %}>Colombia</option>
+                            <option value="Chile" {% if editorial.pais == 'Chile' %}selected{% endif %}>Chile</option>
+                            <option value="Perú" {% if editorial.pais == 'Perú' %}selected{% endif %}>Perú</option>
+                            <option value="Estados Unidos" {% if editorial.pais == 'Estados Unidos' %}selected{% endif %}>Estados Unidos</option>
+                            <option value="Reino Unido" {% if editorial.pais == 'Reino Unido' %}selected{% endif %}>Reino Unido</option>
+                            <option value="Otro" {% if not editorial.pais or editorial.pais not in "México,España,Argentina,Colombia,Chile,Perú,Estados Unidos,Reino Unido" %}selected{% endif %}>Otro</option>
+                        </select>
+                        <input type="text" class="form-control" name="pais_otro" id="paisOtroInput" 
+                               placeholder="Especificar país" value="{% if editorial.pais and editorial.pais not in 'México,España,Argentina,Colombia,Chile,Perú,Estados Unidos,Reino Unido' %}{{ editorial.pais }}{% endif %}"
+                               style="{% if editorial.pais and editorial.pais not in 'México,España,Argentina,Colombia,Chile,Perú,Estados Unidos,Reino Unido' %}display: block;{% else %}display: none;{% endif %} margin-top: 5px;">
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Información de Contacto</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-col-6">
+                            <div class="form-group">
+                                <label>Teléfono *</label>
+                                <input type="text" class="form-control" name="telefono" value="{{ editorial.telefono }}" required id="telefonoInput">
+                                <div class="form-help">Formato internacional</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-col-6">
+                            <div class="form-group">
+                                <label>Email de Contacto *</label>
+                                <input type="email" class="form-control" name="email" value="{{ editorial.email }}" required id="emailInput">
+                                <div class="form-help">Email oficial de contacto</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Dirección *</label>
+                        <textarea class="form-control" name="direccion" rows="2" required id="direccionInput">{{ editorial.direccion }}</textarea>
+                        <div class="form-help">Dirección física completa</div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Información en Línea</h3>
+                    
+                    <div class="form-group">
+                        <label>Sitio Web</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">🌐</span>
+                            <input type="url" class="form-control" name="sitioweb" value="{{ editorial.sitioweb }}" id="sitiowebInput" placeholder="https://ejemplo.com">
+                        </div>
+                        <div class="form-help">URL completa del sitio web oficial</div>
+                        {% if editorial.sitioweb %}
+                        <div class="current-link">
+                            <a href="{{ editorial.sitioweb }}" target="_blank" class="link-preview">
+                                🔗 Visitar sitio actual
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Cambios detectados -->
+                <div class="changes-detected" id="changesSection" style="display: none;">
+                    <h4>📝 Cambios pendientes</h4>
+                    <ul id="changesList"></ul>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-verde" id="submitBtn">
+                        <span class="btn-text">Actualizar Editorial</span>
+                        <span class="btn-icon">✓</span>
+                    </button>
+                    <a href="{% url 'admin_editoriales' %}" class="btn btn-secondary">Cancelar</a>
+                    <button type="button" class="btn btn-outline" onclick="resetForm()" id="resetBtn" style="display: none;">
+                        Restaurar original
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="card-footer">
+            <div class="editorial-info">
+                <div class="info-item">
+                    <strong>Última actualización:</strong> 
+                    <span id="lastUpdate">Hoy</span>
+                </div>
+                <div class="info-item">
+                    <strong>Libros publicados:</strong> 
+                    <span>{{ libros_count|default:"0" }} libros</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos específicos para la página de editar editorial */
+.container {
+    width: 90%;
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+h1 {
+    color: #2e8b57;
+    margin-bottom: 30px;
+    font-size: 2rem;
+    text-align: center;
+}
+
+/* Mensajes */
+.messages-container {
+    margin-bottom: 25px;
+}
+
+.alert {
+    padding: 15px 40px 15px 20px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    position: relative;
+    animation: slideIn 0.4s ease-out;
+    border-left: 4px solid;
+}
+
+.alert-danger {
+    background: #fff5f5;
+    color: #721c24;
+    border-color: #f5c6cb;
+}
+
+.alert-success {
+    background: #f0fff4;
+    color: #155724;
+    border-color: #c3e6cb;
+}
+
+.alert-warning {
+    background: #fff9e6;
+    color: #856404;
+    border-color: #ffeaa7;
+}
+
+.alert-close {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.6;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.alert-close:hover {
+    opacity: 1;
+    background: rgba(0,0,0,0.1);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Tarjeta */
+.card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    overflow: hidden;
+    margin-bottom: 30px;
+    border: 1px solid #e9ecef;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #2e8b57 0%, #3cb371 100%);
+    color: white;
+    padding: 25px 30px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.card-header h2 {
+    margin: 0 0 5px 0;
+    font-size: 1.8rem;
+}
+
+.card-subtitle {
+    opacity: 0.9;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.card-body {
+    padding: 30px;
+}
+
+.card-footer {
+    background: #f8f9fa;
+    padding: 20px 30px;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Secciones del formulario */
+.form-section {
+    margin-bottom: 40px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #eee;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.form-section h3 {
+    color: #495057;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    padding-left: 15px;
+    border-left: 4px solid #2e8b57;
+}
+
+/* Sistema de grid */
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -10px;
+}
+
+.form-col-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding: 0 10px;
+}
+
+/* Formulario */
+.form-group {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s;
+    font-family: inherit;
+    background: white;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #2e8b57;
+    box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);
+    transform: translateY(-2px);
+}
+
+textarea.form-control {
+    min-height: 60px;
+    resize: vertical;
+}
+
+select.form-control {
+    height: 50px;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 14px;
+    padding-right: 45px;
+}
+
+/* Input con icono */
+.input-with-icon {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+}
+
+.input-with-icon .form-control {
+    padding-left: 45px;
+}
+
+/* Texto de ayuda */
+.form-help {
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-top: 6px;
+    display: block;
+    font-style: italic;
+}
+
+/* Enlace actual */
+.current-link {
+    margin-top: 10px;
+}
+
+.link-preview {
+    color: #2e8b57;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    background: #f0f9f4;
+    transition: all 0.3s;
+}
+
+.link-preview:hover {
+    background: #2e8b57;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Sección de cambios */
+.changes-detected {
+    background: #fff9e6;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 25px 0;
+    animation: fadeIn 0.5s;
+}
+
+.changes-detected h4 {
+    color: #856404;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#changesList {
+    margin: 0;
+    padding-left: 20px;
+    color: #856404;
+}
+
+#changesList li {
+    margin-bottom: 5px;
+    padding: 5px 0;
+    border-bottom: 1px dashed #ffeaa7;
+}
+
+#changesList li:last-child {
+    border-bottom: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Botones */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 14px 28px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+    min-width: 180px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-verde {
+    background: linear-gradient(135deg, #2e8b57 0%, #3cb371 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(46, 139, 87, 0.3);
+}
+
+.btn-verde:hover {
+    background: linear-gradient(135deg, #1e6b3a 0%, #2e8b57 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(46, 139, 87, 0.4);
+}
+
+.btn-secondary {
+    background: white;
+    color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background: #6c757d;
+    color: white;
+    transform: translateY(-3px);
+}
+
+.btn-outline {
+    background: transparent;
+    color: #6c757d;
+    border-color: #adb5bd;
+}
+
+.btn-outline:hover {
+    background: #f8f9fa;
+    color: #495057;
+    transform: translateY(-3px);
+}
+
+.btn-icon {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Info del pie */
+.editorial-info {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-item strong {
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.info-item span {
+    color: #2e8b57;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+/* Validación visual */
+.form-control.modified {
+    border-color: #ffc107;
+    background-color: #fff9e6;
+}
+
+.form-control.error {
+    border-color: #dc3545;
+    background-color: #fff5f5;
+    animation: shake 0.5s;
+}
+
+.form-control.success {
+    border-color: #28a745;
+    background-color: #f8fff9;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-col-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 15px;
+    }
+    
+    .container {
+        padding: 15px;
+    }
+    
+    .card-header,
+    .card-body,
+    .card-footer {
+        padding: 20px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .form-row {
+        margin: 0;
+    }
+    
+    .editorial-info {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    h1 {
+        font-size: 1.7rem;
+    }
+    
+    .card-header h2 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .form-control {
+        padding: 12px 14px;
+        font-size: 0.95rem;
+    }
+    
+    .form-section h3 {
+        font-size: 1.1rem;
+    }
+    
+    .btn {
+        padding: 12px 20px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('editEditorialForm');
+    const originalValues = {};
+    const fields = ['nombre', 'pais', 'telefono', 'email', 'direccion', 'sitioweb'];
+    const changesSection = document.getElementById('changesSection');
+    const changesList = document.getElementById('changesList');
+    const submitBtn = document.getElementById('submitBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const lastUpdate = document.getElementById('lastUpdate');
+    const paisSelect = document.getElementById('paisSelect');
+    const paisOtroInput = document.getElementById('paisOtroInput');
+    
+    // Lista de países predefinidos
+    const paisesPredefinidos = ['México','España','Argentina','Colombia','Chile','Perú','Estados Unidos','Reino Unido'];
+    
+    // Guardar valores originales
+    fields.forEach(field => {
+        const input = document.getElementById(field + 'Input') || document.getElementById(field + 'Select');
+        if (input) {
+            originalValues[field] = field === 'pais' ? getPaisValue() : input.value;
+        }
+    });
+    
+    // Mostrar/ocultar campo "Otro" para país
+    function togglePaisOtro() {
+        if (paisSelect.value === 'Otro') {
+            paisOtroInput.style.display = 'block';
+            paisOtroInput.required = true;
+        } else {
+            paisOtroInput.style.display = 'none';
+            paisOtroInput.required = false;
+        }
+    }
+    
+    // Obtener valor actual de país
+    function getPaisValue() {
+        if (paisSelect.value === 'Otro') {
+            return paisOtroInput.value;
+        }
+        return paisSelect.value;
+    }
+    
+    // Detectar cambios en tiempo real
+    function detectChanges() {
+        const changes = [];
+        
+        fields.forEach(field => {
+            const input = document.getElementById(field + 'Input') || document.getElementById(field + 'Select');
+            if (!input) return;
+            
+            const currentValue = field === 'pais' ? getPaisValue() : input.value;
+            const originalValue = originalValues[field];
+            
+            if (currentValue !== originalValue) {
+                changes.push({
+                    field: field,
+                    original: originalValue,
+                    current: currentValue
+                });
+                
+                // Marcar campo como modificado
+                input.classList.add('modified');
+            } else {
+                input.classList.remove('modified');
+            }
+        });
+        
+        // Mostrar/ocultar sección de cambios
+        if (changes.length > 0) {
+            changesSection.style.display = 'block';
+            resetBtn.style.display = 'inline-flex';
+            
+            // Actualizar lista de cambios
+            changesList.innerHTML = '';
+            changes.forEach(change => {
+                const li = document.createElement('li');
+                let fieldName = '';
+                
+                switch(change.field) {
+                    case 'nombre': fieldName = 'Nombre'; break;
+                    case 'pais': fieldName = 'País'; break;
+                    case 'telefono': fieldName = 'Teléfono'; break;
+                    case 'email': fieldName = 'Email'; break;
+                    case 'direccion': fieldName = 'Dirección'; break;
+                    case 'sitioweb': fieldName = 'Sitio Web'; break;
+                }
+                
+                li.textContent = `${fieldName}: "${change.original}" → "${change.current}"`;
+                changesList.appendChild(li);
+            });
+        } else {
+            changesSection.style.display = 'none';
+            resetBtn.style.display = 'none';
+        }
+        
+        // Actualizar texto del botón
+        const btnText = submitBtn.querySelector('.btn-text');
+        if (changes.length > 0) {
+            btnText.textContent = `Actualizar (${changes.length} cambios)`;
+        } else {
+            btnText.textContent = 'Actualizar Editorial';
+        }
+    }
+    
+    // Restaurar valores originales
+    function resetForm() {
+        if (!confirm('¿Restaurar todos los valores originales? Se perderán los cambios no guardados.')) {
+            return;
+        }
+        
+        fields.forEach(field => {
+            const input = document.getElementById(field + 'Input') || document.getElementById(field + 'Select');
+            if (!input) return;
+            
+            const originalValue = originalValues[field];
+            if (field === 'pais') {
+                // Determinar si es un país de la lista o "Otro"
+                if (paisesPredefinidos.includes(originalValue)) {
+                    paisSelect.value = originalValue;
+                    paisOtroInput.value = '';
+                    togglePaisOtro();
+                } else {
+                    paisSelect.value = 'Otro';
+                    paisOtroInput.value = originalValue;
+                    togglePaisOtro();
+                }
+            } else {
+                input.value = originalValue;
+            }
+            input.classList.remove('modified');
+        });
+        
+        detectChanges();
+        
+        // Mostrar mensaje temporal
+        const tempMsg = document.createElement('div');
+        tempMsg.className = 'alert alert-success';
+        tempMsg.innerHTML = 'Valores restaurados correctamente. <button type="button" class="alert-close" onclick="this.parentElement.remove()">×</button>';
+        document.querySelector('.messages-container').appendChild(tempMsg);
+        
+        setTimeout(() => {
+            if (tempMsg.parentNode) {
+                tempMsg.remove();
+            }
+        }, 3000);
+    }
+    
+    // Validaciones
+    function validateEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+    
+    function validateURL(url) {
+        if (!url) return true; // Opcional
+        try {
+            new URL(url);
+            return url.startsWith('http://') || url.startsWith('https://');
+        } catch (_) {
+            return false;
+        }
+    }
+    
+    // Validar formulario al enviar
+    form.addEventListener('submit', function(e) {
+        let valid = true;
+        const errorMessages = [];
+        
+        // Validar campos requeridos
+        const requiredFields = form.querySelectorAll('[required]');
+        requiredFields.forEach(function(field) {
+            if (!field.value.trim()) {
+                valid = false;
+                field.classList.add('error');
+                const label = field.previousElementSibling?.textContent || 'Campo';
+                errorMessages.push(`"${label.replace(' *', '')}" es requerido.`);
+            } else {
+                field.classList.remove('error');
+            }
+        });
+        
+        // Validar email
+        const emailInput = document.getElementById('emailInput');
+        if (emailInput.value && !validateEmail(emailInput.value)) {
+            valid = false;
+            emailInput.classList.add('error');
+            errorMessages.push('El email no tiene un formato válido.');
+        }
+        
+        // Validar URL
+        const sitioWebInput = document.getElementById('sitiowebInput');
+        if (sitioWebInput.value && !validateURL(sitioWebInput.value)) {
+            valid = false;
+            sitioWebInput.classList.add('error');
+            errorMessages.push('La URL del sitio web no es válida. Debe comenzar con http:// o https://');
+        }
+        
+        // Validar que haya cambios
+        const changes = Array.from(form.querySelectorAll('.modified'));
+        if (changes.length === 0 && valid) {
+            if (!confirm('No hay cambios detectados. ¿Deseas guardar de todas formas?')) {
+                e.preventDefault();
+                return;
+            }
+        }
+        
+        if (!valid) {
+            e.preventDefault();
+            
+            // Mostrar errores en un mensaje flotante
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'alert alert-danger';
+            errorDiv.innerHTML = `
+                <strong>Errores encontrados:</strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 20px;">
+                    ${errorMessages.map(msg => `<li>${msg}</li>`).join('')}
+                </ul>
+                <button type="button" class="alert-close" onclick="this.parentElement.remove()">×</button>
+            `;
+            
+            const messagesContainer = document.querySelector('.messages-container');
+            if (messagesContainer) {
+                messagesContainer.appendChild(errorDiv);
+            } else {
+                form.parentNode.insertBefore(errorDiv, form);
+            }
+            
+            // Hacer scroll al primer error
+            const firstError = form.querySelector('.error');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstError.focus();
+            }
+        } else {
+            // Mostrar estado de carga
+            submitBtn.classList.add('btn-loading');
+            submitBtn.disabled = true;
+            submitBtn.querySelector('.btn-text').textContent = 'Guardando...';
+            
+            // Actualizar timestamp
+            const now = new Date();
+            lastUpdate.textContent = now.toLocaleTimeString('es-MX', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            }) + ' ' + now.toLocaleDateString('es-MX');
+        }
+    });
+    
+    // Escuchar cambios en todos los campos
+    const allInputs = form.querySelectorAll('input, select, textarea');
+    allInputs.forEach(input => {
+        input.addEventListener('input', detectChanges);
+        input.addEventListener('change', detectChanges);
+    });
+    
+    // Eventos específicos para país
+    paisSelect.addEventListener('change', function() {
+        togglePaisOtro();
+        detectChanges();
+    });
+    
+    paisOtroInput.addEventListener('input', detectChanges);
+    
+    // Auto-formatear teléfono
+    const telefonoInput = document.getElementById('telefonoInput');
+    telefonoInput.addEventListener('blur', function() {
+        let phone = this.value.replace(/[^\d+]/g, '');
+        if (phone.length > 0 && !phone.startsWith('+')) {
+            phone = '+52 ' + phone;
+        }
+        this.value = phone;
+        detectChanges();
+    });
+    
+    // Auto-completar http:// en sitio web
+    const sitioWebInput = document.getElementById('sitiowebInput');
+    sitioWebInput.addEventListener('blur', function() {
+        let url = this.value.trim();
+        if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+            this.value = 'https://' + url;
+            detectChanges();
+        }
+    });
+    
+    // Capitalizar nombre
+    const nombreInput = document.getElementById('nombreInput');
+    nombreInput.addEventListener('blur', function() {
+        if (this.value) {
+            const newValue = this.value
+                .toLowerCase()
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+            
+            if (newValue !== this.value) {
+                this.value = newValue;
+                detectChanges();
+            }
+        }
+    });
+    
+    // Inicializar
+    togglePaisOtro();
+    detectChanges();
+    
+    // Asignar función reset al botón
+    resetBtn.onclick = resetForm;
+    
+    // Configurar hora de última actualización
+    const now = new Date();
+    lastUpdate.textContent = now.toLocaleTimeString('es-MX', { 
+        hour: '2-digit', 
+        minute: '2-digit'
+    });
+});
+</script>
+{% endblock %}

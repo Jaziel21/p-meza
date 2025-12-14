@@ -1,0 +1,112 @@
+<!-- app_Libreria/templates/admin/ventas/listado.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-verde">Gestión de Ventas</h1>
+        <a href="{% url 'agregar_venta' %}" class="btn btn-verde">➕ Agregar Venta</a>
+    </div>
+    
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID Venta</th>
+                            <th>Cliente</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Método Pago</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for venta in ventas %}
+                        <tr>
+                            <td><strong>#{{ venta.ventaid }}</strong></td>
+                            <td>{{ venta.clienteid.username }}</td>
+                            <td>{{ venta.fechaventa|date:"d M Y H:i" }}</td>
+                            <td><strong class="text-success">${{ venta.montototal }}</strong></td>
+                            <td>
+                                <span class="badge 
+                                    {% if venta.metodopago == 'EFECTIVO' %}bg-success
+                                    {% elif venta.metodopago == 'TARJETA' %}bg-primary
+                                    {% else %}bg-info{% endif %}">
+                                    {{ venta.get_metodopago_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge 
+                                    {% if venta.estadoventa == 'COMPLETADA' %}bg-success
+                                    {% elif venta.estadoventa == 'CANCELADA' %}bg-danger
+                                    {% else %}bg-warning text-dark{% endif %}">
+                                    {{ venta.get_estadoventa_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'detalle_venta_admin' venta.ventaid %}" class="btn btn-sm btn-outline-primary" title="Ver detalles">
+                                        👁️ Detalles
+                                    </a>
+                                    <a href="{% url 'editar_venta' venta.ventaid %}" class="btn btn-sm btn-outline-warning" title="Editar">
+                                        ✏️ Editar
+                                    </a>
+                                    {% if venta.estadoventa == 'COMPLETADA' %}
+                                    <form method="post" action="{% url 'cancelar_venta' venta.ventaid %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                onclick="return confirm('¿Estás seguro de cancelar esta venta? Se restaurará el stock.')"
+                                                title="Cancelar venta">
+                                            ❌ Cancelar
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <div class="text-muted">
+                                    <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+                                    <h5>No hay ventas registradas</h5>
+                                    <p>Comienza registrando la primera venta.</p>
+                                    <a href="{% url 'agregar_venta' %}" class="btn btn-verde">Agregar Primera Venta</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.table th {
+    background-color: var(--verde-principal);
+    color: white;
+    border: none;
+}
+.table-hover tbody tr:hover {
+    background-color: rgba(46, 139, 87, 0.1);
+}
+.badge {
+    font-size: 0.75em;
+}
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+</style>
+{% endblock %}

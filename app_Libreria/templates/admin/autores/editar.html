@@ -1,0 +1,1048 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+/* Variables y configuración global */
+:root {
+    --verde-principal: #2e7d32;
+    --verde-claro: #4caf50;
+    --verde-hover: #1b5e20;
+    --verde-suave: #e8f5e9;
+    --azul: #2196f3;
+    --azul-claro: #e3f2fd;
+    --morado: #9c27b0;
+    --morado-claro: #f3e5f5;
+    --ambar: #ff9800;
+    --ambar-claro: #fff3e0;
+    --gris-fondo: #f8f9fa;
+    --gris-borde: #e0e0e0;
+    --gris-texto: #757575;
+    --blanco: #ffffff;
+    --texto: #2c3e50;
+    --error: #e53935;
+    --exito: #43a047;
+    --advertencia: #ff9800;
+    --sombra: 0 4px 20px rgba(0, 0, 0, 0.1);
+    --sombra-intensa: 0 8px 30px rgba(0, 0, 0, 0.15);
+    --radio: 12px;
+    --radio-pequeno: 8px;
+    --transicion: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #f0f4f8 0%, #e6f0f7 100%);
+    color: var(--texto);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* Contenedor principal */
+.container {
+    width: 90%;
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 20px;
+    animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Título principal */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(46, 125, 50, 0.1);
+}
+
+.header-content {
+    flex: 1;
+}
+
+.page-header h1 {
+    font-size: 2.4rem;
+    background: linear-gradient(135deg, var(--verde-principal), var(--ambar));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+}
+
+.author-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, var(--verde-suave), var(--azul-claro));
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    border-left: 4px solid var(--verde-principal);
+}
+
+.author-info .author-avatar {
+    font-size: 2.5rem;
+    background: var(--verde-principal);
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3);
+}
+
+.author-details h3 {
+    color: var(--texto);
+    margin-bottom: 0.3rem;
+    font-size: 1.2rem;
+}
+
+.author-details p {
+    color: var(--gris-texto);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.author-details p:before {
+    content: "📝";
+    font-size: 0.9rem;
+}
+
+/* Formulario - Diseño mejorado */
+.form-card {
+    background: var(--blanco);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-intensa);
+    overflow: hidden;
+    position: relative;
+    border: none;
+    margin-bottom: 2rem;
+}
+
+.form-card:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--ambar), var(--verde-principal), var(--azul));
+    background-size: 200% 100%;
+    animation: gradientFlow 3s ease infinite;
+}
+
+@keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.card-body {
+    padding: 2.5rem;
+}
+
+/* Campos del formulario - DISEÑO MEJORADO */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.8rem;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.8rem;
+    font-weight: 600;
+    color: var(--texto);
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    padding-left: 1.8rem;
+}
+
+.form-label:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--ambar);
+    transition: var(--transicion);
+}
+
+.form-label.required:after {
+    content: " *";
+    color: var(--error);
+    font-size: 1.2rem;
+    margin-left: 4px;
+}
+
+/* Campo de entrada mejorado */
+.input-container {
+    position: relative;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: var(--radio-pequeno);
+    padding: 5px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.input-container:before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radio-pequeno);
+    padding: 2px;
+    background: linear-gradient(135deg, var(--ambar), var(--verde-claro));
+    -webkit-mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: var(--transicion);
+}
+
+.input-container.focused:before {
+    opacity: 1;
+}
+
+.form-control {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 1rem;
+    border: none;
+    background: transparent;
+    color: var(--texto);
+    font-family: inherit;
+    outline: none;
+    transition: var(--transicion);
+    position: relative;
+    z-index: 1;
+}
+
+.form-control::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+}
+
+/* Iconos dentro de los campos */
+.input-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gris-texto);
+    font-size: 1.2rem;
+    z-index: 2;
+    pointer-events: none;
+    transition: var(--transicion);
+}
+
+.input-container.focused .input-icon {
+    color: var(--verde-principal);
+    transform: translateY(-50%) scale(1.1);
+}
+
+/* Efecto de enfoque */
+.form-control:focus ~ .input-icon {
+    animation: bounce 0.5s ease;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(-50%); }
+    50% { transform: translateY(-60%); }
+}
+
+/* Campo de fecha especial */
+.date-input-container {
+    position: relative;
+    cursor: pointer;
+}
+
+.date-input-container .form-control {
+    cursor: pointer;
+}
+
+.date-input-container:after {
+    content: "📅";
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    z-index: 2;
+}
+
+/* Textarea mejorado */
+.textarea-container {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: var(--radio-pequeno);
+    padding: 5px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    position: relative;
+}
+
+.textarea-container:before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radio-pequeno);
+    padding: 2px;
+    background: linear-gradient(135deg, var(--ambar), var(--verde-claro));
+    -webkit-mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: var(--transicion);
+}
+
+.textarea-container.focused:before {
+    opacity: 1;
+}
+
+textarea.form-control {
+    min-height: 140px;
+    resize: vertical;
+    line-height: 1.6;
+    padding: 20px;
+    background: transparent;
+    border: none;
+    outline: none;
+    width: 100%;
+    font-family: inherit;
+}
+
+/* Contador de caracteres con estilo */
+.char-counter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.8rem;
+    padding: 0 0.5rem;
+}
+
+.char-count {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--verde-suave);
+    color: var(--verde-principal);
+    transition: var(--transicion);
+}
+
+.char-count.warning {
+    background: var(--ambar-claro);
+    color: var(--ambar);
+}
+
+.char-count.error {
+    background: #ffebee;
+    color: var(--error);
+}
+
+/* Campo de URL especial */
+.url-input-container {
+    position: relative;
+}
+
+.url-input-container:before {
+    content: "🌐";
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    z-index: 1;
+}
+
+.url-input-container .form-control {
+    padding-left: 50px;
+}
+
+/* Mensajes del sistema */
+.messages-container {
+    margin-bottom: 2rem;
+    animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: var(--radio);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: var(--sombra);
+    animation: slideIn 0.5s ease-out;
+    border-left: 4px solid;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    color: var(--error);
+    border-left-color: var(--error);
+}
+
+.alert-danger:before {
+    content: "⚠️";
+    font-size: 1.3rem;
+}
+
+/* Botones con diseño premium */
+.button-group {
+    display: flex;
+    gap: 1.2rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    justify-content: center;
+}
+
+.btn {
+    padding: 16px 32px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radio-pequeno);
+    cursor: pointer;
+    transition: var(--transicion);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    text-decoration: none;
+    min-width: 180px;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.btn:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: 0.5s;
+}
+
+.btn:hover:before {
+    left: 100%;
+}
+
+.btn-verde {
+    background: linear-gradient(135deg, var(--ambar), var(--verde-principal));
+    color: white;
+}
+
+.btn-verde:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 152, 0, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6c757d, #868e96);
+    color: white;
+}
+
+.btn-secondary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
+}
+
+/* Mensajes de error elegantes */
+.error-message {
+    color: var(--error);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #ffebee, #ffcdd2);
+    border-radius: var(--radio-pequeno);
+    border-left: 4px solid var(--error);
+    animation: shake 0.3s ease;
+    display: none;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+        padding: 0 15px;
+    }
+    
+    .page-header {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+    
+    .author-info {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .page-header h1 {
+        font-size: 2rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .button-group {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
+
+/* Estados de validación */
+.input-container.valid:before {
+    background: linear-gradient(135deg, var(--exito), var(--verde-claro));
+}
+
+.input-container.invalid:before {
+    background: linear-gradient(135deg, var(--error), #ff5252);
+}
+
+/* Efecto de pulso en campos requeridos vacíos */
+@keyframes pulseRequired {
+    0% { box-shadow: inset 0 0 0 1px rgba(229, 57, 53, 0.2); }
+    70% { box-shadow: inset 0 0 0 3px rgba(229, 57, 53, 0.4); }
+    100% { box-shadow: inset 0 0 0 1px rgba(229, 57, 53, 0.2); }
+}
+
+.input-container.required-empty {
+    animation: pulseRequired 2s infinite;
+}
+
+/* Información de autor existente */
+.current-data {
+    background: var(--gris-fondo);
+    border-radius: var(--radio-pequeno);
+    padding: 1rem;
+    margin-top: 0.5rem;
+    border-left: 3px solid var(--azul);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.current-data:before {
+    content: "💾";
+    font-size: 1.2rem;
+}
+
+.current-data span {
+    font-weight: 500;
+    color: var(--texto);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Encabezado de la página -->
+    <div class="page-header">
+        <div class="header-content">
+            <h1>Editar Autor</h1>
+            <p class="subtitle" style="color: var(--gris-texto);">Modifique la información del autor seleccionado</p>
+        </div>
+        
+        <div class="author-info">
+            <div class="author-avatar">
+                {{ autor.nombre|first }}{{ autor.apellido|first }}
+            </div>
+            <div class="author-details">
+                <h3>{{ autor.nombre }} {{ autor.apellido }}</h3>
+                <p>ID: {{ autor.autorid }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mensajes del sistema -->
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Formulario principal -->
+    <div class="form-card">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data" id="autorForm">
+                {% csrf_token %}
+                
+                <div class="form-grid">
+                    <!-- Nombre -->
+                    <div class="form-group">
+                        <label for="nombre" class="form-label required">
+                            Nombre
+                        </label>
+                        <div class="input-container" id="nombre-container">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="nombre" 
+                                   name="nombre" 
+                                   required 
+                                   value="{{ autor.nombre }}"
+                                   placeholder="Ingrese el nombre del autor">
+                            <span class="input-icon">👤</span>
+                        </div>
+                        <div class="error-message" id="nombre-error">
+                            <span>⚠️</span> Este campo es obligatorio
+                        </div>
+                    </div>
+                    
+                    <!-- Apellido -->
+                    <div class="form-group">
+                        <label for="apellido" class="form-label required">
+                            Apellido
+                        </label>
+                        <div class="input-container" id="apellido-container">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="apellido" 
+                                   name="apellido" 
+                                   required 
+                                   value="{{ autor.apellido }}"
+                                   placeholder="Ingrese el apellido del autor">
+                            <span class="input-icon">📝</span>
+                        </div>
+                        <div class="error-message" id="apellido-error">
+                            <span>⚠️</span> Este campo es obligatorio
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-grid">
+                    <!-- Nacionalidad -->
+                    <div class="form-group">
+                        <label for="nacionalidad" class="form-label required">
+                            Nacionalidad
+                        </label>
+                        <div class="input-container" id="nacionalidad-container">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="nacionalidad" 
+                                   name="nacionalidad" 
+                                   required 
+                                   value="{{ autor.nacionalidad }}"
+                                   placeholder="Ej: Mexicano, Colombiano, Español">
+                            <span class="input-icon">🌍</span>
+                        </div>
+                        <div class="error-message" id="nacionalidad-error">
+                            <span>⚠️</span> Este campo es obligatorio
+                        </div>
+                    </div>
+                    
+                    <!-- Fecha de Nacimiento -->
+                    <div class="form-group">
+                        <label for="fechanacimiento" class="form-label required">
+                            Fecha de Nacimiento
+                        </label>
+                        <div class="current-data">
+                            <span>Actual: {{ autor.fechanacimiento|date:"d/m/Y" }}</span>
+                        </div>
+                        <div class="input-container date-input-container" id="fecha-container">
+                            <input type="date" 
+                                   class="form-control" 
+                                   id="fechanacimiento" 
+                                   name="fechanacimiento" 
+                                   required 
+                                   value="{{ autor.fechanacimiento|date:'Y-m-d' }}">
+                        </div>
+                        <div class="error-message" id="fechanacimiento-error">
+                            <span>⚠️</span> Seleccione una fecha válida
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bibliografía -->
+                <div class="form-group">
+                    <label for="bibliografia" class="form-label">
+                        Bibliografía
+                    </label>
+                    <div class="textarea-container" id="bio-container">
+                        <textarea class="form-control" 
+                                  id="bibliografia" 
+                                  name="bibliografia" 
+                                  rows="4" 
+                                  placeholder="Escriba aquí la biografía del autor, sus obras más importantes, premios, reconocimientos...">{{ autor.bibliografia }}</textarea>
+                    </div>
+                    <div class="char-counter">
+                        <small class="file-upload-hint" style="color: var(--gris-texto);">
+                            📖 Longitud actual: {{ autor.bibliografia|length }} caracteres
+                        </small>
+                        <span class="char-count" id="char-count">0 caracteres</span>
+                    </div>
+                </div>
+                
+                <!-- Página Web -->
+                <div class="form-group">
+                    <label for="paginaweb" class="form-label">
+                        Página Web
+                    </label>
+                    {% if autor.paginaweb %}
+                    <div class="current-data">
+                        <span>Actual: <a href="{{ autor.paginaweb }}" target="_blank" style="color: var(--azul); text-decoration: none;">{{ autor.paginaweb }}</a></span>
+                    </div>
+                    {% endif %}
+                    <div class="input-container url-input-container" id="url-container">
+                        <input type="url" 
+                               class="form-control" 
+                               id="paginaweb" 
+                               name="paginaweb" 
+                               value="{{ autor.paginaweb }}"
+                               placeholder="https://www.ejemplo.com/autor">
+                    </div>
+                    <div class="error-message" id="paginaweb-error">
+                        <span>⚠️</span> Ingrese una URL válida
+                    </div>
+                </div>
+                
+                <!-- Botones de acción -->
+                <div class="button-group">
+                    <button type="submit" class="btn btn-verde" id="submitBtn">
+                        <span>🔄</span> Actualizar Autor
+                    </button>
+                    <a href="{% url 'admin_autores' %}" class="btn btn-secondary">
+                        <span>↩️</span> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Nota informativa -->
+    <div style="display: flex; align-items: center; gap: 1rem; margin-top: 2rem; padding: 1.2rem; background: linear-gradient(135deg, #fff3e0, #ffecb3); border-radius: var(--radio); border-left: 4px solid var(--ambar);">
+        <div style="font-size: 1.8rem;">💡</div>
+        <div>
+            <p style="margin: 0; color: var(--texto); font-weight: 500;">
+                <strong>Modo edición:</strong> Está editando la información del autor "{{ autor.nombre }} {{ autor.apellido }}". 
+                Los cambios se aplicarán inmediatamente después de guardar.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('autorForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const fechaInput = document.getElementById('fechanacimiento');
+    const bioTextarea = document.getElementById('bibliografia');
+    const charCount = document.getElementById('char-count');
+    
+    // Contador de caracteres
+    function updateCharCount() {
+        const count = bioTextarea.value.length;
+        charCount.textContent = `${count} caracteres`;
+        
+        // Cambiar color según la cantidad
+        charCount.classList.remove('warning', 'error');
+        if (count > 1000) {
+            charCount.classList.add('error');
+        } else if (count > 500) {
+            charCount.classList.add('warning');
+        }
+    }
+    
+    bioTextarea.addEventListener('input', updateCharCount);
+    updateCharCount(); // Inicializar con el valor actual
+    
+    // Fecha máxima (hoy)
+    const today = new Date().toISOString().split('T')[0];
+    fechaInput.max = today;
+    
+    // Efectos de enfoque en campos
+    const inputContainers = document.querySelectorAll('.input-container, .textarea-container');
+    
+    inputContainers.forEach(container => {
+        const input = container.querySelector('.form-control');
+        
+        input.addEventListener('focus', function() {
+            container.classList.add('focused');
+            this.style.background = 'var(--blanco)';
+        });
+        
+        input.addEventListener('blur', function() {
+            container.classList.remove('focused');
+            
+            // Validación básica en blur
+            if (this.hasAttribute('required') && !this.value.trim()) {
+                container.classList.add('invalid');
+                container.classList.remove('valid');
+            } else if (this.value.trim()) {
+                container.classList.add('valid');
+                container.classList.remove('invalid');
+            }
+        });
+        
+        // Efecto hover
+        container.addEventListener('mouseenter', function() {
+            if (!this.classList.contains('focused')) {
+                this.style.transform = 'translateY(-2px)';
+            }
+        });
+        
+        container.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+        
+        // Inicializar estado basado en el valor
+        if (input.value.trim()) {
+            container.classList.add('valid');
+        }
+    });
+    
+    // Validación del formulario
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        let isValid = true;
+        const errors = [];
+        
+        // Ocultar todos los errores primero
+        document.querySelectorAll('.error-message').forEach(el => {
+            el.style.display = 'none';
+        });
+        
+        // Validar campos requeridos
+        const requiredFields = [
+            {id: 'nombre', name: 'Nombre', container: 'nombre-container'},
+            {id: 'apellido', name: 'Apellido', container: 'apellido-container'},
+            {id: 'nacionalidad', name: 'Nacionalidad', container: 'nacionalidad-container'},
+            {id: 'fechanacimiento', name: 'Fecha de Nacimiento', container: 'fecha-container'}
+        ];
+        
+        requiredFields.forEach(field => {
+            const input = document.getElementById(field.id);
+            const container = document.getElementById(field.container);
+            const errorEl = document.getElementById(field.id + '-error');
+            
+            if (!input.value.trim()) {
+                // Mostrar error
+                errorEl.style.display = 'flex';
+                container.classList.add('invalid');
+                container.classList.remove('valid');
+                
+                // Efecto de atención
+                container.classList.add('required-empty');
+                setTimeout(() => {
+                    container.classList.remove('required-empty');
+                }, 2000);
+                
+                isValid = false;
+                errors.push(field.name);
+            } else {
+                container.classList.add('valid');
+                container.classList.remove('invalid');
+            }
+        });
+        
+        // Validar fecha
+        if (fechaInput.value) {
+            const selectedDate = new Date(fechaInput.value);
+            const today = new Date();
+            
+            if (selectedDate > today) {
+                const errorEl = document.getElementById('fechanacimiento-error');
+                errorEl.textContent = '⚠️ La fecha no puede ser futura';
+                errorEl.style.display = 'flex';
+                document.getElementById('fecha-container').classList.add('invalid');
+                isValid = false;
+                errors.push('Fecha de Nacimiento (fecha futura)');
+            }
+        }
+        
+        // Validar URL si se proporciona
+        const urlInput = document.getElementById('paginaweb');
+        if (urlInput.value && !isValidURL(urlInput.value)) {
+            const errorEl = document.getElementById('paginaweb-error');
+            errorEl.textContent = '⚠️ Ingrese una URL válida (ej: https://ejemplo.com)';
+            errorEl.style.display = 'flex';
+            document.getElementById('url-container').classList.add('invalid');
+            isValid = false;
+            errors.push('Página Web (URL inválida)');
+        }
+        
+        // Validar biografía (recomendación)
+        if (bioTextarea.value.length > 0 && bioTextarea.value.length < 50) {
+            if (!confirm('⚠️ La biografía es muy corta (menos de 50 caracteres). ¿Desea continuar de todos modos?')) {
+                isValid = false;
+                bioTextarea.focus();
+            }
+        }
+        
+        // Animación del botón
+        if (!isValid) {
+            submitBtn.style.animation = 'shake 0.5s ease';
+            setTimeout(() => {
+                submitBtn.style.animation = '';
+            }, 500);
+            
+            // Scroll al primer error
+            const firstError = document.querySelector('.error-message[style*="flex"]');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            alert(`❌ Por favor, corrija los siguientes errores:\n\n• ${errors.join('\n• ')}`);
+        } else {
+            // Mostrar confirmación
+            if (confirm(`¿Está seguro de que desea actualizar la información de "${document.getElementById('nombre').value} ${document.getElementById('apellido').value}"?`)) {
+                // Efecto de éxito
+                submitBtn.innerHTML = '<span>⏳</span> Actualizando...';
+                submitBtn.style.background = 'linear-gradient(135deg, #ff9800, #ffb74d)';
+                submitBtn.disabled = true;
+                
+                // Simular procesamiento
+                setTimeout(() => {
+                    form.submit();
+                }, 1500);
+            }
+        }
+    });
+    
+    // Función para validar URL
+    function isValidURL(string) {
+        try {
+            const url = new URL(string);
+            return url.protocol === 'http:' || url.protocol === 'https:';
+        } catch (_) {
+            return false;
+        }
+    }
+    
+    // Efecto de entrada en campos (animación secuencial)
+    const inputs = document.querySelectorAll('.form-control');
+    inputs.forEach((input, index) => {
+        input.style.opacity = '0';
+        input.style.transform = 'translateY(10px)';
+        
+        setTimeout(() => {
+            input.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            input.style.opacity = '1';
+            input.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+    
+    // Detectar cambios en los campos
+    let originalValues = {};
+    inputs.forEach(input => {
+        originalValues[input.id] = input.value;
+        
+        input.addEventListener('input', function() {
+            if (this.value !== originalValues[this.id]) {
+                this.style.boxShadow = '0 0 0 2px rgba(255, 152, 0, 0.2)';
+            } else {
+                this.style.boxShadow = 'none';
+            }
+        });
+    });
+    
+    // Prevenir navegación accidental si hay cambios
+    let hasChanges = false;
+    form.addEventListener('input', () => hasChanges = true);
+    
+    window.addEventListener('beforeunload', function(e) {
+        if (hasChanges) {
+            e.preventDefault();
+            e.returnValue = 'Tiene cambios sin guardar. ¿Está seguro de que desea salir?';
+            return e.returnValue;
+        }
+    });
+});
+</script>
+{% endblock %}

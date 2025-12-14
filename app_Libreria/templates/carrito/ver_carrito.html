@@ -1,0 +1,1452 @@
+<!-- app_Libreria/templates/carrito/ver_carrito.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+{% csrf_token %}
+<div class="cart-container">
+    <!-- Header del carrito -->
+    <header class="cart-header">
+        <div class="cart-title-section">
+            <div class="cart-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+                </svg>
+            </div>
+            <div>
+                <h1>Tu Carrito</h1>
+                <p class="cart-subtitle">
+                    {{ items_carrito|length }} item{{ items_carrito|pluralize:"s" }} 
+                    • Total: ${{ total_final|floatformat:2 }}
+                </p>
+            </div>
+        </div>
+        
+        <div class="cart-actions-header">
+            <a href="{% url 'libros' %}" class="btn-secondary">
+                <svg viewBox="0 0 24 24">
+                    <path d="M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4h-.01l-1.1 2-2.76 5H8.53l-.13-.27L6.16 6l-.95-2-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z"/>
+                </svg>
+                Seguir Comprando
+            </a>
+        </div>
+    </header>
+
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="message message-{{ message.tags }}">
+            <div class="message-icon">
+                {% if message.tags == 'success' %}✓{% endif %}
+                {% if message.tags == 'error' %}✗{% endif %}
+                {% if message.tags == 'warning' %}⚠{% endif %}
+                {% if message.tags == 'info' %}ℹ{% endif %}
+            </div>
+            <span class="message-text">{{ message }}</span>
+            <button class="message-close" onclick="this.parentElement.remove()">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    {% if items_carrito %}
+    <div class="cart-main">
+        <!-- Sección de productos -->
+        <section class="cart-products">
+            <div class="section-title-bar">
+                <h2>Tus Productos</h2>
+                <span class="item-count">{{ items_carrito|length }} item{{ items_carrito|pluralize:"s" }}</span>
+            </div>
+            
+            <form method="post" action="{% url 'ver_carrito' %}" class="cart-form">
+                {% csrf_token %}
+                <div class="cart-table">
+                    <!-- Encabezados de tabla -->
+                    <div class="table-header">
+                        <div class="col-product">Producto</div>
+                        <div class="col-price">Precio</div>
+                        <div class="col-quantity">Cantidad</div>
+                        <div class="col-subtotal">Subtotal</div>
+                        <div class="col-actions"></div>
+                    </div>
+                    
+                    <!-- Items del carrito -->
+                    {% for item in items_carrito %}
+                    <div class="cart-item">
+                        <!-- Imagen y detalles -->
+                        <div class="col-product">
+                            <div class="product-info">
+                                <div class="product-image">
+                                    {% if item.libro.portada %}
+                                    <img src="{{ item.libro.portada.url }}" alt="{{ item.libro.titulo }}" loading="lazy">
+                                    {% else %}
+                                    <div class="image-placeholder">
+                                        <svg viewBox="0 0 24 24">
+                                            <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
+                                        </svg>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="product-details">
+                                    <h3 class="product-title">{{ item.libro.titulo }}</h3>
+                                    <p class="product-author">{{ item.libro.autorid.nombre }} {{ item.libro.autorid.apellido }}</p>
+                                    <div class="product-meta">
+                                        <span class="stock-badge {% if item.libro.stock > 0 %}in-stock{% else %}out-stock{% endif %}">
+                                            {{ item.libro.stock }} disponibles
+                                        </span>
+                                        <span class="isbn">ISBN: {{ item.libro.isbn }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Precio unitario -->
+                        <div class="col-price">
+                            <div class="price-unit">${{ item.libro.precioventa|floatformat:2 }}</div>
+                        </div>
+                        
+                        <!-- Cantidad -->
+                        <div class="col-quantity">
+                            <div class="quantity-control">
+                                <input type="hidden" name="item_id" value="{{ item.carritoid }}">
+                                <button type="button" class="qty-btn minus" 
+                                        onclick="adjustQuantity(this, -1)"
+                                        {% if item.cantidad <= 1 %}disabled{% endif %}>
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M19 13H5v-2h14v2z"/>
+                                    </svg>
+                                </button>
+                                <input type="number" 
+                                       name="cantidad"
+                                       class="qty-input" 
+                                       value="{{ item.cantidad }}" 
+                                       min="1" 
+                                       max="{{ item.libro.stock }}"
+                                       data-item-id="{{ item.carritoid }}">
+                                <button type="button" class="qty-btn plus" 
+                                        onclick="adjustQuantity(this, 1)"
+                                        {% if item.cantidad >= item.libro.stock %}disabled{% endif %}>
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="stock-hint">Máx: {{ item.libro.stock }}</div>
+                        </div>
+                        
+                        <!-- Subtotal -->
+                        <div class="col-subtotal">
+                            <div class="subtotal-amount">${{ item.item_subtotal|floatformat:2 }}</div>
+                        </div>
+                        
+                        <!-- Acciones -->
+                        <div class="col-actions">
+                            <a href="{% url 'eliminar_del_carrito' item.carritoid %}" 
+                               class="action-btn delete-btn"
+                               onclick="return confirm('¿Eliminar \"{{ item.libro.titulo }}\" del carrito?')">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Botones de acción del formulario -->
+                <div class="cart-form-actions">
+                    <button type="submit" class="btn-update">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                        </svg>
+                        Actualizar Carrito
+                    </button>
+                    <button type="button" class="btn-clear" onclick="clearCart()">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                        </svg>
+                        Vaciar Todo
+                    </button>
+                </div>
+            </form>
+        </section>
+        
+        <!-- Resumen de compra -->
+        <aside class="cart-summary">
+            <div class="summary-card">
+                <div class="summary-header">
+                    <h2>Resumen del Pedido</h2>
+                </div>
+                
+                <div class="summary-content">
+                    <!-- Resumen de precios -->
+                    <div class="price-breakdown">
+                        <div class="price-row">
+                            <span>Subtotal</span>
+                            <span>${{ subtotal|floatformat:2 }}</span>
+                        </div>
+                        <div class="price-row">
+                            <span>IVA (16%)</span>
+                            <span>${{ iva|floatformat:2 }}</span>
+                        </div>
+                        <div class="price-divider"></div>
+                        <div class="price-row total">
+                            <span>Total</span>
+                            <span>${{ total_final|floatformat:2 }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Métodos de pago -->
+                    <div class="payment-methods">
+                        <h3>Selecciona Método de Pago</h3>
+                        
+                        <form method="post" action="{% url 'procesar_compra' %}" class="payment-form" id="payment-form">
+                            {% csrf_token %}
+                            
+                            <div class="payment-options">
+                                <label class="payment-option">
+                                    <input type="radio" name="metodo_pago" value="EFECTIVO" required>
+                                    <div class="option-content">
+                                        <div class="option-icon">💵</div>
+                                        <div class="option-info">
+                                            <strong>Efectivo</strong>
+                                            <small>Pago en caja</small>
+                                        </div>
+                                    </div>
+                                </label>
+                                
+                                <label class="payment-option">
+                                    <input type="radio" name="metodo_pago" value="TARJETA">
+                                    <div class="option-content">
+                                        <div class="option-icon">💳</div>
+                                        <div class="option-info">
+                                            <strong>Tarjeta</strong>
+                                            <small>Débito/Crédito</small>
+                                        </div>
+                                    </div>
+                                </label>
+                                
+                                <label class="payment-option">
+                                    <input type="radio" name="metodo_pago" value="TRANSFERENCIA">
+                                    <div class="option-content">
+                                        <div class="option-icon">🏦</div>
+                                        <div class="option-info">
+                                            <strong>Transferencia</strong>
+                                            <small>Bancaria</small>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <!-- Campo para efectivo -->
+                            <div class="cash-field" id="cash-field" style="display: none;">
+                                <label for="pago_recibido">
+                                    <span>Pago Recibido</span>
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="cash-input-group">
+                                    <span class="currency">$</span>
+                                    <input type="number" 
+                                           name="pago_recibido"
+                                           id="pago_recibido" 
+                                           step="0.01" 
+                                           min="{{ total_final|floatformat:2 }}"
+                                           placeholder="{{ total_final|floatformat:2 }}"
+                                           oninput="calculateChange()">
+                                </div>
+                                <div class="change-display" id="change-display">
+                                    <span>Cambio:</span>
+                                    <strong>$0.00</strong>
+                                </div>
+                                <small class="field-hint">Mínimo: ${{ total_final|floatformat:2 }}</small>
+                            </div>
+                            
+                            <!-- Botón de compra -->
+                            <button type="submit" class="btn-checkout" id="checkout-btn">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M18 6h-2c0-2.21-1.79-4-4-4S8 3.79 8 6H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6-2c1.1 0 2 .9 2 2h-4c0-1.1.9-2 2-2zm6 16H6V8h2v2c0 .55.45 1 1 1s1-.45 1-1V8h4v2c0 .55.45 1 1 1s1-.45 1-1V8h2v12z"/>
+                                </svg>
+                                Proceder al Pago
+                            </button>
+                            
+                            <div class="payment-note">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                                </svg>
+                                Tu compra será procesada inmediatamente
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información de ayuda -->
+            <div class="help-info">
+                <h3>¿Necesitas ayuda?</h3>
+                <div class="help-items">
+                    <div class="help-item">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z"/>
+                        </svg>
+                        <span>contacto@libreria.com</span>
+                    </div>
+                    <div class="help-item">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                        </svg>
+                        <span>(55) 1234-5678</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+    {% else %}
+    <!-- Estado vacío -->
+    <div class="empty-cart-state">
+        <div class="empty-icon">
+            <svg viewBox="0 0 24 24">
+                <path d="M22 9h-4.79l-4.38-6.56c-.19-.28-.51-.42-.83-.42s-.64.14-.83.43L6.79 9H2c-.55 0-1 .45-1 1 0 .09.01.18.04.27l2.54 9.27c.23.84 1 1.46 1.92 1.46h13c.92 0 1.69-.62 1.93-1.46l2.54-9.27L23 10c0-.55-.45-1-1-1zM12 4.8L14.8 9H9.2L12 4.8zM18.5 19l-12.99.01L3.31 11H20.7l-2.2 8zM12 13c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+            </svg>
+        </div>
+        <h2>Tu carrito está vacío</h2>
+        <p>Parece que aún no has agregado libros a tu carrito.</p>
+        <div class="empty-actions">
+            <a href="{% url 'libros' %}" class="btn-primary">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+                Explorar Libros
+            </a>
+            <a href="{% url 'inicio' %}" class="btn-secondary">
+                <svg viewBox="0 0 24 24">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+                Volver al Inicio
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Estilos CSS modernos y eficientes -->
+<style>
+/* Variables del sistema */
+:root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #dbeafe;
+    --secondary: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --success: #10b981;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    --radius-sm: 0.375rem;
+    --radius: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+}
+
+/* Reset y estilos base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--gray-800);
+    line-height: 1.5;
+}
+
+/* Contenedor principal */
+.cart-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+/* Header del carrito */
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--gray-100);
+}
+
+.cart-title-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.cart-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cart-icon svg {
+    width: 24px;
+    height: 24px;
+    fill: white;
+}
+
+.cart-title-section h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 0.25rem;
+}
+
+.cart-subtitle {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+.cart-actions-header {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Botones base */
+.btn-primary, .btn-secondary, .btn-update, .btn-clear, .btn-checkout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+}
+
+.btn-secondary {
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-200);
+}
+
+.btn-secondary:hover {
+    background: var(--gray-200);
+}
+
+.btn-secondary svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+/* Mensajes */
+.messages-container {
+    margin-bottom: 2rem;
+}
+
+.message {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius);
+    margin-bottom: 0.75rem;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-success {
+    background: #d1fae5;
+    color: #065f46;
+    border-left: 4px solid var(--success);
+}
+
+.message-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid var(--danger);
+}
+
+.message-warning {
+    background: #fef3c7;
+    color: #92400e;
+    border-left: 4px solid var(--warning);
+}
+
+.message-info {
+    background: #dbeafe;
+    color: #1e40af;
+    border-left: 4px solid var(--primary);
+}
+
+.message-icon {
+    font-weight: bold;
+    font-size: 1.125rem;
+}
+
+.message-text {
+    flex: 1;
+}
+
+.message-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.7;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.message-close:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+/* Layout principal */
+.cart-main {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .cart-main {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Sección de productos */
+.cart-products {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.section-title-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.section-title-bar h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.item-count {
+    background: var(--gray-200);
+    color: var(--gray-700);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Tabla de productos */
+.cart-table {
+    padding: 0;
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr auto;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    font-weight: 600;
+    color: var(--gray-700);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cart-item {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr auto;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--gray-100);
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.cart-item:hover {
+    background: var(--gray-50);
+}
+
+.col-product {
+    min-width: 0; /* Para que el texto no desborde */
+}
+
+.product-info {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.product-image {
+    flex-shrink: 0;
+    width: 80px;
+    height: 100px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--gray-100);
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.product-image img:hover {
+    transform: scale(1.05);
+}
+
+.image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray-200);
+}
+
+.image-placeholder svg {
+    width: 32px;
+    height: 32px;
+    fill: var(--gray-400);
+}
+
+.product-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.product-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 0.25rem;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.product-author {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.product-meta {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.stock-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.stock-badge.in-stock {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.stock-badge.out-stock {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.isbn {
+    color: var(--gray-500);
+    font-size: 0.75rem;
+}
+
+/* Precio unitario */
+.col-price {
+    text-align: center;
+}
+
+.price-unit {
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: 1.125rem;
+}
+
+/* Controles de cantidad */
+.quantity-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.qty-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--gray-300);
+    background: white;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.qty-btn:hover:not(:disabled) {
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+.qty-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.qty-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--gray-700);
+}
+
+.qty-input {
+    width: 64px;
+    height: 32px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    text-align: center;
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: 0.875rem;
+}
+
+.qty-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.stock-hint {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin-top: 0.25rem;
+}
+
+/* Subtotal */
+.subtotal-amount {
+    font-weight: 700;
+    color: var(--gray-900);
+    font-size: 1.25rem;
+    text-align: center;
+}
+
+/* Botones de acción */
+.action-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: none;
+}
+
+.delete-btn {
+    color: var(--gray-500);
+}
+
+.delete-btn:hover {
+    color: var(--danger);
+    background: #fee2e2;
+}
+
+.delete-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+/* Acciones del formulario */
+.cart-form-actions {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-top: 1px solid var(--gray-200);
+    background: var(--gray-50);
+}
+
+.btn-update, .btn-clear {
+    flex: 1;
+}
+
+.btn-update {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-update:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.btn-clear {
+    background: white;
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+}
+
+.btn-clear:hover {
+    background: var(--gray-100);
+    border-color: var(--gray-400);
+}
+
+.btn-update svg, .btn-clear svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+/* Resumen del carrito */
+.cart-summary {
+    position: sticky;
+    top: 2rem;
+    height: fit-content;
+}
+
+.summary-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.summary-header {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+}
+
+.summary-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.summary-content {
+    padding: 1.5rem;
+}
+
+/* Desglose de precios */
+.price-breakdown {
+    margin-bottom: 2rem;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    color: var(--gray-600);
+}
+
+.price-row.total {
+    border-top: 2px solid var(--gray-200);
+    margin-top: 0.75rem;
+    padding-top: 1rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.price-divider {
+    height: 1px;
+    background: var(--gray-200);
+    margin: 0.5rem 0;
+}
+
+/* Métodos de pago */
+.payment-methods h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 1rem;
+}
+
+.payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.payment-option {
+    cursor: pointer;
+}
+
+.payment-option input[type="radio"] {
+    display: none;
+}
+
+.option-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius);
+    transition: all 0.2s ease;
+}
+
+.payment-option input[type="radio"]:checked + .option-content {
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+.payment-option:hover .option-content {
+    border-color: var(--gray-400);
+}
+
+.option-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray-100);
+    border-radius: 50%;
+}
+
+.option-info {
+    flex: 1;
+}
+
+.option-info strong {
+    display: block;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.option-info small {
+    color: var(--gray-500);
+    font-size: 0.875rem;
+}
+
+/* Campo de efectivo */
+.cash-field {
+    background: var(--gray-50);
+    padding: 1rem;
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+}
+
+.cash-field label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+.required {
+    color: var(--danger);
+}
+
+.cash-input-group {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.currency {
+    padding: 0.75rem 1rem;
+    background: var(--gray-100);
+    color: var(--gray-600);
+    font-weight: 600;
+    border-right: 1px solid var(--gray-300);
+}
+
+.cash-input-group input {
+    flex: 1;
+    border: none;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    min-width: 0;
+}
+
+.cash-input-group input:focus {
+    outline: none;
+}
+
+.change-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background: #d1fae5;
+    border-radius: var(--radius-sm);
+    color: #065f46;
+    font-weight: 500;
+}
+
+.field-hint {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+/* Botón de checkout */
+.btn-checkout {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.btn-checkout:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-checkout:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-checkout svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.payment-note {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gray-600);
+    font-size: 0.875rem;
+    padding: 0.75rem;
+    background: var(--gray-50);
+    border-radius: var(--radius);
+}
+
+.payment-note svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+/* Información de ayuda */
+.help-info {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+}
+
+.help-info h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 1rem;
+}
+
+.help-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.help-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+.help-item svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+/* Estado vacío */
+.empty-cart-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+}
+
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: var(--gray-100);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-icon svg {
+    width: 40px;
+    height: 40px;
+    fill: var(--gray-400);
+}
+
+.empty-cart-state h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 0.5rem;
+}
+
+.empty-cart-state p {
+    color: var(--gray-600);
+    margin-bottom: 2rem;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.empty-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cart-container {
+        padding: 1rem;
+    }
+    
+    .cart-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .cart-actions-header {
+        width: 100%;
+        justify-content: stretch;
+    }
+    
+    .btn-secondary {
+        flex: 1;
+        justify-content: center;
+    }
+    
+    .table-header {
+        display: none;
+    }
+    
+    .cart-item {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .product-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .product-meta {
+        justify-content: center;
+    }
+    
+    .cart-form-actions {
+        flex-direction: column;
+    }
+    
+    .empty-actions {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .cart-title-section {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+    
+    .cart-icon {
+        align-self: center;
+    }
+    
+    .product-image {
+        width: 60px;
+        height: 75px;
+    }
+    
+    .help-items {
+        flex-direction: column;
+    }
+}
+</style>
+
+<!-- JavaScript eficiente y limpio -->
+<script>
+// Estado global
+const cartState = {
+    total: parseFloat("{{ total_final|floatformat:2 }}"),
+    itemsCount: {{ items_carrito|length }},
+    cashPayment: false
+};
+
+// Ajustar cantidad
+function adjustQuantity(button, change) {
+    const quantityControl = button.closest('.quantity-control');
+    const input = quantityControl.querySelector('.qty-input');
+    const minusBtn = quantityControl.querySelector('.minus');
+    const plusBtn = quantityControl.querySelector('.plus');
+    
+    let value = parseInt(input.value);
+    const max = parseInt(input.max);
+    const min = parseInt(input.min);
+    
+    value += change;
+    
+    // Validar límites
+    if (value < min) value = min;
+    if (value > max) value = max;
+    
+    input.value = value;
+    
+    // Actualizar estado de botones
+    minusBtn.disabled = value <= min;
+    plusBtn.disabled = value >= max;
+    
+    // Marcar formulario como modificado
+    input.form.classList.add('modified');
+}
+
+// Calcular cambio
+function calculateChange() {
+    if (!cartState.cashPayment) return;
+    
+    const cashInput = document.getElementById('pago_recibido');
+    const changeDisplay = document.getElementById('change-display');
+    
+    if (!cashInput || !changeDisplay) return;
+    
+    const cashReceived = parseFloat(cashInput.value) || 0;
+    const change = cashReceived - cartState.total;
+    
+    if (change >= 0) {
+        changeDisplay.innerHTML = `
+            <span>Cambio:</span>
+            <strong>$${change.toFixed(2)}</strong>
+        `;
+        changeDisplay.style.background = '#d1fae5';
+        changeDisplay.style.color = '#065f46';
+    } else {
+        const missing = Math.abs(change);
+        changeDisplay.innerHTML = `
+            <span>Faltan:</span>
+            <strong>$${missing.toFixed(2)}</strong>
+        `;
+        changeDisplay.style.background = '#fee2e2';
+        changeDisplay.style.color = '#991b1b';
+    }
+    
+    validateCheckout();
+}
+
+// Validar checkout
+function validateCheckout() {
+    const checkoutBtn = document.getElementById('checkout-btn');
+    const paymentMethod = document.querySelector('input[name="metodo_pago"]:checked');
+    const cashInput = document.getElementById('pago_recibido');
+    
+    let isValid = true;
+    
+    if (!paymentMethod) {
+        isValid = false;
+    } else if (paymentMethod.value === 'EFECTIVO') {
+        const cashReceived = parseFloat(cashInput.value) || 0;
+        if (cashReceived < cartState.total) {
+            isValid = false;
+        }
+    }
+    
+    checkoutBtn.disabled = !isValid;
+    return isValid;
+}
+
+// Vaciar carrito
+function clearCart() {
+    if (!confirm('¿Estás seguro de que quieres vaciar todo tu carrito?')) return;
+    
+    // Crear formulario temporal
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{% url "ver_carrito" %}';
+    form.style.display = 'none';
+    
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+    const clearInput = document.createElement('input');
+    clearInput.type = 'hidden';
+    clearInput.name = 'clear_all';
+    clearInput.value = 'true';
+    
+    form.appendChild(csrfToken.cloneNode(true));
+    form.appendChild(clearInput);
+    document.body.appendChild(form);
+    form.submit();
+}
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', function() {
+    // Event listeners para métodos de pago
+    document.querySelectorAll('input[name="metodo_pago"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const cashField = document.getElementById('cash-field');
+            cartState.cashPayment = this.value === 'EFECTIVO';
+            
+            if (cartState.cashPayment) {
+                cashField.style.display = 'block';
+                document.getElementById('pago_recibido').focus();
+            } else {
+                cashField.style.display = 'none';
+            }
+            
+            validateCheckout();
+        });
+    });
+    
+    // Event listener para cambios en efectivo
+    document.getElementById('pago_recibido')?.addEventListener('input', calculateChange);
+    
+    // Validar formulario de pago
+    document.getElementById('payment-form')?.addEventListener('submit', function(e) {
+        if (!validateCheckout()) {
+            e.preventDefault();
+            alert('Por favor completa todos los campos requeridos');
+            return;
+        }
+        
+        const paymentMethod = document.querySelector('input[name="metodo_pago"]:checked');
+        if (paymentMethod.value === 'EFECTIVO') {
+            const cashReceived = parseFloat(document.getElementById('pago_recibido').value) || 0;
+            if (cashReceived < cartState.total) {
+                e.preventDefault();
+                alert(`El pago recibido debe ser mayor o igual a $${cartState.total.toFixed(2)}`);
+                document.getElementById('pago_recibido').focus();
+            }
+        }
+    });
+    
+    // Event listeners para botones de cantidad
+    document.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // La función adjustQuantity ya maneja esto
+        });
+    });
+    
+    // Event listeners para inputs de cantidad
+    document.querySelectorAll('.qty-input').forEach(input => {
+        input.addEventListener('change', function() {
+            this.form.classList.add('modified');
+        });
+    });
+    
+    // Mostrar advertencia si hay cambios sin guardar
+    window.addEventListener('beforeunload', function(e) {
+        const modifiedForm = document.querySelector('.cart-form.modified');
+        if (modifiedForm) {
+            e.preventDefault();
+            e.returnValue = 'Tienes cambios sin guardar en tu carrito. ¿Seguro que quieres salir?';
+        }
+    });
+    
+    // Validación inicial
+    validateCheckout();
+});
+</script>
+{% endblock %}

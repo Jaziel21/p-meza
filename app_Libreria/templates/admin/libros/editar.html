@@ -1,0 +1,765 @@
+<!-- app_Libreria/templates/admin/libros/editar.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="admin-container">
+    <h1 class="page-title">Editar Libro</h1>
+    
+    <div class="card">
+        <div class="card-content">
+            <form method="post" enctype="multipart/form-data" class="form-libro">
+                {% csrf_token %}
+                
+                <div class="form-grid">
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label class="form-label">Título *</label>
+                            <input type="text" class="form-input" name="titulo" 
+                                   value="{{ libro.titulo }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">ISBN *</label>
+                            <input type="text" class="form-input" name="isbn" 
+                                   value="{{ libro.isbn }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Autor *</label>
+                            <select class="form-select" name="autorid" required>
+                                <option value="">Seleccionar autor</option>
+                                {% for autor in autores %}
+                                <option value="{{ autor.autorid }}" 
+                                        {% if autor.autorid == libro.autorid.autorid %}selected{% endif %}>
+                                    {{ autor.nombre }} {{ autor.apellido }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Editorial *</label>
+                            <select class="form-select" name="editorialid" required>
+                                <option value="">Seleccionar editorial</option>
+                                {% for editorial in editoriales %}
+                                <option value="{{ editorial.editorialid }}" 
+                                        {% if editorial.editorialid == libro.editorialid.editorialid %}selected{% endif %}>
+                                    {{ editorial.nombre }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label class="form-label">Año Publicación *</label>
+                            <input type="number" class="form-input" name="aniopublicacion" 
+                                   value="{{ libro.aniopublicacion }}" min="1900" max="2030" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Género *</label>
+                            <select class="form-select" name="genero" required>
+                                <option value="">Seleccionar género</option>
+                                <option value="FIC" {% if libro.genero == 'FIC' %}selected{% endif %}>Ficción</option>
+                                <option value="ROM" {% if libro.genero == 'ROM' %}selected{% endif %}>Romance</option>
+                                <option value="TER" {% if libro.genero == 'TER' %}selected{% endif %}>Terror</option>
+                                <option value="CIE" {% if libro.genero == 'CIE' %}selected{% endif %}>Ciencia Ficción</option>
+                                <option value="FAN" {% if libro.genero == 'FAN' %}selected{% endif %}>Fantasía</option>
+                                <option value="HIS" {% if libro.genero == 'HIS' %}selected{% endif %}>Histórico</option>
+                                <option value="BIO" {% if libro.genero == 'BIO' %}selected{% endif %}>Biografía</option>
+                                <option value="INF" {% if libro.genero == 'INF' %}selected{% endif %}>Infantil</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Precio Venta *</label>
+                            <input type="number" step="0.01" class="form-input" 
+                                   name="precioventa" value="{{ libro.precioventa }}" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Stock *</label>
+                            <input type="number" class="form-input" name="stock" 
+                                   value="{{ libro.stock }}" min="0" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Descripción</label>
+                    <textarea class="form-textarea" name="descripcion" rows="4">{{ libro.descripcion }}</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Portada Actual</label>
+                    {% if libro.portada %}
+                    <div class="current-image">
+                        <img src="{{ libro.portada.url }}" alt="{{ libro.titulo }}" class="book-image">
+                        <div class="image-info">
+                            <span class="image-name">{{ libro.portada.name|default:"portada.jpg" }}</span>
+                            <a href="{{ libro.portada.url }}" target="_blank" class="image-link">Ver original</a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="no-image">
+                        <span class="no-image-icon">🖼️</span>
+                        <span class="no-image-text">No hay portada asignada</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="image-upload">
+                        <label class="form-label">Actualizar Portada</label>
+                        <div class="file-upload">
+                            <input type="file" class="file-input" name="portada" 
+                                   accept="image/*" id="portada-input">
+                            <label for="portada-input" class="file-label">
+                                <span class="file-icon">📁</span>
+                                <span class="file-text">Seleccionar nueva imagen</span>
+                            </label>
+                            <span class="file-name" id="portada-name">Mantener imagen actual</span>
+                        </div>
+                        <small class="file-hint">Formatos: JPG, PNG, GIF. Máx: 5MB</small>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-icon">💾</span> Actualizar Libro
+                    </button>
+                    <a href="{% url 'admin_libros' %}" class="btn btn-secondary">
+                        <span class="btn-icon">❌</span> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Variables CSS (consistentes con el anterior) */
+:root {
+    --verde-principal: #2e8b57;
+    --verde-claro: rgba(46, 139, 87, 0.1);
+    --blanco: #ffffff;
+    --gris-claro: #f8f9fa;
+    --gris-medio: #e9ecef;
+    --gris-oscuro: #343a40;
+    --texto: #212529;
+    --texto-secundario: #6c757d;
+    --primario: #2e8b57;
+    --secundario: #28a745;
+    --peligro: #dc3545;
+    --advertencia: #ffc107;
+    --info: #17a2b8;
+    --sombra: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --sombra-hover: 0 4px 8px rgba(0, 0, 0, 0.15);
+    --radio-borde: 8px;
+    --radio-input: 6px;
+}
+
+/* Contenedor principal */
+.admin-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.page-title {
+    color: var(--verde-principal);
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--verde-claro);
+}
+
+/* Card */
+.card {
+    background: var(--blanco);
+    border-radius: var(--radio-borde);
+    box-shadow: var(--sombra);
+    overflow: hidden;
+}
+
+.card-content {
+    padding: 30px;
+}
+
+/* Formulario - mantiene estilos consistentes */
+.form-libro {
+    max-width: 100%;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+.form-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--texto);
+    font-size: 15px;
+}
+
+.form-label:after {
+    content: ' *';
+    color: var(--peligro);
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    padding: 12px 15px;
+    border: 2px solid var(--gris-medio);
+    border-radius: var(--radio-input);
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background-color: var(--blanco);
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--verde-principal);
+    box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);
+}
+
+.form-select {
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23212529" viewBox="0 0 16 16"><path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 12px;
+    cursor: pointer;
+    padding-right: 40px;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+/* Imagen actual */
+.current-image {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--gris-claro);
+    border-radius: var(--radio-input);
+    border: 2px dashed var(--gris-medio);
+}
+
+.book-image {
+    width: 120px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: var(--radio-input);
+    box-shadow: var(--sombra);
+    border: 3px solid var(--blanco);
+}
+
+.image-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.image-name {
+    font-size: 14px;
+    color: var(--texto);
+    font-weight: 500;
+    background-color: var(--blanco);
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.image-link {
+    color: var(--primario);
+    text-decoration: none;
+    font-size: 14px;
+    padding: 6px 12px;
+    background-color: var(--blanco);
+    border: 1px solid var(--primario);
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    width: fit-content;
+    transition: all 0.2s;
+}
+
+.image-link:hover {
+    background-color: var(--primario);
+    color: var(--blanco);
+}
+
+.image-link:before {
+    content: "👁️";
+    font-size: 12px;
+}
+
+/* Estado sin imagen */
+.no-image {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--gris-claro);
+    border-radius: var(--radio-input);
+    border: 2px dashed var(--gris-medio);
+}
+
+.no-image-icon {
+    font-size: 24px;
+    opacity: 0.5;
+}
+
+.no-image-text {
+    color: var(--texto-secundario);
+    font-style: italic;
+}
+
+/* Upload de archivo */
+.image-upload {
+    margin-top: 20px;
+}
+
+.file-upload {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.file-input {
+    display: none;
+}
+
+.file-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background-color: var(--gris-claro);
+    border: 2px solid var(--gris-medio);
+    border-radius: var(--radio-input);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.file-label:hover {
+    background-color: var(--gris-medio);
+    border-color: var(--verde-principal);
+}
+
+.file-icon {
+    font-size: 16px;
+}
+
+.file-text {
+    font-weight: 500;
+}
+
+.file-name {
+    font-size: 14px;
+    color: var(--texto-secundario);
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 8px 12px;
+    background-color: var(--gris-claro);
+    border-radius: 4px;
+    border: 1px solid var(--gris-medio);
+}
+
+.file-hint {
+    display: block;
+    margin-top: 8px;
+    color: var(--texto-secundario);
+    font-size: 12px;
+}
+
+/* Botones */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--gris-medio);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 25px;
+    border-radius: var(--radio-input);
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+    font-size: 15px;
+    gap: 8px;
+}
+
+.btn-primary {
+    background-color: var(--verde-principal);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #247449;
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-hover);
+}
+
+.btn-secondary {
+    background-color: var(--gris-medio);
+    color: var(--texto);
+}
+
+.btn-secondary:hover {
+    background-color: var(--gris-oscuro);
+    color: var(--blanco);
+}
+
+.btn-icon {
+    font-size: 16px;
+}
+
+/* Validación visual */
+.form-input:invalid:not(:focus):not(:placeholder-shown),
+.form-select:invalid:not(:focus) {
+    border-color: var(--peligro);
+    background-color: rgba(220, 53, 69, 0.05);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card-content {
+    animation: fadeIn 0.4s ease;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-container {
+        padding: 15px;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .current-image {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .image-info {
+        align-items: center;
+    }
+    
+    .image-name {
+        max-width: 100%;
+    }
+    
+    .file-upload {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .file-name {
+        max-width: 100%;
+        text-align: center;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 24px;
+    }
+    
+    .card-content {
+        padding: 20px;
+    }
+    
+    .book-image {
+        width: 100px;
+        height: 140px;
+    }
+    
+    .form-input,
+    .form-select,
+    .form-textarea {
+        padding: 10px 12px;
+        font-size: 16px; /* Previene zoom en iOS */
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const portadaInput = document.getElementById('portada-input');
+    const portadaName = document.getElementById('portada-name');
+    const formulario = document.querySelector('.form-libro');
+    
+    // Manejo de archivo de portada
+    if (portadaInput && portadaName) {
+        portadaInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                const file = this.files[0];
+                const fileName = file.name;
+                const fileSize = (file.size / 1024 / 1024).toFixed(2); // MB
+                
+                // Validar tamaño máximo (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`El archivo ${fileName} es demasiado grande (${fileSize}MB). Máximo permitido: 5MB`);
+                    this.value = '';
+                    portadaName.textContent = 'Mantener imagen actual';
+                    portadaName.style.color = 'var(--texto-secundario)';
+                    return;
+                }
+                
+                // Validar tipo de archivo
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                if (!validTypes.includes(file.type)) {
+                    alert(`Formato no válido: ${fileName}. Solo se permiten imágenes JPG, PNG, GIF o WebP.`);
+                    this.value = '';
+                    portadaName.textContent = 'Mantener imagen actual';
+                    portadaName.style.color = 'var(--texto-secundario)';
+                    return;
+                }
+                
+                // Mostrar preview de la imagen (opcional)
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.maxWidth = '100px';
+                    img.style.marginRight = '10px';
+                    img.style.borderRadius = '4px';
+                    
+                    // Reemplazar o agregar preview
+                    const existingPreview = document.querySelector('.file-preview');
+                    if (existingPreview) {
+                        existingPreview.remove();
+                    }
+                    
+                    const preview = document.createElement('div');
+                    preview.className = 'file-preview';
+                    preview.style.display = 'flex';
+                    preview.style.alignItems = 'center';
+                    preview.style.marginTop = '10px';
+                    preview.appendChild(img);
+                    
+                    const info = document.createElement('div');
+                    info.innerHTML = `<div style="font-size: 12px; color: var(--texto-secundario)">
+                                        ${fileName}<br>
+                                        ${fileSize}MB • ${file.type.split('/')[1].toUpperCase()}
+                                      </div>`;
+                    preview.appendChild(info);
+                    
+                    portadaName.parentNode.insertBefore(preview, portadaName.nextSibling);
+                };
+                reader.readAsDataURL(file);
+                
+                // Actualizar texto del archivo
+                portadaName.textContent = fileName;
+                portadaName.style.color = 'var(--verde-principal)';
+                portadaName.style.fontWeight = '500';
+            } else {
+                portadaName.textContent = 'Mantener imagen actual';
+                portadaName.style.color = 'var(--texto-secundario)';
+                portadaName.style.fontWeight = 'normal';
+                
+                // Eliminar preview si existe
+                const existingPreview = document.querySelector('.file-preview');
+                if (existingPreview) {
+                    existingPreview.remove();
+                }
+            }
+        });
+    }
+    
+    // Validación de formulario mejorada
+    if (formulario) {
+        formulario.addEventListener('submit', function(e) {
+            let valido = true;
+            let mensajesError = [];
+            
+            // Validar campos requeridos
+            const camposRequeridos = this.querySelectorAll('[required]');
+            camposRequeridos.forEach(campo => {
+                if (!campo.value.trim()) {
+                    campo.style.borderColor = 'var(--peligro)';
+                    campo.style.boxShadow = '0 0 0 3px rgba(220, 53, 69, 0.1)';
+                    
+                    const label = campo.closest('.form-group')?.querySelector('.form-label');
+                    if (label) {
+                        mensajesError.push(`"${label.textContent.replace(' *', '')}" es requerido`);
+                    }
+                    
+                    valido = false;
+                } else {
+                    campo.style.borderColor = '';
+                    campo.style.boxShadow = '';
+                    
+                    // Validaciones específicas por campo
+                    if (campo.name === 'isbn') {
+                        // Validación básica de ISBN (puedes personalizar)
+                        const isbnRegex = /^(97(8|9))?\d{9}(\d|X)$/;
+                        if (!isbnRegex.test(campo.value.replace(/[-\s]/g, ''))) {
+                            campo.style.borderColor = 'var(--peligro)';
+                            campo.style.boxShadow = '0 0 0 3px rgba(220, 53, 69, 0.1)';
+                            mensajesError.push('ISBN no válido. Use formato correcto (ej: 978-3-16-148410-0)');
+                            valido = false;
+                        }
+                    }
+                    
+                    if (campo.name === 'precioventa') {
+                        const precio = parseFloat(campo.value);
+                        if (precio < 0) {
+                            campo.style.borderColor = 'var(--peligro)';
+                            campo.style.boxShadow = '0 0 0 3px rgba(220, 53, 69, 0.1)';
+                            mensajesError.push('El precio no puede ser negativo');
+                            valido = false;
+                        }
+                    }
+                    
+                    if (campo.name === 'stock') {
+                        const stock = parseInt(campo.value);
+                        if (stock < 0) {
+                            campo.style.borderColor = 'var(--peligro)';
+                            campo.style.boxShadow = '0 0 0 3px rgba(220, 53, 69, 0.1)';
+                            mensajesError.push('El stock no puede ser negativo');
+                            valido = false;
+                        }
+                    }
+                    
+                    if (campo.name === 'aniopublicacion') {
+                        const año = parseInt(campo.value);
+                        const añoActual = new Date().getFullYear();
+                        if (año < 1900 || año > añoActual + 5) {
+                            campo.style.borderColor = 'var(--peligro)';
+                            campo.style.boxShadow = '0 0 0 3px rgba(220, 53, 69, 0.1)';
+                            mensajesError.push(`El año debe estar entre 1900 y ${añoActual + 5}`);
+                            valido = false;
+                        }
+                    }
+                }
+            });
+            
+            // Validar archivo si se seleccionó uno nuevo
+            if (portadaInput && portadaInput.files.length > 0) {
+                const file = portadaInput.files[0];
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('La imagen es demasiado grande. Máximo permitido: 5MB');
+                    valido = false;
+                }
+            }
+            
+            if (!valido) {
+                e.preventDefault();
+                
+                // Mostrar mensajes de error
+                if (mensajesError.length > 0) {
+                    let mensaje = 'Por favor, corrija los siguientes errores:\n\n';
+                    mensajesError.forEach((error, index) => {
+                        mensaje += `${index + 1}. ${error}\n`;
+                    });
+                    alert(mensaje);
+                } else {
+                    alert('Por favor, complete todos los campos requeridos (*)');
+                }
+            }
+        });
+        
+        // Limpiar validación al escribir
+        const inputs = formulario.querySelectorAll('.form-input, .form-select, .form-textarea');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                this.style.borderColor = '';
+                this.style.boxShadow = '';
+            });
+            
+            input.addEventListener('blur', function() {
+                if (this.hasAttribute('required') && !this.value.trim()) {
+                    this.style.borderColor = 'var(--peligro)';
+                    this.style.boxShadow = '0 0 0 3px rgba(220, 53, 69, 0.1)';
+                }
+            });
+        });
+    }
+    
+    // Función para formatear precio
+    const precioInput = formulario?.querySelector('input[name="precioventa"]');
+    if (precioInput) {
+        precioInput.addEventListener('blur', function() {
+            if (this.value) {
+                const valor = parseFloat(this.value);
+                if (!isNaN(valor)) {
+                    this.value = valor.toFixed(2);
+                }
+            }
+        });
+    }
+    
+    // Mostrar información del libro actual
+    console.log('📖 Editando libro:', {
+        titulo: '{{ libro.titulo }}',
+        autor: '{{ libro.autorid.nombre }} {{ libro.autorid.apellido }}',
+        editorial: '{{ libro.editorialid.nombre }}',
+        genero: '{{ libro.get_genero_display }}'
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio - Librería AJMG{% endblock %}
+
+{% block page_title %}Bienvenido a Librería AJMG{% endblock %}
+{% block page_subtitle %}
+<p style="font-size: 1.2rem; color: var(--gris-medio); margin-top: var(--espacio-sm);">
+    Descubre un mundo de conocimiento y entretenimiento en nuestra librería.
+</p>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div style="display: flex; align-items: center; margin-bottom: var(--espacio-xl); gap: var(--espacio-lg); flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 300px;">
+        <h1 style="font-size: 2.5rem; color: var(--verde-oscuro); margin-bottom: var(--espacio-sm); font-weight: 700; line-height: 1.2;">
+            Bienvenido a Librería AJMG
+        </h1>
+        <p style="font-size: 1.2rem; color: var(--gris-medio); line-height: 1.6;">
+            Tu destino literario favorito. Explora miles de títulos, asiste a eventos exclusivos y forma parte de nuestra comunidad de lectores apasionados.
+        </p>
+        <div style="display: flex; gap: var(--espacio-sm); margin-top: var(--espacio-md);">
+            <a href="{% url 'libros' %}" style="background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro)); color: white; padding: 12px 24px; border-radius: var(--radio-md); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fas fa-book"></i> Ver Catálogo
+            </a>
+            <a href="{% url 'eventos' %}" style="background-color: var(--verde-claro); color: var(--verde-oscuro); padding: 12px 24px; border-radius: var(--radio-md); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; border: 2px solid var(--verde-principal);">
+                <i class="fas fa-calendar-alt"></i> Ver Eventos
+            </a>
+        </div>
+    </div>
+    
+    <div style="flex: 1; min-width: 300px;">
+        <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" 
+             alt="Librería" 
+             style="width: 100%; height: auto; border-radius: var(--radio-lg); box-shadow: var(--sombra-fuerte);">
+    </div>
+</div>
+
+<!-- Sección de características -->
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--espacio-md); margin-bottom: var(--espacio-xl);">
+    <div style="background-color: var(--verde-muy-claro); padding: var(--espacio-md); border-radius: var(--radio-md); text-align: center; border: 1px solid var(--verde-claro);">
+        <div style="font-size: 2.5rem; color: var(--verde-principal); margin-bottom: var(--espacio-sm);">📚</div>
+        <h3 style="color: var(--verde-oscuro); margin-bottom: var(--espacio-xs);">Amplio Catálogo</h3>
+        <p style="color: var(--gris-medio); font-size: 0.95rem;">Más de 10,000 títulos en todos los géneros literarios</p>
+    </div>
+    
+    <div style="background-color: var(--verde-muy-claro); padding: var(--espacio-md); border-radius: var(--radio-md); text-align: center; border: 1px solid var(--verde-claro);">
+        <div style="font-size: 2.5rem; color: var(--verde-principal); margin-bottom: var(--espacio-sm);">🎭</div>
+        <h3 style="color: var(--verde-oscuro); margin-bottom: var(--espacio-xs);">Eventos Exclusivos</h3>
+        <p style="color: var(--gris-medio); font-size: 0.95rem;">Presentaciones de autores, talleres y clubes de lectura</p>
+    </div>
+    
+    <div style="background-color: var(--verde-muy-claro); padding: var(--espacio-md); border-radius: var(--radio-md); text-align: center; border: 1px solid var(--verde-claro);">
+        <div style="font-size: 2.5rem; color: var(--verde-principal); margin-bottom: var(--espacio-sm);">🚚</div>
+        <h3 style="color: var(--verde-oscuro); margin-bottom: var(--espacio-xs);">Envío Rápido</h3>
+        <p style="color: var(--gris-medio); font-size: 0.95rem;">Entrega a domicilio en 24-48 horas en toda la ciudad</p>
+    </div>
+</div>
+
+<!-- Libros Destacados -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--espacio-lg); flex-wrap: wrap; gap: var(--espacio-sm);">
+    <h2 style="color: var(--verde-oscuro); font-size: 1.8rem; margin: 0;">
+        <span style="font-size: 1.5rem; margin-right: 10px;">📚</span>
+        Libros Destacados
+    </h2>
+    
+    <div style="display: flex; gap: var(--espacio-sm);">
+        {% if user.is_authenticated and not user.is_staff %}
+        <a href="{% url 'ver_carrito' %}" style="background: linear-gradient(135deg, var(--dorado), #c69500); color: var(--verde-oscuro); padding: 10px 20px; border-radius: var(--radio-md); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+            🛒 Mi Carrito
+            {% with cart_count=user.carrito_set.count %}
+            {% if cart_count > 0 %}
+            <span style="background-color: var(--verde-oscuro); color: white; padding: 2px 8px; border-radius: 12px; margin-left: 5px; font-size: 0.85rem;">
+                {{ cart_count }}
+            </span>
+            {% endif %}
+            {% endwith %}
+        </a>
+        {% endif %}
+        
+        <a href="{% url 'libros' %}" style="background-color: transparent; color: var(--verde-principal); padding: 10px 20px; border-radius: var(--radio-md); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; border: 2px solid var(--verde-principal);">
+            Ver Todos <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+</div>
+
+{% if libros %}
+<div class="libros-grid-4x4">
+    {% for libro in libros %}
+    <div class="libro-card-4x4">
+        <div class="libro-imagen-4x4">
+            {% if libro.portada %}
+            <img src="{{ libro.portada.url }}" alt="{{ libro.titulo }}" class="imagen-libro-4x4">
+            {% else %}
+            <div class="sin-imagen-4x4">
+                📚
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="libro-contenido-4x4">
+            <h3 class="libro-titulo-4x4">{{ libro.titulo }}</h3>
+            <p class="libro-autor-4x4">por {{ libro.autorid.nombre }} {{ libro.autorid.apellido }}</p>
+            
+            {% if libro.descripcion %}
+            <p class="libro-descripcion-4x4">{{ libro.descripcion|truncatechars:100 }}</p>
+            {% endif %}
+            
+            <div class="libro-info-4x4">
+                <div>
+                    <div class="libro-precio-4x4">${{ libro.precioventa }}</div>
+                    <div class="libro-stock-4x4">{{ libro.stock }} disponibles</div>
+                </div>
+                
+                {% if user.is_authenticated and not user.is_staff %}
+                <form method="post" action="{% url 'agregar_al_carrito' libro.libroid %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-agregar-carrito-4x4">
+                        <i class="fas fa-cart-plus"></i>
+                    </button>
+                </form>
+                {% elif user.is_authenticated and user.is_staff %}
+                <button class="btn-agregar-carrito-4x4" disabled style="background-color: var(--gris-medio);">
+                    <i class="fas fa-user-shield"></i>
+                </button>
+                {% else %}
+                <a href="{% url 'login_selector' %}" class="btn-agregar-carrito-4x4" style="text-decoration: none;">
+                    <i class="fas fa-sign-in-alt"></i>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Botón para ver más libros -->
+<div style="text-align: center; margin-top: var(--espacio-xl);">
+    <a href="{% url 'libros' %}" style="background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro)); color: white; padding: 15px 30px; border-radius: var(--radio-md); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 10px; font-size: 1.1rem;">
+        <i class="fas fa-book-open"></i> Ver Todos los Libros
+    </a>
+</div>
+
+{% else %}
+<!-- Mensaje cuando no hay libros -->
+<div style="text-align: center; padding: var(--espacio-xl); background-color: var(--verde-muy-claro); border-radius: var(--radio-md); margin: var(--espacio-lg) 0;">
+    <div style="font-size: 4rem; color: var(--verde-claro); margin-bottom: var(--espacio-md);">📚</div>
+    <h3 style="color: var(--verde-oscuro); margin-bottom: var(--espacio-sm);">No hay libros disponibles</h3>
+    <p style="color: var(--gris-medio); margin-bottom: var(--espacio-md); max-width: 500px; margin-left: auto; margin-right: auto;">
+        Actualmente no tenemos libros en nuestro catálogo. Estamos trabajando para agregar nuevos títulos.
+    </p>
+    
+    {% if user.is_authenticated and user.is_staff %}
+    <a href="{% url 'agregar_libro' %}" style="background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro)); color: white; padding: 12px 24px; border-radius: var(--radio-md); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+        <i class="fas fa-plus"></i> Agregar Primer Libro
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Sección de CTA (Call to Action) -->
+<div style="background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal)); padding: var(--espacio-xl); border-radius: var(--radio-lg); margin-top: var(--espacio-xl); text-align: center;">
+    <h2 style="color: white; margin-bottom: var(--espacio-sm); font-size: 2rem;">¿Listo para empezar tu próxima aventura literaria?</h2>
+    <p style="color: var(--verde-claro); margin-bottom: var(--espacio-lg); font-size: 1.1rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+        Únete a nuestra comunidad de lectores y recibe recomendaciones personalizadas, descuentos exclusivos y acceso anticipado a nuevos lanzamientos.
+    </p>
+    
+    <div style="display: flex; gap: var(--espacio-sm); justify-content: center; flex-wrap: wrap;">
+        {% if not user.is_authenticated %}
+        <a href="{% url 'login_selector' %}" style="background-color: var(--dorado); color: var(--verde-oscuro); padding: 15px 30px; border-radius: var(--radio-md); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 10px;">
+            <i class="fas fa-user-plus"></i> Crear Cuenta
+        </a>
+        {% endif %}
+        
+        <a href="{% url 'contacto' %}" style="background-color: transparent; color: white; padding: 15px 30px; border-radius: var(--radio-md); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 10px; border: 2px solid white;">
+            <i class="fas fa-envelope"></i> Contáctanos
+        </a>
+    </div>
+</div>
+
+<script>
+// Script para mejorar la interactividad
+document.addEventListener('DOMContentLoaded', function() {
+    // Efecto hover en tarjetas de características
+    const featureCards = document.querySelectorAll('.libros-grid-4x4 > div');
+    featureCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-10px)';
+            this.style.transition = 'transform 0.3s ease';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+    
+    // Smooth scroll para enlaces internos
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 100,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+    
+    // Contador animado (efecto)
+    const counterElements = document.querySelectorAll('.libro-stock-4x4');
+    counterElements.forEach(element => {
+        const originalText = element.textContent;
+        element.addEventListener('mouseenter', function() {
+            this.textContent = '¡Compra ahora!';
+        });
+        
+        element.addEventListener('mouseleave', function() {
+            this.textContent = originalText;
+        });
+    });
+});
+</script>
+
+<style>
+/* Estilos específicos para la página de inicio */
+.libro-card-4x4:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--sombra-fuerte);
+}
+
+/* Responsive para la sección hero */
+@media (max-width: 992px) {
+    .libros-grid-4x4 {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .hero-section {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .hero-section > div {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .libros-grid-4x4 {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .cta-buttons a {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Animaciones para elementos */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.libro-card-4x4 {
+    animation: fadeInUp 0.5s ease forwards;
+    animation-delay: calc(var(--index, 0) * 0.1s);
+    opacity: 0;
+}
+
+/* Estilos para los botones */
+a[style*="background: linear-gradient"]:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--sombra-mediana);
+    transition: all 0.3s ease;
+}
+
+/* Estilos para la imagen hero */
+img[alt="Librería"] {
+    transition: transform 0.5s ease;
+}
+
+img[alt="Librería"]:hover {
+    transform: scale(1.02);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-verde mb-4">Editar Venta #{{ venta.ventaid }}</h1>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Cliente *</label>
+                            <select class="form-control" name="clienteid" required>
+                                <option value="">Seleccionar cliente</option>
+                                {% for cliente in clientes %}
+                                <option value="{{ cliente.id }}" {% if cliente.id == venta.clienteid.id %}selected{% endif %}>
+                                    {{ cliente.username }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Método de Pago *</label>
+                            <select class="form-control" name="metodopago" required>
+                                <option value="EFECTIVO" {% if venta.metodopago == 'EFECTIVO' %}selected{% endif %}>Efectivo</option>
+                                <option value="TARJETA" {% if venta.metodopago == 'TARJETA' %}selected{% endif %}>Tarjeta</option>
+                                <option value="TRANSFERENCIA" {% if venta.metodopago == 'TRANSFERENCIA' %}selected{% endif %}>Transferencia</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Estado de Venta</label>
+                            <select class="form-control" name="estadoventa">
+                                <option value="PENDIENTE" {% if venta.estadoventa == 'PENDIENTE' %}selected{% endif %}>Pendiente</option>
+                                <option value="COMPLETADA" {% if venta.estadoventa == 'COMPLETADA' %}selected{% endif %}>Completada</option>
+                                <option value="CANCELADA" {% if venta.estadoventa == 'CANCELADA' %}selected{% endif %}>Cancelada</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Monto Total *</label>
+                            <input type="number" step="0.01" class="form-control" name="montototal" value="{{ venta.montototal }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Descuento Aplicado</label>
+                            <input type="number" step="0.01" class="form-control" name="descuentoaplicado" value="{{ venta.descuentoaplicado }}">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Pago Recibido</label>
+                            <input type="number" step="0.01" class="form-control" name="pagorecibido" value="{{ venta.pagorecibido }}">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-verde">Actualizar Venta</button>
+                    <a href="{% url 'admin_ventas' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

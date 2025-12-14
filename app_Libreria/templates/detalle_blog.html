@@ -1,0 +1,590 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ entrada.titulo }} - Blog{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Botón para volver al listado -->
+    <div class="nav-back">
+        <a href="{% url 'blog' %}" class="btn-back">
+            <svg class="icon" viewBox="0 0 24 24" width="16" height="16">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+            </svg>
+            Volver al Blog
+        </a>
+    </div>
+    
+    <article class="blog-article">
+        <!-- Encabezado del artículo -->
+        <header class="article-header">
+            {% if entrada.imagen %}
+            <div class="article-image">
+                <img src="{{ entrada.imagen.url }}" alt="{{ entrada.titulo }}" 
+                     class="article-img">
+            </div>
+            {% endif %}
+            
+            <!-- Categoría -->
+            <div class="article-category">
+                <span class="category-badge">
+                    {{ entrada.get_categoria_display }}
+                </span>
+            </div>
+            
+            <!-- Título -->
+            <h1 class="article-title">{{ entrada.titulo }}</h1>
+            
+            <!-- Metadatos -->
+            <div class="article-meta">
+                <div class="meta-item">
+                    <svg class="icon" viewBox="0 0 24 24" width="16" height="16">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                    <span>Por <strong>{{ entrada.autor.get_full_name|default:entrada.autor.username }}</strong></span>
+                </div>
+                <div class="meta-item">
+                    <svg class="icon" viewBox="0 0 24 24" width="16" height="16">
+                        <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 6v2h14V6H5zm2 4h10v2H7zm0 4h7v2H7z"/>
+                    </svg>
+                    <span>{{ entrada.fechapublicacion|date:"d M Y, H:i" }}</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Contenido del artículo -->
+        <div class="article-content">
+            <!-- Resumen (si existe) -->
+            {% if entrada.resumen %}
+            <div class="article-summary">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24" width="20" height="20">
+                        <path d="M4 6h16v2H4zm0 4h16v2H4zm0 4h10v2H4z"/>
+                    </svg>
+                    Resumen
+                </h3>
+                <p>{{ entrada.resumen }}</p>
+            </div>
+            {% endif %}
+            
+            <!-- Contenido principal -->
+            <div class="content-main">
+                {{ entrada.contenido|safe }}
+            </div>
+            
+            <!-- Separador -->
+            <hr class="content-divider">
+            
+            <!-- Información del autor -->
+            <div class="author-card">
+                <div class="author-avatar">
+                    <svg viewBox="0 0 24 24" width="40" height="40">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                </div>
+                <div class="author-info">
+                    <h3>{{ entrada.autor.get_full_name|default:entrada.autor.username }}</h3>
+                    <p>
+                        <svg class="icon" viewBox="0 0 24 24" width="14" height="14">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                        </svg>
+                        Artículo publicado en nuestro blog literario
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="action-buttons">
+                <a href="{% url 'blog' %}" class="btn btn-primary">
+                    <svg class="icon" viewBox="0 0 24 24" width="18" height="18">
+                        <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 4h2v5l-1-.75L9 9V4zm9 16H6V4h1v9l3-2.25L13 13V4h5v16z"/>
+                    </svg>
+                    Ver más artículos
+                </a>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="window.print()">
+                        <svg class="icon" viewBox="0 0 24 24" width="18" height="18">
+                            <path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/>
+                        </svg>
+                        Imprimir
+                    </button>
+                    <button class="btn btn-secondary" onclick="compartirArticulo()">
+                        <svg class="icon" viewBox="0 0 24 24" width="18" height="18">
+                            <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                        </svg>
+                        Compartir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </article>
+</div>
+
+<!-- JavaScript para compartir -->
+<script>
+function compartirArticulo() {
+    if (navigator.share) {
+        navigator.share({
+            title: document.title,
+            text: 'Mira este interesante artículo: {{ entrada.titulo }}',
+            url: window.location.href,
+        })
+        .then(() => {
+            alert('¡Artículo compartido exitosamente!');
+        })
+        .catch((error) => {
+            console.log('Error al compartir:', error);
+        });
+    } else {
+        // Fallback para navegadores que no soportan Web Share API
+        const url = encodeURIComponent(window.location.href);
+        const text = encodeURIComponent('Mira este artículo: {{ entrada.titulo }}');
+        window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=600,height=400');
+    }
+}
+
+// Mejorar la experiencia de impresión
+window.addEventListener('beforeprint', function() {
+    document.body.classList.add('printing');
+});
+
+window.addEventListener('afterprint', function() {
+    document.body.classList.remove('printing');
+});
+</script>
+
+<!-- Estilos CSS puro -->
+<style>
+/* Variables de color */
+:root {
+    --verde-principal: #2e7d32;
+    --verde-claro: #4caf50;
+    --verde-muy-claro: #e8f5e9;
+    --gris-claro: #f5f5f5;
+    --gris-medio: #757575;
+    --gris-oscuro: #424242;
+    --blanco: #ffffff;
+    --sombra: 0 2px 10px rgba(0,0,0,0.1);
+    --borde: 1px solid #e0e0e0;
+}
+
+/* Estructura base */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Navegación de regreso */
+.nav-back {
+    margin: 20px 0;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    background: var(--verde-muy-claro);
+    color: var(--verde-principal);
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid var(--verde-principal);
+}
+
+.btn-back:hover {
+    background: var(--verde-principal);
+    color: var(--blanco);
+    transform: translateX(-3px);
+}
+
+.btn-back .icon {
+    margin-right: 8px;
+    fill: currentColor;
+}
+
+/* Artículo principal */
+.blog-article {
+    background: var(--blanco);
+    border-radius: 10px;
+    box-shadow: var(--sombra);
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+/* Encabezado del artículo */
+.article-header {
+    padding: 40px 40px 20px;
+    text-align: center;
+}
+
+.article-image {
+    margin-bottom: 30px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.article-img {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.article-category {
+    margin-bottom: 20px;
+}
+
+.category-badge {
+    display: inline-block;
+    padding: 8px 20px;
+    background: var(--verde-principal);
+    color: var(--blanco);
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.article-title {
+    color: var(--verde-principal);
+    font-size: 2.5rem;
+    margin: 20px 0;
+    line-height: 1.3;
+    font-weight: 700;
+}
+
+.article-meta {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 30px;
+    color: var(--gris-medio);
+    font-size: 14px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.meta-item .icon {
+    fill: currentColor;
+}
+
+/* Contenido del artículo */
+.article-content {
+    padding: 20px 40px 40px;
+}
+
+.article-summary {
+    background: var(--verde-muy-claro);
+    border-left: 4px solid var(--verde-principal);
+    padding: 25px;
+    margin: 30px 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.article-summary h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--verde-principal);
+    margin: 0 0 15px 0;
+    font-size: 1.3rem;
+}
+
+.article-summary .icon {
+    fill: var(--verde-principal);
+}
+
+.article-summary p {
+    margin: 0;
+    line-height: 1.6;
+    color: var(--gris-oscuro);
+}
+
+/* Contenido principal */
+.content-main {
+    line-height: 1.8;
+    font-size: 1.125rem;
+    color: var(--gris-oscuro);
+}
+
+.content-main h2 {
+    color: var(--verde-principal);
+    margin: 2.5rem 0 1.5rem;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.content-main h3 {
+    color: var(--gris-oscuro);
+    margin: 2rem 0 1rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.content-main p {
+    margin-bottom: 1.5rem;
+}
+
+.content-main ul,
+.content-main ol {
+    margin-bottom: 1.5rem;
+    padding-left: 2rem;
+}
+
+.content-main li {
+    margin-bottom: 0.5rem;
+}
+
+.content-main blockquote {
+    border-left: 4px solid var(--verde-principal);
+    padding: 1.5rem 2rem;
+    margin: 2rem 0;
+    font-style: italic;
+    color: var(--gris-oscuro);
+    background: var(--gris-claro);
+    border-radius: 0 8px 8px 0;
+}
+
+.content-main img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 2rem 0;
+}
+
+.content-divider {
+    border: none;
+    height: 1px;
+    background: var(--borde);
+    margin: 3rem 0;
+}
+
+/* Tarjeta de autor */
+.author-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 25px;
+    background: var(--gris-claro);
+    border-radius: 10px;
+    margin: 30px 0;
+}
+
+.author-avatar {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--verde-principal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.author-avatar svg {
+    fill: var(--blanco);
+}
+
+.author-info h3 {
+    color: var(--verde-principal);
+    margin: 0 0 8px 0;
+    font-size: 1.3rem;
+}
+
+.author-info p {
+    margin: 0;
+    color: var(--gris-medio);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.author-info .icon {
+    fill: currentColor;
+}
+
+/* Botones */
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: var(--borde);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    gap: 10px;
+}
+
+.btn .icon {
+    fill: currentColor;
+}
+
+.btn-primary {
+    background: var(--verde-principal);
+    color: var(--blanco);
+}
+
+.btn-primary:hover {
+    background: var(--verde-claro);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+}
+
+.btn-secondary {
+    background: var(--gris-claro);
+    color: var(--gris-oscuro);
+    border: 1px solid #ddd;
+}
+
+.btn-secondary:hover {
+    background: #e0e0e0;
+    transform: translateY(-2px);
+}
+
+.btn-group {
+    display: flex;
+    gap: 15px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .article-header,
+    .article-content {
+        padding: 25px 20px;
+    }
+    
+    .article-title {
+        font-size: 2rem;
+    }
+    
+    .article-meta {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+    
+    .content-main {
+        font-size: 1rem;
+    }
+    
+    .content-main h2 {
+        font-size: 1.5rem;
+    }
+    
+    .content-main h3 {
+        font-size: 1.3rem;
+    }
+    
+    .author-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .btn-group {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .article-title {
+        font-size: 1.6rem;
+    }
+    
+    .blog-article {
+        margin: 10px;
+    }
+    
+    .article-summary {
+        padding: 20px;
+    }
+    
+    .content-main blockquote {
+        padding: 15px;
+    }
+}
+
+/* Estilos para impresión */
+@media print {
+    .nav-back,
+    .action-buttons,
+    .author-card {
+        display: none;
+    }
+    
+    .blog-article {
+        box-shadow: none;
+        border: none;
+    }
+    
+    .article-header {
+        padding: 0;
+    }
+    
+    .article-title {
+        color: #000;
+        font-size: 24pt;
+    }
+    
+    .content-main {
+        font-size: 12pt;
+        color: #000;
+    }
+    
+    .content-main h2 {
+        color: #000;
+        font-size: 16pt;
+    }
+    
+    .content-divider {
+        display: none;
+    }
+    
+    a {
+        color: #000;
+        text-decoration: none;
+    }
+    
+    .article-img {
+        max-height: 300px;
+    }
+}
+</style>
+{% endblock %}

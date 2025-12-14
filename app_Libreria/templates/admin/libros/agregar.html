@@ -1,0 +1,788 @@
+<!-- app_Libreria/templates/admin/libros/agregar.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="admin-container">
+    <h1 class="page-title">Agregar Nuevo Libro</h1>
+    
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-danger">
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Debug: Mostrar editoriales disponibles -->
+    <div class="alert alert-info">
+        <strong>Editoriales disponibles:</strong> {{ editoriales.count }}
+        {% for editorial in editoriales %}
+        <br><small>{{ editorial.editorialid }} - {{ editorial.nombre }} - {{ editorial.pais }}</small>
+        {% empty %}
+        <br><small class="text-danger">No hay editoriales registradas</small>
+        {% endfor %}
+    </div>
+    
+    <div class="card">
+        <div class="card-content">
+            <form method="post" enctype="multipart/form-data" class="form-libro">
+                {% csrf_token %}
+                
+                <div class="form-grid">
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label class="form-label">Título *</label>
+                            <input type="text" class="form-input" name="titulo" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">ISBN *</label>
+                            <input type="text" class="form-input" name="isbn" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Autor *</label>
+                            <select class="form-select" name="autorid" required>
+                                <option value="">Seleccionar autor</option>
+                                {% for autor in autores %}
+                                <option value="{{ autor.autorid }}">{{ autor.nombre }} {{ autor.apellido }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Editorial *</label>
+                            
+                            <!-- Campo de búsqueda para filtrar -->
+                            <input type="text" class="form-input search-input" id="buscar-editorial" 
+                                   placeholder="🔍 Buscar editorial por nombre, país o email..." 
+                                   autocomplete="off">
+                            
+                            <div class="select-wrapper">
+                                <select class="form-select search-select" name="editorialid" required id="editorial-select">
+                                    <option value="">Seleccionar editorial</option>
+                                    {% for editorial in editoriales %}
+                                    <option value="{{ editorial.editorialid }}" 
+                                            data-nombre="{{ editorial.nombre }}"
+                                            data-pais="{{ editorial.pais }}"
+                                            data-email="{{ editorial.email }}">
+                                        {{ editorial.nombre }} - {{ editorial.pais }}
+                                        {% if editorial.email %} | {{ editorial.email }}{% endif %}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="select-dropdown" id="editorial-dropdown"></div>
+                            </div>
+                            
+                            <div class="select-info">
+                                <span class="select-counter" id="contador-editoriales">
+                                    Mostrando {{ editoriales.count }} editoriales
+                                </span>
+                                {% if not editoriales %}
+                                <div class="select-error">
+                                    No hay editoriales registradas. 
+                                    <a href="{% url 'agregar_editorial' %}" class="link">Agregar editorial primero</a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label class="form-label">Año Publicación *</label>
+                            <input type="number" class="form-input" name="aniopublicacion" 
+                                   min="1900" max="2030" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Género *</label>
+                            <select class="form-select" name="genero" required>
+                                <option value="">Seleccionar género</option>
+                                <option value="FIC">Ficción</option>
+                                <option value="ROM">Romance</option>
+                                <option value="TER">Terror</option>
+                                <option value="CIE">Ciencia Ficción</option>
+                                <option value="FAN">Fantasía</option>
+                                <option value="HIS">Histórico</option>
+                                <option value="BIO">Biografía</option>
+                                <option value="INF">Infantil</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Precio Venta *</label>
+                            <input type="number" step="0.01" class="form-input" 
+                                   name="precioventa" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Stock *</label>
+                            <input type="number" class="form-input" name="stock" min="0" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Descripción</label>
+                    <textarea class="form-textarea" name="descripcion" rows="4" 
+                              placeholder="Descripción del libro..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Portada</label>
+                    <div class="file-upload">
+                        <input type="file" class="file-input" name="portada" accept="image/*" id="portada-input">
+                        <label for="portada-input" class="file-label">
+                            <span class="file-icon">📁</span>
+                            <span class="file-text">Seleccionar archivo</span>
+                        </label>
+                        <span class="file-name" id="portada-name">No se ha seleccionado ningún archivo</span>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-icon">💾</span> Guardar Libro
+                    </button>
+                    <a href="{% url 'admin_libros' %}" class="btn btn-secondary">
+                        <span class="btn-icon">❌</span> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Variables CSS */
+:root {
+    --verde-principal: #2e8b57;
+    --verde-claro: rgba(46, 139, 87, 0.1);
+    --blanco: #ffffff;
+    --gris-claro: #f8f9fa;
+    --gris-medio: #e9ecef;
+    --gris-oscuro: #343a40;
+    --texto: #212529;
+    --texto-secundario: #6c757d;
+    --primario: #2e8b57;
+    --secundario: #28a745;
+    --peligro: #dc3545;
+    --advertencia: #ffc107;
+    --info: #17a2b8;
+    --sombra: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --sombra-hover: 0 4px 8px rgba(0, 0, 0, 0.15);
+    --radio-borde: 8px;
+    --radio-input: 6px;
+}
+
+/* Contenedor principal */
+.admin-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.page-title {
+    color: var(--verde-principal);
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--verde-claro);
+}
+
+/* Alertas */
+.messages-container {
+    margin-bottom: 20px;
+}
+
+.alert {
+    padding: 15px 20px;
+    border-radius: var(--radio-borde);
+    margin-bottom: 10px;
+    animation: slideIn 0.3s ease;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+    font-size: 14px;
+}
+
+.alert-info small {
+    display: block;
+    margin-top: 5px;
+    line-height: 1.4;
+}
+
+.text-danger {
+    color: var(--peligro);
+}
+
+.link {
+    color: var(--primario);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
+/* Card */
+.card {
+    background: var(--blanco);
+    border-radius: var(--radio-borde);
+    box-shadow: var(--sombra);
+    overflow: hidden;
+}
+
+.card-content {
+    padding: 30px;
+}
+
+/* Formulario */
+.form-libro {
+    max-width: 100%;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+.form-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--texto);
+    font-size: 15px;
+}
+
+.form-label:after {
+    content: ' *';
+    color: var(--peligro);
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    padding: 12px 15px;
+    border: 2px solid var(--gris-medio);
+    border-radius: var(--radio-input);
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background-color: var(--blanco);
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--verde-principal);
+    box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);
+}
+
+.form-input::placeholder {
+    color: var(--texto-secundario);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+/* Búsqueda de editoriales */
+.search-input {
+    margin-bottom: 10px;
+    padding-left: 40px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%236c757d" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: 15px center;
+    background-size: 16px;
+}
+
+.select-wrapper {
+    position: relative;
+}
+
+.search-select {
+    width: 100%;
+    appearance: none;
+    cursor: pointer;
+    padding-right: 40px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23212529" viewBox="0 0 16 16"><path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 12px;
+}
+
+.search-select option {
+    padding: 10px 15px;
+    font-size: 14px;
+    background-color: var(--blanco);
+    color: var(--texto);
+}
+
+.search-select option:hover {
+    background-color: var(--verde-claro) !important;
+}
+
+.search-select option:checked {
+    background-color: var(--verde-principal) !important;
+    color: var(--blanco) !important;
+}
+
+.select-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--blanco);
+    border: 2px solid var(--verde-principal);
+    border-top: none;
+    border-radius: 0 0 var(--radio-input) var(--radio-input);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: var(--sombra-hover);
+}
+
+.select-dropdown.active {
+    display: block;
+}
+
+.dropdown-option {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--gris-medio);
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.dropdown-option:hover {
+    background-color: var(--verde-claro);
+}
+
+.dropdown-option.selected {
+    background-color: var(--verde-principal);
+    color: var(--blanco);
+}
+
+.select-info {
+    margin-top: 10px;
+    font-size: 13px;
+}
+
+.select-counter {
+    color: var(--texto-secundario);
+    font-size: 12px;
+}
+
+.select-error {
+    color: var(--peligro);
+    margin-top: 5px;
+    font-size: 13px;
+}
+
+/* Upload de archivo */
+.file-upload {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.file-input {
+    display: none;
+}
+
+.file-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background-color: var(--gris-claro);
+    border: 2px solid var(--gris-medio);
+    border-radius: var(--radio-input);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.file-label:hover {
+    background-color: var(--gris-medio);
+    border-color: var(--verde-principal);
+}
+
+.file-icon {
+    font-size: 16px;
+}
+
+.file-text {
+    font-weight: 500;
+}
+
+.file-name {
+    font-size: 14px;
+    color: var(--texto-secundario);
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Botones */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--gris-medio);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 25px;
+    border-radius: var(--radio-input);
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+    font-size: 15px;
+    gap: 8px;
+}
+
+.btn-primary {
+    background-color: var(--verde-principal);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #247449;
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-hover);
+}
+
+.btn-secondary {
+    background-color: var(--gris-medio);
+    color: var(--texto);
+}
+
+.btn-secondary:hover {
+    background-color: var(--gris-oscuro);
+    color: var(--blanco);
+}
+
+.btn-icon {
+    font-size: 16px;
+}
+
+/* Animaciones */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-container {
+        padding: 15px;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .file-upload {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .file-name {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 24px;
+    }
+    
+    .card-content {
+        padding: 20px;
+    }
+    
+    .form-input,
+    .form-select,
+    .form-textarea {
+        padding: 10px 12px;
+        font-size: 16px; /* Previene zoom en iOS */
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const editorialSelect = document.getElementById('editorial-select');
+    const buscarInput = document.getElementById('buscar-editorial');
+    const contador = document.getElementById('contador-editoriales');
+    const portadaInput = document.getElementById('portada-input');
+    const portadaName = document.getElementById('portada-name');
+    const dropdown = document.getElementById('editorial-dropdown');
+    
+    // Mostrar información de debug
+    console.log('Editoriales cargadas:', {{ editoriales.count }});
+    console.log('Opciones en select:', editorialSelect.options.length);
+    
+    // Sistema de dropdown personalizado para búsqueda
+    function crearDropdown(opciones) {
+        if (!dropdown || opciones.length === 0) return;
+        
+        dropdown.innerHTML = '';
+        
+        opciones.forEach(opcion => {
+            if (opcion.value === '') return;
+            
+            const div = document.createElement('div');
+            div.className = 'dropdown-option';
+            div.textContent = opcion.textContent;
+            div.dataset.value = opcion.value;
+            
+            if (editorialSelect.value === opcion.value) {
+                div.classList.add('selected');
+            }
+            
+            div.addEventListener('click', function() {
+                editorialSelect.value = this.dataset.value;
+                editorialSelect.dispatchEvent(new Event('change'));
+                cerrarDropdown();
+                actualizarDropdown();
+            });
+            
+            dropdown.appendChild(div);
+        });
+    }
+    
+    function actualizarDropdown() {
+        const filtro = buscarInput ? buscarInput.value.toLowerCase() : '';
+        const opciones = Array.from(editorialSelect.options);
+        let visibles = 0;
+        
+        const opcionesVisibles = opciones.filter(option => {
+            if (option.value === '') return false;
+            
+            const nombre = option.getAttribute('data-nombre') || '';
+            const pais = option.getAttribute('data-pais') || '';
+            const email = option.getAttribute('data-email') || '';
+            const texto = option.text.toLowerCase();
+            
+            const mostrar = filtro === '' || 
+                           texto.includes(filtro) || 
+                           nombre.toLowerCase().includes(filtro) || 
+                           pais.toLowerCase().includes(filtro) || 
+                           email.toLowerCase().includes(filtro);
+            
+            if (mostrar) visibles++;
+            return mostrar;
+        });
+        
+        crearDropdown(opcionesVisibles);
+        
+        if (contador) {
+            contador.textContent = `Mostrando ${visibles} de {{ editoriales.count }} editoriales`;
+        }
+    }
+    
+    function mostrarDropdown() {
+        if (dropdown) {
+            dropdown.classList.add('active');
+        }
+    }
+    
+    function cerrarDropdown() {
+        if (dropdown) {
+            dropdown.classList.remove('active');
+        }
+    }
+    
+    // Event listeners para el input de búsqueda
+    if (buscarInput) {
+        buscarInput.addEventListener('input', function() {
+            actualizarDropdown();
+            mostrarDropdown();
+        });
+        
+        buscarInput.addEventListener('focus', function() {
+            actualizarDropdown();
+            mostrarDropdown();
+        });
+        
+        buscarInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                this.value = '';
+                actualizarDropdown();
+                cerrarDropdown();
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (dropdown.querySelector('.dropdown-option')) {
+                    const primeraOpcion = dropdown.querySelector('.dropdown-option');
+                    if (primeraOpcion) {
+                        editorialSelect.value = primeraOpcion.dataset.value;
+                        editorialSelect.dispatchEvent(new Event('change'));
+                        cerrarDropdown();
+                    }
+                }
+            }
+        });
+    }
+    
+    // Event listeners para el select
+    if (editorialSelect) {
+        editorialSelect.addEventListener('focus', function() {
+            mostrarDropdown();
+        });
+        
+        editorialSelect.addEventListener('change', function() {
+            actualizarDropdown();
+        });
+        
+        // Navegación con teclado para el dropdown
+        editorialSelect.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                
+                if (!dropdown.classList.contains('active')) {
+                    mostrarDropdown();
+                    return;
+                }
+                
+                const opciones = dropdown.querySelectorAll('.dropdown-option');
+                if (opciones.length === 0) return;
+                
+                const selected = dropdown.querySelector('.dropdown-option.selected');
+                let index = selected ? Array.from(opciones).indexOf(selected) : -1;
+                
+                if (e.key === 'ArrowDown') {
+                    index = (index + 1) % opciones.length;
+                } else if (e.key === 'ArrowUp') {
+                    index = (index - 1 + opciones.length) % opciones.length;
+                }
+                
+                opciones.forEach(op => op.classList.remove('selected'));
+                opciones[index].classList.add('selected');
+                opciones[index].scrollIntoView({ block: 'nearest' });
+            } else if (e.key === 'Enter') {
+                const selected = dropdown.querySelector('.dropdown-option.selected');
+                if (selected) {
+                    editorialSelect.value = selected.dataset.value;
+                    editorialSelect.dispatchEvent(new Event('change'));
+                    cerrarDropdown();
+                }
+            } else if (e.key === 'Escape') {
+                cerrarDropdown();
+            }
+        });
+    }
+    
+    // Cerrar dropdown al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        if (!dropdown.contains(e.target) && 
+            e.target !== buscarInput && 
+            e.target !== editorialSelect) {
+            cerrarDropdown();
+        }
+    });
+    
+    // Manejo de archivo de portada
+    if (portadaInput && portadaName) {
+        portadaInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                portadaName.textContent = this.files[0].name;
+                portadaName.style.color = 'var(--verde-principal)';
+            } else {
+                portadaName.textContent = 'No se ha seleccionado ningún archivo';
+                portadaName.style.color = 'var(--texto-secundario)';
+            }
+        });
+    }
+    
+    // Validación de formulario
+    const formulario = document.querySelector('.form-libro');
+    if (formulario) {
+        formulario.addEventListener('submit', function(e) {
+            const camposRequeridos = this.querySelectorAll('[required]');
+            let valido = true;
+            
+            camposRequeridos.forEach(campo => {
+                if (!campo.value.trim()) {
+                    campo.style.borderColor = 'var(--peligro)';
+                    campo.style.boxShadow = '0 0 0 3px rgba(220, 53, 69, 0.1)';
+                    valido = false;
+                } else {
+                    campo.style.borderColor = '';
+                    campo.style.boxShadow = '';
+                }
+            });
+            
+            if (!valido) {
+                e.preventDefault();
+                alert('Por favor, complete todos los campos requeridos (*)');
+            }
+        });
+    }
+    
+    // Inicializar
+    actualizarDropdown();
+    
+    // Información de ayuda
+    console.log('💡 Tips de uso:');
+    console.log('   - Usa el campo de búsqueda para filtrar editoriales');
+    console.log('   - Presiona ESC para limpiar la búsqueda');
+    console.log('   - Usa las flechas ↑↓ para navegar en el dropdown');
+    console.log('   - Presiona Enter para seleccionar');
+});
+</script>
+{% endblock %}

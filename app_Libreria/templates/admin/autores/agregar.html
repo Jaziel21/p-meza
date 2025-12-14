@@ -1,0 +1,1002 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+/* Variables y configuración global */
+:root {
+    --verde-principal: #2e7d32;
+    --verde-claro: #4caf50;
+    --verde-hover: #1b5e20;
+    --verde-suave: #e8f5e9;
+    --azul: #2196f3;
+    --azul-claro: #e3f2fd;
+    --morado: #9c27b0;
+    --morado-claro: #f3e5f5;
+    --ambar: #ff9800;
+    --ambar-claro: #fff3e0;
+    --gris-fondo: #f8f9fa;
+    --gris-borde: #e0e0e0;
+    --gris-texto: #757575;
+    --blanco: #ffffff;
+    --texto: #2c3e50;
+    --error: #e53935;
+    --exito: #43a047;
+    --advertencia: #ff9800;
+    --sombra: 0 4px 20px rgba(0, 0, 0, 0.1);
+    --sombra-intensa: 0 8px 30px rgba(0, 0, 0, 0.15);
+    --radio: 12px;
+    --radio-pequeno: 8px;
+    --transicion: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #f0f4f8 0%, #e6f0f7 100%);
+    color: var(--texto);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* Contenedor principal */
+.container {
+    width: 90%;
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 20px;
+    animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Título principal */
+.page-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    position: relative;
+}
+
+.page-header h1 {
+    font-size: 2.4rem;
+    background: linear-gradient(135deg, var(--verde-principal), var(--azul));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800;
+    margin-bottom: 0.8rem;
+    letter-spacing: -0.5px;
+}
+
+.page-header .subtitle {
+    color: var(--gris-texto);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+/* Formulario - Diseño mejorado */
+.form-card {
+    background: var(--blanco);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-intensa);
+    overflow: hidden;
+    position: relative;
+    border: none;
+    margin-bottom: 2rem;
+}
+
+.form-card:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--verde-principal), var(--azul), var(--morado));
+    background-size: 200% 100%;
+    animation: gradientFlow 3s ease infinite;
+}
+
+@keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.card-body {
+    padding: 2.5rem;
+}
+
+/* Campos del formulario - DISEÑO MEJORADO */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.8rem;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.8rem;
+    font-weight: 600;
+    color: var(--texto);
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    padding-left: 1.8rem;
+}
+
+.form-label:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--verde-principal);
+    transition: var(--transicion);
+}
+
+.form-label.required:after {
+    content: " *";
+    color: var(--error);
+    font-size: 1.2rem;
+    margin-left: 4px;
+}
+
+/* Campo de entrada mejorado */
+.input-container {
+    position: relative;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: var(--radio-pequeno);
+    padding: 5px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.input-container:before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radio-pequeno);
+    padding: 2px;
+    background: linear-gradient(135deg, var(--verde-claro), var(--azul));
+    -webkit-mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: var(--transicion);
+}
+
+.input-container.focused:before {
+    opacity: 1;
+}
+
+.form-control {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 1rem;
+    border: none;
+    background: transparent;
+    color: var(--texto);
+    font-family: inherit;
+    outline: none;
+    transition: var(--transicion);
+    position: relative;
+    z-index: 1;
+}
+
+.form-control::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+}
+
+/* Iconos dentro de los campos */
+.input-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gris-texto);
+    font-size: 1.2rem;
+    z-index: 2;
+    pointer-events: none;
+    transition: var(--transicion);
+}
+
+.input-container.focused .input-icon {
+    color: var(--verde-principal);
+    transform: translateY(-50%) scale(1.1);
+}
+
+/* Efecto de enfoque */
+.form-control:focus ~ .input-icon {
+    animation: bounce 0.5s ease;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(-50%); }
+    50% { transform: translateY(-60%); }
+}
+
+/* Campo de fecha especial */
+.date-input-container {
+    position: relative;
+    cursor: pointer;
+}
+
+.date-input-container .form-control {
+    cursor: pointer;
+}
+
+.date-input-container:after {
+    content: "📅";
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    z-index: 2;
+}
+
+/* Textarea mejorado */
+.textarea-container {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: var(--radio-pequeno);
+    padding: 5px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    position: relative;
+}
+
+.textarea-container:before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radio-pequeno);
+    padding: 2px;
+    background: linear-gradient(135deg, var(--verde-claro), var(--azul));
+    -webkit-mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: var(--transicion);
+}
+
+.textarea-container.focused:before {
+    opacity: 1;
+}
+
+textarea.form-control {
+    min-height: 140px;
+    resize: vertical;
+    line-height: 1.6;
+    padding: 20px;
+    background: transparent;
+    border: none;
+    outline: none;
+    width: 100%;
+    font-family: inherit;
+}
+
+/* Contador de caracteres con estilo */
+.char-counter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.8rem;
+    padding: 0 0.5rem;
+}
+
+.char-count {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--verde-suave);
+    color: var(--verde-principal);
+    transition: var(--transicion);
+}
+
+.char-count.warning {
+    background: var(--ambar-claro);
+    color: var(--ambar);
+}
+
+.char-count.error {
+    background: #ffebee;
+    color: var(--error);
+}
+
+/* Campo de URL especial */
+.url-input-container {
+    position: relative;
+}
+
+.url-input-container:before {
+    content: "🌐";
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    z-index: 1;
+}
+
+.url-input-container .form-control {
+    padding-left: 50px;
+}
+
+/* Upload de archivo con diseño premium */
+.file-upload-container {
+    background: linear-gradient(135deg, var(--morado-claro), var(--azul-claro));
+    border-radius: var(--radio);
+    padding: 25px;
+    text-align: center;
+    border: 2px dashed rgba(156, 39, 176, 0.3);
+    transition: var(--transicion);
+    position: relative;
+    overflow: hidden;
+}
+
+.file-upload-container:hover {
+    border-color: var(--morado);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(156, 39, 176, 0.15);
+}
+
+.file-upload-container:before {
+    content: "📷";
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.file-upload-container label {
+    display: block;
+    font-weight: 600;
+    color: var(--morado);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
+.file-upload-container input[type="file"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.file-upload-hint {
+    color: var(--gris-texto);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+/* Preview de archivo */
+.file-preview {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: var(--blanco);
+    border-radius: var(--radio-pequeno);
+    box-shadow: var(--sombra);
+    display: none;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.file-preview.show {
+    display: block;
+}
+
+.preview-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.preview-icon {
+    font-size: 2rem;
+}
+
+.preview-info h4 {
+    margin-bottom: 0.3rem;
+    color: var(--texto);
+}
+
+.preview-info small {
+    color: var(--gris-texto);
+}
+
+/* Botones con diseño premium */
+.button-group {
+    display: flex;
+    gap: 1.2rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    justify-content: center;
+}
+
+.btn {
+    padding: 16px 32px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radio-pequeno);
+    cursor: pointer;
+    transition: var(--transicion);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    text-decoration: none;
+    min-width: 160px;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.btn:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: 0.5s;
+}
+
+.btn:hover:before {
+    left: 100%;
+}
+
+.btn-verde {
+    background: linear-gradient(135deg, var(--verde-principal), var(--verde-claro));
+    color: white;
+    box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+}
+
+.btn-verde:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(46, 125, 50, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6c757d, #868e96);
+    color: white;
+    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+}
+
+.btn-secondary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
+}
+
+/* Mensajes de error elegantes */
+.error-message {
+    color: var(--error);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #ffebee, #ffcdd2);
+    border-radius: var(--radio-pequeno);
+    border-left: 4px solid var(--error);
+    animation: shake 0.3s ease;
+    display: none;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+        padding: 0 15px;
+    }
+    
+    .page-header h1 {
+        font-size: 2rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .button-group {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
+
+/* Estados de validación */
+.input-container.valid:before {
+    background: linear-gradient(135deg, var(--exito), var(--verde-claro));
+}
+
+.input-container.invalid:before {
+    background: linear-gradient(135deg, var(--error), #ff5252);
+}
+
+/* Efecto de pulso en campos requeridos vacíos */
+@keyframes pulseRequired {
+    0% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(229, 57, 53, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); }
+}
+
+.input-container.required-empty {
+    animation: pulseRequired 2s infinite;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Encabezado de la página -->
+    <div class="page-header">
+        <h1>Nuevo Autor</h1>
+        <p class="subtitle">Complete el formulario para agregar un nuevo autor a la librería</p>
+    </div>
+    
+    <!-- Mensajes del sistema -->
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Formulario principal -->
+    <div class="form-card">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data" id="autorForm">
+                {% csrf_token %}
+                
+                <div class="form-grid">
+                    <!-- Nombre -->
+                    <div class="form-group">
+                        <label for="nombre" class="form-label required">
+                            Nombre
+                        </label>
+                        <div class="input-container" id="nombre-container">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="nombre" 
+                                   name="nombre" 
+                                   required 
+                                   placeholder="Ingrese el nombre del autor">
+                            <span class="input-icon">👤</span>
+                        </div>
+                        <div class="error-message" id="nombre-error">
+                            <span>⚠️</span> Este campo es obligatorio
+                        </div>
+                    </div>
+                    
+                    <!-- Apellido -->
+                    <div class="form-group">
+                        <label for="apellido" class="form-label required">
+                            Apellido
+                        </label>
+                        <div class="input-container" id="apellido-container">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="apellido" 
+                                   name="apellido" 
+                                   required 
+                                   placeholder="Ingrese el apellido del autor">
+                            <span class="input-icon">📝</span>
+                        </div>
+                        <div class="error-message" id="apellido-error">
+                            <span>⚠️</span> Este campo es obligatorio
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-grid">
+                    <!-- Nacionalidad -->
+                    <div class="form-group">
+                        <label for="nacionalidad" class="form-label required">
+                            Nacionalidad
+                        </label>
+                        <div class="input-container" id="nacionalidad-container">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="nacionalidad" 
+                                   name="nacionalidad" 
+                                   required 
+                                   placeholder="Ej: Mexicano, Colombiano, Español">
+                            <span class="input-icon">🌍</span>
+                        </div>
+                        <div class="error-message" id="nacionalidad-error">
+                            <span>⚠️</span> Este campo es obligatorio
+                        </div>
+                    </div>
+                    
+                    <!-- Fecha de Nacimiento -->
+                    <div class="form-group">
+                        <label for="fechanacimiento" class="form-label required">
+                            Fecha de Nacimiento
+                        </label>
+                        <div class="input-container date-input-container" id="fecha-container">
+                            <input type="date" 
+                                   class="form-control" 
+                                   id="fechanacimiento" 
+                                   name="fechanacimiento" 
+                                   required>
+                        </div>
+                        <div class="error-message" id="fechanacimiento-error">
+                            <span>⚠️</span> Seleccione una fecha válida
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bibliografía -->
+                <div class="form-group">
+                    <label for="bibliografia" class="form-label">
+                        Bibliografía
+                    </label>
+                    <div class="textarea-container" id="bio-container">
+                        <textarea class="form-control" 
+                                  id="bibliografia" 
+                                  name="bibliografia" 
+                                  rows="4" 
+                                  placeholder="Escriba aquí la biografía del autor, sus obras más importantes, premios, reconocimientos..."></textarea>
+                    </div>
+                    <div class="char-counter">
+                        <small class="file-upload-hint">Mínimo recomendado: 100 caracteres</small>
+                        <span class="char-count" id="char-count">0 caracteres</span>
+                    </div>
+                </div>
+                
+                <!-- Página Web -->
+                <div class="form-group">
+                    <label for="paginaweb" class="form-label">
+                        Página Web
+                    </label>
+                    <div class="input-container url-input-container" id="url-container">
+                        <input type="url" 
+                               class="form-control" 
+                               id="paginaweb" 
+                               name="paginaweb" 
+                               placeholder="https://www.ejemplo.com/autor">
+                    </div>
+                    <div class="error-message" id="paginaweb-error">
+                        <span>⚠️</span> Ingrese una URL válida
+                    </div>
+                </div>
+                
+                <!-- Foto -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Fotografía
+                    </label>
+                    <div class="file-upload-container">
+                        <div class="upload-icon">📷</div>
+                        <label for="foto">Haga clic para seleccionar una imagen</label>
+                        <input type="file" 
+                               id="foto" 
+                               name="foto" 
+                               accept="image/*">
+                        <p class="file-upload-hint">Formatos permitidos: JPG, PNG, GIF | Tamaño máximo: 5MB</p>
+                    </div>
+                    
+                    <div class="file-preview" id="file-preview">
+                        <div class="preview-content">
+                            <div class="preview-icon">📷</div>
+                            <div class="preview-info">
+                                <h4 id="file-name">Sin archivo seleccionado</h4>
+                                <small id="file-details">Seleccione una imagen para previsualizar</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Botones de acción -->
+                <div class="button-group">
+                    <button type="submit" class="btn btn-verde" id="submitBtn">
+                        <span>💾</span> Guardar Autor
+                    </button>
+                    <a href="{% url 'admin_autores' %}" class="btn btn-secondary">
+                        <span>↩️</span> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Nota informativa -->
+    <div style="text-align: center; margin-top: 2rem; padding: 1rem; background: linear-gradient(135deg, #e8f5e9, #f1f8e9); border-radius: var(--radio);">
+        <p style="margin: 0; color: var(--verde-principal); font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <span style="font-size: 1.2rem;">💡</span>
+            <span><strong>Consejo:</strong> Complete todos los campos marcados con * para un registro exitoso.</span>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('autorForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const fileInput = document.getElementById('foto');
+    const filePreview = document.getElementById('file-preview');
+    const fileName = document.getElementById('file-name');
+    const fileDetails = document.getElementById('file-details');
+    const fechaInput = document.getElementById('fechanacimiento');
+    const bioTextarea = document.getElementById('bibliografia');
+    const charCount = document.getElementById('char-count');
+    
+    // Contador de caracteres
+    function updateCharCount() {
+        const count = bioTextarea.value.length;
+        charCount.textContent = `${count} caracteres`;
+        
+        // Cambiar color según la cantidad
+        charCount.classList.remove('warning', 'error');
+        if (count > 1000) {
+            charCount.classList.add('error');
+        } else if (count > 500) {
+            charCount.classList.add('warning');
+        }
+    }
+    
+    bioTextarea.addEventListener('input', updateCharCount);
+    updateCharCount();
+    
+    // Fecha máxima (hoy)
+    const today = new Date().toISOString().split('T')[0];
+    fechaInput.max = today;
+    fechaInput.value = '1990-01-01'; // Valor por defecto
+    
+    // Manejo de archivos
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const file = this.files[0];
+            const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            
+            // Mostrar preview
+            filePreview.classList.add('show');
+            fileName.textContent = file.name;
+            fileDetails.textContent = `${file.type.split('/')[1].toUpperCase()} • ${fileSizeMB} MB`;
+            
+            // Mostrar previsualización de imagen
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Actualizar icono con mini preview
+                    const previewIcon = filePreview.querySelector('.preview-icon');
+                    previewIcon.innerHTML = `<img src="${e.target.result}" style="width: 40px; height: 40px; border-radius: 5px; object-fit: cover;">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        } else {
+            filePreview.classList.remove('show');
+        }
+    });
+    
+    // Efectos de enfoque en campos
+    const inputContainers = document.querySelectorAll('.input-container, .textarea-container');
+    
+    inputContainers.forEach(container => {
+        const input = container.querySelector('.form-control');
+        
+        input.addEventListener('focus', function() {
+            container.classList.add('focused');
+        });
+        
+        input.addEventListener('blur', function() {
+            container.classList.remove('focused');
+            
+            // Validación básica en blur
+            if (this.hasAttribute('required') && !this.value.trim()) {
+                container.classList.add('invalid');
+                container.classList.remove('valid');
+            } else if (this.value.trim()) {
+                container.classList.add('valid');
+                container.classList.remove('invalid');
+            }
+        });
+        
+        // Efecto hover
+        container.addEventListener('mouseenter', function() {
+            if (!this.classList.contains('focused')) {
+                this.style.transform = 'translateY(-2px)';
+            }
+        });
+        
+        container.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+    
+    // Validación del formulario
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        let isValid = true;
+        const errors = [];
+        
+        // Ocultar todos los errores primero
+        document.querySelectorAll('.error-message').forEach(el => {
+            el.style.display = 'none';
+        });
+        
+        // Validar campos requeridos
+        const requiredFields = [
+            {id: 'nombre', name: 'Nombre', container: 'nombre-container'},
+            {id: 'apellido', name: 'Apellido', container: 'apellido-container'},
+            {id: 'nacionalidad', name: 'Nacionalidad', container: 'nacionalidad-container'},
+            {id: 'fechanacimiento', name: 'Fecha de Nacimiento', container: 'fecha-container'}
+        ];
+        
+        requiredFields.forEach(field => {
+            const input = document.getElementById(field.id);
+            const container = document.getElementById(field.container);
+            const errorEl = document.getElementById(field.id + '-error');
+            
+            if (!input.value.trim()) {
+                // Mostrar error
+                errorEl.style.display = 'flex';
+                container.classList.add('invalid');
+                container.classList.remove('valid');
+                
+                // Efecto de atención
+                container.classList.add('required-empty');
+                setTimeout(() => {
+                    container.classList.remove('required-empty');
+                }, 2000);
+                
+                isValid = false;
+                errors.push(field.name);
+            } else {
+                container.classList.add('valid');
+                container.classList.remove('invalid');
+            }
+        });
+        
+        // Validar fecha
+        if (fechaInput.value) {
+            const selectedDate = new Date(fechaInput.value);
+            const today = new Date();
+            
+            if (selectedDate > today) {
+                const errorEl = document.getElementById('fechanacimiento-error');
+                errorEl.textContent = '⚠️ La fecha no puede ser futura';
+                errorEl.style.display = 'flex';
+                document.getElementById('fecha-container').classList.add('invalid');
+                isValid = false;
+            }
+        }
+        
+        // Validar URL si se proporciona
+        const urlInput = document.getElementById('paginaweb');
+        if (urlInput.value && !isValidURL(urlInput.value)) {
+            const errorEl = document.getElementById('paginaweb-error');
+            errorEl.textContent = '⚠️ Ingrese una URL válida (ej: https://ejemplo.com)';
+            errorEl.style.display = 'flex';
+            document.getElementById('url-container').classList.add('invalid');
+            isValid = false;
+        }
+        
+        // Validar biografía (recomendación)
+        if (bioTextarea.value.length > 0 && bioTextarea.value.length < 100) {
+            alert('💡 Recomendación: La biografía es muy corta. Considere agregar más detalles.');
+        }
+        
+        // Animación del botón
+        if (!isValid) {
+            submitBtn.style.animation = 'shake 0.5s ease';
+            setTimeout(() => {
+                submitBtn.style.animation = '';
+            }, 500);
+            
+            // Scroll al primer error
+            const firstError = document.querySelector('.error-message[style*="flex"]');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            alert(`❌ Por favor, complete los siguientes campos:\n\n• ${errors.join('\n• ')}`);
+        } else {
+            // Efecto de éxito
+            submitBtn.innerHTML = '<span>✅</span> Guardando...';
+            submitBtn.style.background = 'linear-gradient(135deg, #43a047, #66bb6a)';
+            
+            // Simular procesamiento
+            setTimeout(() => {
+                form.submit();
+            }, 1000);
+        }
+    });
+    
+    // Función para validar URL
+    function isValidURL(string) {
+        try {
+            const url = new URL(string);
+            return url.protocol === 'http:' || url.protocol === 'https:';
+        } catch (_) {
+            return false;
+        }
+    }
+    
+    // Efecto de entrada en campos
+    const inputs = document.querySelectorAll('.form-control');
+    inputs.forEach((input, index) => {
+        setTimeout(() => {
+            input.style.opacity = '1';
+            input.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,1381 @@
+<!-- app_Libreria/templates/auth/login_cliente.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="login-client-container">
+    <div class="login-client-wrapper">
+        <!-- Panel izquierdo - Formulario -->
+        <div class="login-client-form-section">
+            <div class="login-client-card">
+                <!-- Header con branding -->
+                <div class="login-client-header">
+                    <div class="brand-logo">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm0 18H6V4h5v7l2.5-1.5L16 11V4h2v16z"/>
+                        </svg>
+                        <span>Librería</span>
+                    </div>
+                    <div class="login-client-title">
+                        <h1>Bienvenido de vuelta</h1>
+                        <p>Ingresa a tu cuenta de cliente</p>
+                    </div>
+                </div>
+
+                <!-- Mensajes de error -->
+                {% if messages %}
+                <div class="login-messages">
+                    {% for message in messages %}
+                    <div class="message message-error">
+                        <div class="message-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                            </svg>
+                        </div>
+                        <div class="message-content">
+                            <p>{{ message }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Formulario de login -->
+                <form method="post" class="login-client-form" id="clientLoginForm">
+                    {% csrf_token %}
+                    
+                    <!-- Campo Usuario -->
+                    <div class="form-field">
+                        <label for="username" class="field-label">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                            <span>Usuario o Email</span>
+                        </label>
+                        <div class="input-with-icon">
+                            <input type="text" 
+                                   id="username" 
+                                   name="username" 
+                                   class="form-input"
+                                   placeholder="tu_usuario@gmail.com"
+                                   required
+                                   autocomplete="username"
+                                   autofocus>
+                            <div class="input-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <small class="field-hint">Tu nombre de usuario o correo electrónico</small>
+                    </div>
+
+                    <!-- Campo Contraseña -->
+                    <div class="form-field">
+                        <label for="password" class="field-label">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                            </svg>
+                            <span>Contraseña</span>
+                        </label>
+                        <div class="input-with-icon">
+                            <input type="password" 
+                                   id="password" 
+                                   name="password" 
+                                   class="form-input"
+                                   placeholder="••••••••"
+                                   required
+                                   autocomplete="current-password">
+                            <div class="input-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                                </svg>
+                            </div>
+                            <button type="button" class="toggle-password-btn" id="togglePasswordBtn">
+                                <svg class="eye-open" viewBox="0 0 24 24">
+                                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                                </svg>
+                                <svg class="eye-closed" viewBox="0 0 24 24" style="display: none;">
+                                    <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <small class="field-hint">Tu contraseña de acceso</small>
+                    </div>
+
+                    <!-- Opciones adicionales -->
+                    <div class="login-options">
+                        <label class="remember-me">
+                            <input type="checkbox" id="rememberMe" name="remember">
+                            <span class="checkmark"></span>
+                            <span class="option-text">Recordar mi sesión</span>
+                        </label>
+                        <a href="#" class="forgot-password" onclick="showForgotPassword()">
+                            ¿Olvidaste tu contraseña?
+                        </a>
+                    </div>
+
+                    <!-- Botón de login -->
+                    <button type="submit" class="login-submit-btn" id="loginSubmitBtn">
+                        <span class="btn-text">Iniciar Sesión</span>
+                        <span class="btn-loader">
+                            <svg viewBox="0 0 50 50">
+                                <circle cx="25" cy="25" r="20" fill="none" stroke-width="4"/>
+                            </svg>
+                        </span>
+                    </button>
+
+                    <!-- Separador -->
+                    <div class="login-separator">
+                        <span>¿No tienes cuenta?</span>
+                    </div>
+
+                    <!-- Registro rápido -->
+                    <div class="quick-register">
+                        <p>Únete a nuestra comunidad de lectores</p>
+                        <button type="button" class="register-btn" onclick="showRegisterModal()">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                            </svg>
+                            Crear cuenta nueva
+                        </button>
+                    </div>
+
+                    <!-- Volver al selector -->
+                    <div class="back-to-selector">
+                        <a href="{% url 'login_selector' %}" class="back-link">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                            </svg>
+                            Volver al selector de acceso
+                        </a>
+                    </div>
+                </form>
+
+                <!-- Información de seguridad -->
+                <div class="security-note">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                    </svg>
+                    <p>Tu información está protegida con encriptación de alta seguridad</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel derecho - Beneficios -->
+        <div class="login-client-benefits">
+            <div class="benefits-content">
+                <div class="benefits-header">
+                    <h2>Tu cuenta de cliente te permite:</h2>
+                    <p>Accede a todos estos beneficios exclusivos</p>
+                </div>
+
+                <div class="benefits-list">
+                    <!-- Beneficio 1 -->
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zM19.16 6.5c-.23-.55-.92-.73-1.4-.4L7.6 14.6c-.29.27-.47.66-.47 1.06 0 .83.67 1.5 1.5 1.5h7.69l-1.22 2.44c-.15.3-.04.66.26.85.14.09.29.15.46.15.2 0 .39-.07.54-.22l4.29-4.29c.38-.38.59-.89.59-1.41 0-.47-.18-.91-.47-1.24L19.16 6.5zM7.41 15h7.18l2.5-5H9.91l-2.5 5z"/>
+                            </svg>
+                        </div>
+                        <div class="benefit-text">
+                            <h3>Compras rápidas</h3>
+                            <p>Proceso de compra optimizado en 3 clicks</p>
+                        </div>
+                    </div>
+
+                    <!-- Beneficio 2 -->
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="benefit-text">
+                            <h3>Seguimiento de pedidos</h3>
+                            <p>Mira el estado de tus compras en tiempo real</p>
+                        </div>
+                    </div>
+
+                    <!-- Beneficio 3 -->
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                            </svg>
+                        </div>
+                        <div class="benefit-text">
+                            <h3>Historial de compras</h3>
+                            <p>Accede a todos tus pedidos anteriores</p>
+                        </div>
+                    </div>
+
+                    <!-- Beneficio 4 -->
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                            </svg>
+                        </div>
+                        <div class="benefit-text">
+                            <h3>Recomendaciones personalizadas</h3>
+                            <p>Libros seleccionados según tus gustos</p>
+                        </div>
+                    </div>
+
+                    <!-- Beneficio 5 -->
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z"/>
+                            </svg>
+                        </div>
+                        <div class="benefit-text">
+                            <h3>Ofertas exclusivas</h3>
+                            <p>Descuentos especiales para clientes registrados</p>
+                        </div>
+                    </div>
+
+                    <!-- Beneficio 6 -->
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="benefit-text">
+                            <h3>Lista de deseos</h3>
+                            <p>Guarda tus libros favoritos para después</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonios -->
+                <div class="testimonials">
+                    <div class="testimonial-header">
+                        <h3>Lo que dicen nuestros clientes</h3>
+                    </div>
+                    <div class="testimonial-slider">
+                        <div class="testimonial-item">
+                            <div class="testimonial-text">
+                                "La mejor experiencia de compra de libros online. ¡Super recomendado!"
+                            </div>
+                            <div class="testimonial-author">
+                                <div class="author-avatar">M</div>
+                                <div class="author-info">
+                                    <strong>María González</strong>
+                                    <small>Cliente desde 2022</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer beneficios -->
+                <div class="benefits-footer">
+                    <p>Más de <strong>10,000</strong> clientes satisfechos</p>
+                    <div class="rating">
+                        <div class="stars">
+                            ★★★★★
+                        </div>
+                        <span>4.8/5 basado en 2,456 reseñas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de registro rápido -->
+<div class="modal-overlay" id="registerModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Crear cuenta nueva</h3>
+            <button class="modal-close" onclick="closeRegisterModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Para crear una cuenta, necesitas contactar con un administrador o registrarte en el mostrador de la librería.</p>
+            
+            <div class="contact-options">
+                <div class="contact-option">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z"/>
+                    </svg>
+                    <div>
+                        <strong>Email</strong>
+                        <span>registro@libreria.com</span>
+                    </div>
+                </div>
+                <div class="contact-option">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55.45 1 1 1 9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                    </svg>
+                    <div>
+                        <strong>Teléfono</strong>
+                        <span>(55) 1234-5678</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-primary" onclick="closeRegisterModal()">Entendido</button>
+        </div>
+    </div>
+</div>
+
+<!-- Estilos CSS -->
+<style>
+/* Variables del sistema */
+:root {
+    --primary: #10b981;
+    --primary-dark: #059669;
+    --primary-light: #d1fae5;
+    --secondary: #3b82f6;
+    --accent: #8b5cf6;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --success: #10b981;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    --radius-sm: 0.375rem;
+    --radius: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --transition: all 0.2s ease;
+}
+
+/* Reset y base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--gray-800);
+    line-height: 1.5;
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    min-height: 100vh;
+}
+
+/* Contenedor principal */
+.login-client-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.login-client-wrapper {
+    display: grid;
+    grid-template-columns: 480px 1fr;
+    gap: 4rem;
+    max-width: 1400px;
+    width: 100%;
+    align-items: center;
+}
+
+@media (max-width: 1024px) {
+    .login-client-wrapper {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        max-width: 480px;
+    }
+}
+
+/* Sección del formulario */
+.login-client-form-section {
+    z-index: 2;
+}
+
+.login-client-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    animation: slideUp 0.5s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header del formulario */
+.login-client-header {
+    padding: 2.5rem 2.5rem 1.5rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+}
+
+.brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.brand-logo svg {
+    width: 32px;
+    height: 32px;
+    fill: white;
+}
+
+.brand-logo span {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+}
+
+.login-client-title h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.login-client-title p {
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+/* Mensajes */
+.login-messages {
+    padding: 1.5rem 2.5rem 0;
+}
+
+.message {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-error {
+    background: #fee2e2;
+    border-left: 4px solid var(--danger);
+    color: #991b1b;
+}
+
+.message-icon {
+    flex-shrink: 0;
+}
+
+.message-icon svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.message-content p {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+/* Formulario */
+.login-client-form {
+    padding: 2rem 2.5rem;
+}
+
+.form-field {
+    margin-bottom: 1.5rem;
+}
+
+.field-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    font-size: 0.875rem;
+}
+
+.field-label svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--gray-500);
+}
+
+.input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.875rem 3rem 0.875rem 1rem;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    color: var(--gray-900);
+    background: white;
+    transition: var(--transition);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.form-input::placeholder {
+    color: var(--gray-400);
+}
+
+.input-icon {
+    position: absolute;
+    right: 1rem;
+    pointer-events: none;
+    color: var(--gray-400);
+}
+
+.input-icon svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.toggle-password-btn {
+    position: absolute;
+    right: 3rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--gray-400);
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.toggle-password-btn:hover {
+    color: var(--gray-600);
+}
+
+.toggle-password-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.field-hint {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+/* Opciones de login */
+.login-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+    color: var(--gray-700);
+    font-size: 0.875rem;
+}
+
+.remember-me input {
+    display: none;
+}
+
+.checkmark {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--gray-300);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+.checkmark::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: var(--primary);
+    border-radius: 2px;
+    opacity: 0;
+    transform: scale(0);
+    transition: var(--transition);
+}
+
+.remember-me input:checked + .checkmark {
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+.remember-me input:checked + .checkmark::after {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.forgot-password {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: var(--transition);
+}
+
+.forgot-password:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+/* Botón de login */
+.login-submit-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.login-submit-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.login-submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.btn-text {
+    transition: opacity 0.2s ease;
+}
+
+.btn-loader {
+    display: none;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+}
+
+.btn-loader svg {
+    width: 100%;
+    height: 100%;
+}
+
+.btn-loader circle {
+    stroke: white;
+    stroke-linecap: round;
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: 0;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.login-submit-btn.loading .btn-text {
+    opacity: 0.7;
+}
+
+.login-submit-btn.loading .btn-loader {
+    display: block;
+}
+
+/* Separador */
+.login-separator {
+    display: flex;
+    align-items: center;
+    margin: 2rem 0;
+    color: var(--gray-400);
+    font-size: 0.875rem;
+}
+
+.login-separator::before,
+.login-separator::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--gray-200);
+}
+
+.login-separator span {
+    padding: 0 1rem;
+}
+
+/* Registro rápido */
+.quick-register {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.quick-register p {
+    color: var(--gray-600);
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+}
+
+.register-btn {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+}
+
+.register-btn:hover {
+    background: var(--gray-200);
+    border-color: var(--gray-300);
+}
+
+.register-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+/* Volver al selector */
+.back-to-selector {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--gray-200);
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gray-600);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: var(--transition);
+}
+
+.back-link:hover {
+    color: var(--primary);
+}
+
+.back-link svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+/* Nota de seguridad */
+.security-note {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem 2.5rem;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    color: var(--gray-600);
+    font-size: 0.75rem;
+}
+
+.security-note svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--primary);
+    flex-shrink: 0;
+}
+
+/* Sección de beneficios */
+.login-client-benefits {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 3rem;
+    height: fit-content;
+    animation: slideIn 0.5s ease 0.1s both;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.benefits-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.benefits-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 0.5rem;
+}
+
+.benefits-header p {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+/* Lista de beneficios */
+.benefits-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.benefit-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: var(--radius);
+    transition: var(--transition);
+    cursor: default;
+}
+
+.benefit-item:hover {
+    background: var(--gray-50);
+    transform: translateX(4px);
+}
+
+.benefit-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-light);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.benefit-icon svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--primary);
+}
+
+.benefit-text h3 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 0.25rem;
+}
+
+.benefit-text p {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Testimonios */
+.testimonials {
+    background: var(--gray-50);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+}
+
+.testimonial-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 1rem;
+}
+
+.testimonial-item {
+    background: white;
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.testimonial-text {
+    color: var(--gray-700);
+    font-style: italic;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.author-avatar {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+
+.author-info strong {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--gray-900);
+    margin-bottom: 0.125rem;
+}
+
+.author-info small {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+/* Footer beneficios */
+.benefits-footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--gray-200);
+}
+
+.benefits-footer p {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+}
+
+.benefits-footer strong {
+    color: var(--gray-900);
+}
+
+.rating {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.stars {
+    color: #f59e0b;
+    font-size: 1.25rem;
+    letter-spacing: 2px;
+}
+
+.rating span {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+/* Modal */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    max-width: 500px;
+    width: 100%;
+    animation: modalSlideUp 0.3s ease;
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.modal-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--gray-500);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.modal-close:hover {
+    background: var(--gray-100);
+    color: var(--gray-700);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-body p {
+    color: var(--gray-600);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.contact-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.contact-option {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--gray-50);
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+}
+
+.contact-option svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--primary);
+    flex-shrink: 0;
+}
+
+.contact-option div {
+    flex: 1;
+}
+
+.contact-option strong {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--gray-900);
+    margin-bottom: 0.25rem;
+}
+
+.contact-option span {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+}
+
+.modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--gray-200);
+    text-align: right;
+}
+
+.btn-primary {
+    padding: 0.75rem 1.5rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .login-client-container {
+        padding: 1rem;
+    }
+    
+    .login-client-header {
+        padding: 2rem 1.5rem 1rem;
+    }
+    
+    .login-client-form {
+        padding: 1.5rem;
+    }
+    
+    .login-messages {
+        padding: 1.5rem 1.5rem 0;
+    }
+    
+    .security-note {
+        padding: 1rem 1.5rem;
+    }
+    
+    .login-client-benefits {
+        padding: 1.5rem;
+    }
+    
+    .benefits-list {
+        gap: 1rem;
+    }
+    
+    .benefit-item {
+        padding: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-options {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .benefit-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+    
+    .benefit-icon {
+        align-self: center;
+    }
+}
+</style>
+
+<!-- JavaScript interactivo -->
+<script>
+// Toggle de visibilidad de contraseña
+const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+const passwordInput = document.getElementById('password');
+const eyeOpen = document.querySelector('.eye-open');
+const eyeClosed = document.querySelector('.eye-closed');
+
+if (togglePasswordBtn && passwordInput) {
+    togglePasswordBtn.addEventListener('click', function() {
+        const isPassword = passwordInput.type === 'password';
+        
+        passwordInput.type = isPassword ? 'text' : 'password';
+        eyeOpen.style.display = isPassword ? 'none' : 'block';
+        eyeClosed.style.display = isPassword ? 'block' : 'none';
+        
+        // Enfocar el input después de cambiar
+        passwordInput.focus();
+    });
+}
+
+// Manejo del formulario
+const clientLoginForm = document.getElementById('clientLoginForm');
+const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+
+if (clientLoginForm) {
+    clientLoginForm.addEventListener('submit', function(e) {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        
+        // Validación básica
+        if (!username || !password) {
+            e.preventDefault();
+            showMessage('Por favor completa todos los campos', 'error');
+            return;
+        }
+        
+        // Mostrar estado de loading
+        loginSubmitBtn.classList.add('loading');
+        loginSubmitBtn.disabled = true;
+        
+        // El formulario se enviará normalmente
+    });
+}
+
+// Función para mostrar mensajes
+function showMessage(text, type = 'info') {
+    const messagesContainer = document.querySelector('.login-messages');
+    if (!messagesContainer) return;
+    
+    const message = document.createElement('div');
+    message.className = `message message-${type}`;
+    message.innerHTML = `
+        <div class="message-icon">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-4h-2V7h2v6z"/>
+            </svg>
+        </div>
+        <div class="message-content">
+            <p>${text}</p>
+        </div>
+    `;
+    
+    messagesContainer.appendChild(message);
+    
+    // Auto-remove después de 5 segundos
+    setTimeout(() => {
+        if (message.parentElement) {
+            message.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => message.remove(), 300);
+        }
+    }, 5000);
+}
+
+// Modal de registro
+function showRegisterModal() {
+    const modal = document.getElementById('registerModal');
+    if (modal) {
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeRegisterModal() {
+    const modal = document.getElementById('registerModal');
+    if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+}
+
+// Función para contraseña olvidada (placeholder)
+function showForgotPassword() {
+    showMessage('Para recuperar tu contraseña, contacta con soporte: soporte@libreria.com', 'info');
+}
+
+// Cerrar modal con ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeRegisterModal();
+    }
+});
+
+// Cerrar modal haciendo clic fuera
+document.getElementById('registerModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeRegisterModal();
+    }
+});
+
+// Auto-focus en el campo de usuario
+document.addEventListener('DOMContentLoaded', function() {
+    const usernameField = document.getElementById('username');
+    if (usernameField) {
+        usernameField.focus();
+    }
+    
+    // Agregar animación de fadeOut
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Animación de entrada para beneficios
+    const benefitItems = document.querySelectorAll('.benefit-item');
+    benefitItems.forEach((item, index) => {
+        item.style.animationDelay = `${index * 0.1}s`;
+    });
+});
+</script>
+{% endblock %}

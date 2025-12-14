@@ -1,0 +1,678 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Agregar Nueva Editorial</h1>
+    
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post" id="editorialForm">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label>Nombre Editorial *</label>
+                    <input type="text" class="form-control" name="nombre" required id="nombreInput">
+                    <div class="form-help">Ingrese el nombre completo de la editorial</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Dirección *</label>
+                    <input type="text" class="form-control" name="direccion" required id="direccionInput">
+                    <div class="form-help">Dirección física de la editorial</div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col-6">
+                        <div class="form-group">
+                            <label>Teléfono *</label>
+                            <input type="text" class="form-control" name="telefono" required id="telefonoInput">
+                            <div class="form-help">Ej: +52 55 1234 5678</div>
+                        </div>
+                    </div>
+                    <div class="form-col-6">
+                        <div class="form-group">
+                            <label>País de Origen *</label>
+                            <select class="form-control" name="pais" required id="paisSelect">
+                                <option value="">Seleccionar país</option>
+                                <option value="México">México</option>
+                                <option value="España">España</option>
+                                <option value="Argentina">Argentina</option>
+                                <option value="Colombia">Colombia</option>
+                                <option value="Chile">Chile</option>
+                                <option value="Perú">Perú</option>
+                                <option value="Estados Unidos">Estados Unidos</option>
+                                <option value="Reino Unido">Reino Unido</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                            <input type="text" class="form-control" name="pais_otro" id="paisOtroInput" placeholder="Especificar país" style="display: none; margin-top: 5px;">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Email de Contacto *</label>
+                    <input type="email" class="form-control" name="email" required id="emailInput">
+                    <div class="form-help">Ej: contacto@editorial.com</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Sitio Web</label>
+                    <input type="url" class="form-control" name="sitioweb" id="sitiowebInput" placeholder="https://ejemplo.com">
+                    <div class="form-help">URL completa del sitio web (opcional)</div>
+                </div>
+                
+                <!-- Validación previa -->
+                <div class="form-preview">
+                    <h4>Resumen de la Editorial</h4>
+                    <div class="preview-content">
+                        <div class="preview-item">
+                            <strong>Nombre:</strong> <span id="previewNombre">-</span>
+                        </div>
+                        <div class="preview-item">
+                            <strong>País:</strong> <span id="previewPais">-</span>
+                        </div>
+                        <div class="preview-item">
+                            <strong>Email:</strong> <span id="previewEmail">-</span>
+                        </div>
+                        <div class="preview-item">
+                            <strong>Sitio Web:</strong> <span id="previewSitioWeb">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-verde">Guardar Editorial</button>
+                    <a href="{% url 'admin_editoriales' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos específicos para la página de agregar editorial */
+.container {
+    width: 90%;
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+h1 {
+    color: #2e8b57;
+    margin-bottom: 30px;
+    font-size: 2rem;
+    text-align: center;
+}
+
+/* Mensajes */
+.messages-container {
+    margin-bottom: 25px;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    position: relative;
+    animation: slideIn 0.3s ease-out;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Tarjeta */
+.card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin-bottom: 30px;
+    border: 1px solid #e9ecef;
+}
+
+.card-body {
+    padding: 35px;
+}
+
+/* Sistema de grid para formulario */
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -15px;
+}
+
+.form-col-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding: 0 15px;
+}
+
+/* Formulario */
+.form-group {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 13px 15px;
+    border: 1.5px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: all 0.3s;
+    font-family: inherit;
+    background: white;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #2e8b57;
+    box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.15);
+    transform: translateY(-1px);
+}
+
+select.form-control {
+    height: 48px;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 12px;
+    padding-right: 40px;
+}
+
+/* Texto de ayuda */
+.form-help {
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-top: 6px;
+    display: block;
+    font-style: italic;
+}
+
+/* Vista previa */
+.form-preview {
+    background: #f8f9fa;
+    border: 1px dashed #adb5bd;
+    border-radius: 6px;
+    padding: 20px;
+    margin: 30px 0;
+    transition: all 0.3s;
+}
+
+.form-preview h4 {
+    color: #495057;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 10px;
+}
+
+.preview-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.preview-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.preview-item strong {
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.preview-item span {
+    color: #2e8b57;
+    font-weight: 500;
+    font-size: 0.95rem;
+    min-height: 20px;
+}
+
+/* Botones */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 14px 28px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-width: 180px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+.btn:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(40, 40);
+        opacity: 0;
+    }
+}
+
+.btn-verde {
+    background: linear-gradient(135deg, #2e8b57 0%, #3cb371 100%);
+    color: white;
+    box-shadow: 0 4px 6px rgba(46, 139, 87, 0.2);
+}
+
+.btn-verde:hover {
+    background: linear-gradient(135deg, #1e6b3a 0%, #2e8b57 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(46, 139, 87, 0.3);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #868e96 100%);
+    color: white;
+    box-shadow: 0 4px 6px rgba(108, 117, 125, 0.2);
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #6c757d 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(108, 117, 125, 0.3);
+}
+
+/* Estilo para campos requeridos */
+.form-group label::after {
+    content: " *";
+    color: #dc3545;
+}
+
+/* Validación visual */
+.form-control.error {
+    border-color: #dc3545;
+    background-color: #fff5f5;
+    animation: shake 0.5s;
+}
+
+.form-control.success {
+    border-color: #28a745;
+    background-color: #f8fff9;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-col-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    .container {
+        padding: 15px;
+    }
+    
+    .card-body {
+        padding: 25px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .form-row {
+        margin: 0;
+    }
+    
+    .preview-content {
+        grid-template-columns: 1fr;
+    }
+    
+    h1 {
+        font-size: 1.7rem;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .form-control {
+        padding: 11px 13px;
+        font-size: 0.95rem;
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+    
+    .form-preview {
+        padding: 15px;
+    }
+}
+
+/* Efectos de carga */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-top: -10px;
+    margin-left: -10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Estilo para campos dinámicos */
+.dynamic-field {
+    transition: all 0.3s ease;
+}
+
+.dynamic-field.visible {
+    max-height: 100px;
+    opacity: 1;
+}
+
+.dynamic-field.hidden {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('editorialForm');
+    const nombreInput = document.getElementById('nombreInput');
+    const direccionInput = document.getElementById('direccionInput');
+    const telefonoInput = document.getElementById('telefonoInput');
+    const paisSelect = document.getElementById('paisSelect');
+    const paisOtroInput = document.getElementById('paisOtroInput');
+    const emailInput = document.getElementById('emailInput');
+    const sitiowebInput = document.getElementById('sitiowebInput');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    // Elementos de vista previa
+    const previewNombre = document.getElementById('previewNombre');
+    const previewPais = document.getElementById('previewPais');
+    const previewEmail = document.getElementById('previewEmail');
+    const previewSitioWeb = document.getElementById('previewSitioWeb');
+    
+    // Mostrar/ocultar campo "Otro" para país
+    paisSelect.addEventListener('change', function() {
+        if (this.value === 'Otro') {
+            paisOtroInput.style.display = 'block';
+            paisOtroInput.required = true;
+        } else {
+            paisOtroInput.style.display = 'none';
+            paisOtroInput.required = false;
+            paisOtroInput.value = '';
+        }
+        updatePreview();
+    });
+    
+    // Validación de email en tiempo real
+    emailInput.addEventListener('input', function() {
+        const email = this.value.trim();
+        if (email && !isValidEmail(email)) {
+            this.classList.add('error');
+            this.classList.remove('success');
+        } else if (email) {
+            this.classList.remove('error');
+            this.classList.add('success');
+        } else {
+            this.classList.remove('error', 'success');
+        }
+        updatePreview();
+    });
+    
+    // Validación de URL en tiempo real
+    sitiowebInput.addEventListener('input', function() {
+        const url = this.value.trim();
+        if (url && !isValidURL(url)) {
+            this.classList.add('error');
+        } else if (url) {
+            this.classList.remove('error');
+            this.classList.add('success');
+        } else {
+            this.classList.remove('error', 'success');
+        }
+        updatePreview();
+    });
+    
+    // Validación de teléfono
+    telefonoInput.addEventListener('input', function() {
+        const telefono = this.value.trim();
+        if (telefono && !isValidPhone(telefono)) {
+            this.classList.add('error');
+            this.classList.remove('success');
+        } else if (telefono) {
+            this.classList.remove('error');
+            this.classList.add('success');
+        } else {
+            this.classList.remove('error', 'success');
+        }
+    });
+    
+    // Actualizar vista previa en tiempo real
+    function updatePreview() {
+        previewNombre.textContent = nombreInput.value || '-';
+        
+        const paisSeleccionado = paisSelect.value;
+        if (paisSeleccionado === 'Otro' && paisOtroInput.value) {
+            previewPais.textContent = paisOtroInput.value;
+        } else if (paisSeleccionado) {
+            previewPais.textContent = paisSeleccionado;
+        } else {
+            previewPais.textContent = '-';
+        }
+        
+        previewEmail.textContent = emailInput.value || '-';
+        previewSitioWeb.textContent = sitiowebInput.value || '-';
+    }
+    
+    // Escuchar cambios en todos los campos para vista previa
+    [nombreInput, direccionInput, telefonoInput, paisSelect, paisOtroInput, emailInput, sitiowebInput].forEach(input => {
+        input.addEventListener('input', updatePreview);
+    });
+    
+    // Validar formulario al enviar
+    form.addEventListener('submit', function(e) {
+        let valid = true;
+        const errorMessages = [];
+        
+        // Validar campos requeridos
+        const requiredFields = form.querySelectorAll('[required]');
+        requiredFields.forEach(function(field) {
+            if (!field.value.trim()) {
+                valid = false;
+                field.classList.add('error');
+                errorMessages.push(`"${field.previousElementSibling.textContent.replace(' *', '')}" es requerido.`);
+            } else {
+                field.classList.remove('error');
+            }
+        });
+        
+        // Validar email
+        if (emailInput.value && !isValidEmail(emailInput.value)) {
+            valid = false;
+            emailInput.classList.add('error');
+            errorMessages.push('El email no tiene un formato válido.');
+        }
+        
+        // Validar URL si existe
+        if (sitiowebInput.value && !isValidURL(sitiowebInput.value)) {
+            valid = false;
+            sitiowebInput.classList.add('error');
+            errorMessages.push('La URL del sitio web no es válida. Debe comenzar con http:// o https://');
+        }
+        
+        // Validar teléfono
+        if (telefonoInput.value && !isValidPhone(telefonoInput.value)) {
+            valid = false;
+            telefonoInput.classList.add('error');
+            errorMessages.push('El teléfono debe contener solo números, espacios y los caracteres + - ( ).');
+        }
+        
+        if (!valid) {
+            e.preventDefault();
+            alert('Por favor, corrija los siguientes errores:\n\n' + errorMessages.join('\n'));
+        } else {
+            // Mostrar estado de carga
+            submitBtn.classList.add('btn-loading');
+            submitBtn.disabled = true;
+            
+            // Simular delay para mostrar efecto de carga (solo visual)
+            setTimeout(() => {
+                submitBtn.classList.remove('btn-loading');
+                submitBtn.disabled = false;
+            }, 2000);
+        }
+    });
+    
+    // Funciones de validación
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+    
+    function isValidURL(url) {
+        try {
+            new URL(url);
+            return url.startsWith('http://') || url.startsWith('https://');
+        } catch (_) {
+            return false;
+        }
+    }
+    
+    function isValidPhone(phone) {
+        const phoneRegex = /^[\d\s+\-()]+$/;
+        return phoneRegex.test(phone) && phone.replace(/[^\d]/g, '').length >= 8;
+    }
+    
+    // Auto-formatear teléfono
+    telefonoInput.addEventListener('blur', function() {
+        let phone = this.value.replace(/[^\d+]/g, '');
+        if (phone.length > 0 && !phone.startsWith('+')) {
+            phone = '+52 ' + phone;
+        }
+        this.value = phone;
+    });
+    
+    // Capitalizar nombre de editorial
+    nombreInput.addEventListener('blur', function() {
+        if (this.value) {
+            this.value = this.value
+                .toLowerCase()
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+    });
+    
+    // Auto-completar http:// si el usuario no lo especifica
+    sitiowebInput.addEventListener('blur', function() {
+        let url = this.value.trim();
+        if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+            this.value = 'https://' + url;
+        }
+    });
+    
+    // Inicializar vista previa
+    updatePreview();
+});
+</script>
+{% endblock %}

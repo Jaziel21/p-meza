@@ -1,0 +1,522 @@
+<!-- app_Libreria/templates/admin/libros/eliminar.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="delete-card">
+        <div class="delete-header">
+            <h3 class="delete-title">Eliminar Libro</h3>
+        </div>
+        <div class="delete-content">
+            <div class="warning-alert">
+                <div class="warning-icon">⚠️</div>
+                <div class="warning-content">
+                    <h4>¿Estás seguro de que quieres eliminar el libro?</h4>
+                    <div class="book-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Título:</span>
+                            <span class="detail-value">{{ libro.titulo }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Autor:</span>
+                            <span class="detail-value">{{ libro.autorid.nombre }} {{ libro.autorid.apellido }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Editorial:</span>
+                            <span class="detail-value">{{ libro.editorialid.nombre }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">ISBN:</span>
+                            <span class="detail-value">{{ libro.isbn }}</span>
+                        </div>
+                    </div>
+                    <div class="warning-message">
+                        <strong>⚠️ Advertencia:</strong> Esta acción no se puede deshacer.
+                    </div>
+                </div>
+            </div>
+            
+            <form method="post" class="delete-form">
+                {% csrf_token %}
+                <div class="delete-actions">
+                    <button type="submit" class="btn btn-danger" id="delete-btn">
+                        <span class="btn-icon">🗑️</span> Sí, eliminar libro
+                    </button>
+                    <a href="{% url 'admin_libros' %}" class="btn btn-secondary">
+                        <span class="btn-icon">❌</span> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Variables CSS (consistentes) */
+:root {
+    --verde-principal: #2e8b57;
+    --blanco: #ffffff;
+    --gris-claro: #f8f9fa;
+    --gris-medio: #e9ecef;
+    --gris-oscuro: #343a40;
+    --texto: #212529;
+    --texto-secundario: #6c757d;
+    --peligro: #dc3545;
+    --peligro-hover: #c82333;
+    --peligro-claro: rgba(220, 53, 69, 0.1);
+    --advertencia: #ffc107;
+    --advertencia-claro: rgba(255, 193, 7, 0.1);
+    --advertencia-oscuro: #e0a800;
+    --sombra: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --sombra-hover: 0 4px 8px rgba(0, 0, 0, 0.15);
+    --radio-borde: 8px;
+    --radio-input: 6px;
+}
+
+/* Contenedor principal */
+.admin-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+}
+
+/* Tarjeta de eliminación */
+.delete-card {
+    background: var(--blanco);
+    border-radius: var(--radio-borde);
+    box-shadow: var(--sombra-hover);
+    overflow: hidden;
+    width: 100%;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Encabezado */
+.delete-header {
+    background: linear-gradient(135deg, var(--peligro), #c82333);
+    color: var(--blanco);
+    padding: 20px 30px;
+    text-align: center;
+}
+
+.delete-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Contenido */
+.delete-content {
+    padding: 30px;
+}
+
+/* Alerta de advertencia */
+.warning-alert {
+    display: flex;
+    gap: 20px;
+    padding: 25px;
+    background-color: var(--advertencia-claro);
+    border: 2px solid var(--advertencia);
+    border-radius: var(--radio-input);
+    margin-bottom: 30px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        border-color: var(--advertencia);
+    }
+    50% {
+        border-color: var(--advertencia-oscuro);
+    }
+}
+
+.warning-icon {
+    font-size: 40px;
+    flex-shrink: 0;
+}
+
+.warning-content {
+    flex: 1;
+}
+
+.warning-content h4 {
+    margin: 0 0 20px 0;
+    color: var(--texto);
+    font-size: 18px;
+}
+
+/* Detalles del libro */
+.book-details {
+    background-color: var(--blanco);
+    border-radius: var(--radio-input);
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid var(--gris-medio);
+}
+
+.detail-row {
+    display: flex;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--gris-claro);
+}
+
+.detail-row:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: var(--texto);
+    min-width: 100px;
+    flex-shrink: 0;
+}
+
+.detail-value {
+    color: var(--texto);
+    flex: 1;
+    word-break: break-word;
+}
+
+.warning-message {
+    background-color: var(--blanco);
+    padding: 15px;
+    border-radius: var(--radio-input);
+    border-left: 4px solid var(--peligro);
+    color: var(--texto);
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.warning-message strong {
+    color: var(--peligro);
+}
+
+/* Formulario */
+.delete-form {
+    margin-top: 30px;
+}
+
+.delete-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+/* Botones */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 14px 28px;
+    border-radius: var(--radio-input);
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    gap: 10px;
+    min-width: 180px;
+    justify-content: center;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--peligro), #c82333);
+    color: white;
+    box-shadow: 0 4px 6px rgba(220, 53, 69, 0.2);
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #c82333, #bd2130);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(220, 53, 69, 0.3);
+}
+
+.btn-danger:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, var(--gris-medio), #dae0e5);
+    color: var(--texto);
+    border: 2px solid var(--gris-medio);
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, var(--gris-oscuro), #495057);
+    color: var(--blanco);
+    border-color: var(--gris-oscuro);
+    transform: translateY(-2px);
+}
+
+.btn-icon {
+    font-size: 18px;
+}
+
+/* Efecto de confirmación */
+.confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.confirm-dialog {
+    background: var(--blanco);
+    border-radius: var(--radio-borde);
+    padding: 40px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    animation: scaleIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.confirm-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.confirm-message {
+    margin-bottom: 30px;
+    color: var(--texto);
+    line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-container {
+        padding: 20px 15px;
+    }
+    
+    .delete-header {
+        padding: 15px 20px;
+    }
+    
+    .delete-title {
+        font-size: 20px;
+    }
+    
+    .delete-content {
+        padding: 20px;
+    }
+    
+    .warning-alert {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .warning-icon {
+        font-size: 32px;
+    }
+    
+    .book-details {
+        padding: 15px;
+    }
+    
+    .detail-row {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .detail-label {
+        min-width: auto;
+    }
+    
+    .delete-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .warning-content h4 {
+        font-size: 16px;
+    }
+    
+    .btn {
+        padding: 12px 20px;
+        font-size: 15px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteBtn = document.getElementById('delete-btn');
+    const deleteForm = document.querySelector('.delete-form');
+    
+    // Información del libro para debug
+    console.log('🗑️ Eliminando libro:', {
+        titulo: '{{ libro.titulo }}',
+        id: '{{ libro.libroid }}',
+        autor: '{{ libro.autorid.nombre }} {{ libro.autorid.apellido }}',
+        isbn: '{{ libro.isbn }}'
+    });
+    
+    // Confirmación mejorada con overlay
+    if (deleteBtn && deleteForm) {
+        deleteBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Crear overlay de confirmación
+            const overlay = document.createElement('div');
+            overlay.className = 'confirm-overlay';
+            
+            const dialog = document.createElement('div');
+            dialog.className = 'confirm-dialog';
+            
+            dialog.innerHTML = `
+                <div class="confirm-icon">❓</div>
+                <h3>Confirmar eliminación</h3>
+                <p class="confirm-message">
+                    ¿Estás absolutamente seguro de que quieres eliminar 
+                    <strong>"{{ libro.titulo }}"</strong>?
+                    <br><br>
+                    <small>Esta acción eliminará permanentemente el libro y 
+                    cualquier venta asociada a él.</small>
+                </p>
+                <div class="confirm-actions" style="display: flex; gap: 15px; justify-content: center;">
+                    <button type="button" id="confirm-delete" class="btn btn-danger" style="min-width: 140px;">
+                        <span class="btn-icon">🗑️</span> Sí, eliminar
+                    </button>
+                    <button type="button" id="cancel-delete" class="btn btn-secondary" style="min-width: 140px;">
+                        <span class="btn-icon">❌</span> Cancelar
+                    </button>
+                </div>
+            `;
+            
+            overlay.appendChild(dialog);
+            document.body.appendChild(overlay);
+            
+            // Deshabilitar scroll del body
+            document.body.style.overflow = 'hidden';
+            
+            // Confirmar eliminación
+            document.getElementById('confirm-delete').addEventListener('click', function() {
+                // Mostrar animación de carga
+                deleteBtn.innerHTML = '<span class="btn-icon">⏳</span> Eliminando...';
+                deleteBtn.disabled = true;
+                
+                // Enviar formulario después de breve pausa
+                setTimeout(() => {
+                    deleteForm.submit();
+                }, 500);
+            });
+            
+            // Cancelar eliminación
+            document.getElementById('cancel-delete').addEventListener('click', function() {
+                document.body.removeChild(overlay);
+                document.body.style.overflow = '';
+            });
+            
+            // Cerrar al hacer clic fuera del diálogo
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    document.body.removeChild(overlay);
+                    document.body.style.overflow = '';
+                }
+            });
+            
+            // Cerrar con tecla Escape
+            document.addEventListener('keydown', function closeOnEscape(e) {
+                if (e.key === 'Escape') {
+                    document.body.removeChild(overlay);
+                    document.body.style.overflow = '';
+                    document.removeEventListener('keydown', closeOnEscape);
+                }
+            });
+        });
+    }
+    
+    // Efecto hover para detalles del libro
+    const detailRows = document.querySelectorAll('.detail-row');
+    detailRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = 'var(--gris-claro)';
+            this.style.transform = 'translateX(5px)';
+            this.style.transition = 'all 0.2s ease';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+            this.style.transform = '';
+        });
+    });
+    
+    // Validar que no se pueda hacer doble clic
+    let formSubmitted = false;
+    
+    if (deleteForm) {
+        deleteForm.addEventListener('submit', function(e) {
+            if (formSubmitted) {
+                e.preventDefault();
+                return false;
+            }
+            
+            formSubmitted = true;
+            
+            // Deshabilitar todos los botones
+            const buttons = this.querySelectorAll('button');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="btn-icon">⏳</span> Procesando...';
+            });
+            
+            return true;
+        });
+    }
+    
+    // Mostrar mensaje en consola sobre las consecuencias
+    console.warn('⚠️ ADVERTENCIA: Eliminar este libro también podría afectar:');
+    console.warn('   - Detalles de venta asociados');
+    console.warn('   - Historial de ventas');
+    console.warn('   - Carritos de compra que lo contengan');
+});
+</script>
+{% endblock %}

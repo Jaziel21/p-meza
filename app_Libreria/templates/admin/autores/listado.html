@@ -1,0 +1,1568 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+/* Variables y configuración global - Tema Librería Premium */
+:root {
+    --verde-oscuro: #1a5d1a;
+    --verde-principal: #2e7d32;
+    --verde-claro: #4caf50;
+    --verde-neon: #00ff88;
+    --verde-suave: #e8f5e9;
+    --dorado: #ffd700;
+    --ambar-oscuro: #ff8c00;
+    --ambar: #ff9800;
+    --ambar-claro: #fff3e0;
+    --rojo-libreria: #c62828;
+    --rojo-claro: #ef5350;
+    --rojo-suave: #ffebee;
+    --azul-profundo: #1565c0;
+    --azul: #2196f3;
+    --azul-claro: #e3f2fd;
+    --morado: #9c27b0;
+    --marron-libro: #5d4037;
+    --beige-papel: #f5f1e8;
+    --gris-oscuro: #263238;
+    --gris: #607d8b;
+    --gris-claro: #b0bec5;
+    --gris-fondo: #f5f7fa;
+    --blanco: #ffffff;
+    --negro: #1a1a1a;
+    
+    --sombra-suave: 0 4px 6px rgba(0, 0, 0, 0.07);
+    --sombra-media: 0 8px 25px rgba(0, 0, 0, 0.1);
+    --sombra-fuerte: 0 15px 40px rgba(0, 0, 0, 0.15);
+    --sombra-neon: 0 0 15px rgba(0, 255, 136, 0.3);
+    
+    --radio-grande: 20px;
+    --radio: 12px;
+    --radio-pequeno: 8px;
+    
+    --transicion: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transicion-rapida: all 0.2s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #e8f5e9 50%, #f1f8e9 100%);
+    background-attachment: fixed;
+    color: var(--gris-oscuro);
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Fondo decorativo con elementos de libros */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(46, 125, 50, 0.03) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(255, 152, 0, 0.03) 0%, transparent 20%),
+        radial-gradient(circle at 50% 50%, rgba(156, 39, 176, 0.02) 0%, transparent 30%);
+    z-index: -1;
+}
+
+/* Contenedor principal */
+.container {
+    width: 95%;
+    max-width: 1600px;
+    margin: 2rem auto;
+    padding: 0 25px;
+    animation: slideUp 0.8s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header épico con efecto de libro abierto */
+.hero-header {
+    position: relative;
+    margin-bottom: 3rem;
+    padding: 3rem 3rem 2rem;
+    background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal));
+    border-radius: var(--radio-grande);
+    box-shadow: var(--sombra-fuerte);
+    overflow: hidden;
+    border: 8px solid var(--dorado);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+.hero-header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text x="50" y="50" font-size="8" fill="rgba(255,255,255,0.05)" text-anchor="middle" dominant-baseline="middle">📚</text></svg>');
+    opacity: 0.3;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--dorado), #fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    letter-spacing: -1px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    position: relative;
+    display: inline-block;
+}
+
+.hero-title::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 25%;
+    width: 50%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--dorado), transparent);
+    border-radius: 2px;
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 2rem;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+}
+
+/* Botón principal con efecto 3D */
+.btn-empire {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 18px 40px;
+    background: linear-gradient(145deg, var(--dorado), var(--ambar-oscuro));
+    color: var(--gris-oscuro);
+    border: none;
+    border-radius: var(--radio);
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: var(--transicion);
+    box-shadow: 
+        0 10px 20px rgba(255, 215, 0, 0.3),
+        0 6px 6px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transform: translateY(0);
+}
+
+.btn-empire::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: 0.6s;
+}
+
+.btn-empire:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 
+        0 15px 30px rgba(255, 215, 0, 0.4),
+        0 10px 10px rgba(0, 0, 0, 0.25),
+        var(--sombra-neon);
+}
+
+.btn-empire:hover::before {
+    left: 100%;
+}
+
+.btn-empire:active {
+    transform: translateY(-2px) scale(1.02);
+}
+
+/* Panel de estadísticas tipo "dashboard premium" */
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+    animation: fadeIn 0.8s ease-out 0.3s both;
+}
+
+.stat-card-premium {
+    background: linear-gradient(145deg, var(--blanco), var(--gris-fondo));
+    border-radius: var(--radio);
+    padding: 2rem;
+    box-shadow: var(--sombra-media);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    transition: var(--transicion);
+    position: relative;
+    overflow: hidden;
+    border: 2px solid transparent;
+    backdrop-filter: blur(10px);
+}
+
+.stat-card-premium::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--verde-claro), var(--azul));
+}
+
+.stat-card-premium:hover {
+    transform: translateY(-10px) rotateX(5deg);
+    box-shadow: var(--sombra-fuerte);
+    border-color: var(--verde-claro);
+}
+
+.stat-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--verde-suave), var(--azul-claro));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: var(--verde-principal);
+    box-shadow: var(--sombra-suave);
+    position: relative;
+}
+
+.stat-icon-wrapper::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--verde-claro), var(--azul));
+    z-index: -1;
+    opacity: 0;
+    transition: var(--transicion);
+}
+
+.stat-card-premium:hover .stat-icon-wrapper::after {
+    opacity: 0.3;
+    animation: rotate 3s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.stat-content-premium {
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--verde-principal), var(--azul-profundo));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.stat-label {
+    color: var(--gris);
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+}
+
+/* Tarjeta principal de datos - Estilo "Biblioteca" */
+.library-card {
+    background: linear-gradient(145deg, var(--blanco), var(--beige-papel));
+    border-radius: var(--radio-grande);
+    box-shadow: var(--sombra-fuerte);
+    overflow: hidden;
+    margin-bottom: 3rem;
+    border: 1px solid rgba(93, 64, 55, 0.1);
+    position: relative;
+}
+
+.library-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(90deg, 
+        var(--verde-principal) 0%, 
+        var(--azul) 25%, 
+        var(--ambar) 50%, 
+        var(--morado) 75%, 
+        var(--rojo-libreria) 100%);
+}
+
+/* Header de la tarjeta estilo "lomo de libro" */
+.card-header-library {
+    padding: 2rem 2.5rem;
+    background: linear-gradient(135deg, var(--marron-libro), #6d4c41);
+    border-bottom: 3px solid var(--dorado);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.card-header-library::before {
+    content: "AUTORES";
+    position: absolute;
+    left: -30px;
+    top: 50%;
+    transform: translateY(-50%) rotate(-90deg);
+    color: var(--dorado);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    background: var(--marron-libro);
+    padding: 10px 15px;
+    border-radius: var(--radio-pequeno);
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.card-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--dorado);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-left: 50px;
+}
+
+.card-title::before {
+    content: "📖";
+    font-size: 2rem;
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
+}
+
+/* Controles de búsqueda premium */
+.search-command {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.search-icon {
+    color: var(--dorado);
+    font-size: 1.2rem;
+}
+
+.command-input {
+    background: transparent;
+    border: none;
+    color: var(--blanco);
+    font-size: 1rem;
+    width: 300px;
+    padding: 0.5rem;
+    font-family: 'Courier New', monospace;
+}
+
+.command-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.command-input:focus {
+    outline: none;
+}
+
+.command-btn {
+    background: var(--dorado);
+    color: var(--gris-oscuro);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transicion);
+}
+
+.command-btn:hover {
+    transform: rotate(15deg) scale(1.1);
+    background: var(--verde-neon);
+}
+
+/* Filtros estilo "etiquetas de libros" */
+.filter-tags {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem 2.5rem;
+    background: linear-gradient(135deg, var(--gris-fondo), var(--verde-suave));
+    border-bottom: 2px solid rgba(93, 64, 55, 0.1);
+    flex-wrap: wrap;
+}
+
+.filter-tag {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, var(--blanco), #f0f0f0);
+    border: 2px solid var(--gris-claro);
+    border-radius: 30px;
+    color: var(--gris);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transicion-rapida);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: var(--sombra-suave);
+}
+
+.filter-tag:hover {
+    transform: translateY(-3px);
+    border-color: var(--verde-claro);
+    color: var(--verde-principal);
+}
+
+.filter-tag.active {
+    background: linear-gradient(135deg, var(--verde-principal), var(--verde-claro));
+    color: var(--blanco);
+    border-color: var(--verde-principal);
+    box-shadow: 0 5px 15px rgba(46, 125, 50, 0.3);
+}
+
+/* Tabla estilo "catálogo de biblioteca" */
+.table-container-premium {
+    padding: 2rem 2.5rem;
+    overflow-x: auto;
+}
+
+.catalogue-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 1200px;
+    background: var(--blanco);
+    border-radius: var(--radio);
+    overflow: hidden;
+    box-shadow: var(--sombra-media);
+}
+
+.catalogue-table thead {
+    background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal));
+}
+
+.catalogue-table th {
+    padding: 1.5rem 1.2rem;
+    text-align: left;
+    font-weight: 700;
+    color: var(--blanco);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+    transition: var(--transicion-rapida);
+}
+
+.catalogue-table th:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.catalogue-table th.sortable::after {
+    content: "↕";
+    margin-left: 0.5rem;
+    opacity: 0.5;
+    font-size: 0.8rem;
+}
+
+.catalogue-table th.sorted-asc::after {
+    content: "↑";
+    color: var(--dorado);
+    opacity: 1;
+}
+
+.catalogue-table th.sorted-desc::after {
+    content: "↓";
+    color: var(--dorado);
+    opacity: 1;
+}
+
+.catalogue-table tbody tr {
+    transition: var(--transicion);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
+}
+
+.catalogue-table tbody tr::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(to bottom, var(--verde-claro), var(--azul));
+    opacity: 0;
+    transition: var(--transicion);
+}
+
+.catalogue-table tbody tr:hover {
+    background: linear-gradient(90deg, var(--verde-suave), transparent);
+    transform: translateX(10px);
+}
+
+.catalogue-table tbody tr:hover::before {
+    opacity: 1;
+}
+
+.catalogue-table tbody tr:nth-child(even) {
+    background: rgba(232, 245, 233, 0.3);
+}
+
+.catalogue-table tbody tr:nth-child(even):hover {
+    background: linear-gradient(90deg, var(--azul-claro), transparent);
+}
+
+.catalogue-table td {
+    padding: 1.5rem 1.2rem;
+    color: var(--gris-oscuro);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
+}
+
+/* Columnas específicas */
+.col-id-badge {
+    width: 100px;
+}
+
+.id-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, var(--verde-principal), var(--verde-claro));
+    color: var(--blanco);
+    border-radius: 20px;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    box-shadow: var(--sombra-suave);
+    transition: var(--transicion);
+}
+
+.catalogue-table tbody tr:hover .id-badge {
+    transform: scale(1.1);
+    box-shadow: var(--sombra-neon);
+}
+
+.col-author {
+    font-weight: 600;
+    color: var(--verde-oscuro);
+    font-size: 1.1rem;
+}
+
+.author-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--verde-principal), var(--azul));
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--blanco);
+    font-weight: 700;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.col-nationality {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.col-nationality::before {
+    content: "📍";
+    position: absolute;
+    left: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+}
+
+.col-date {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: var(--gris);
+    background: var(--gris-fondo);
+    padding: 8px 12px;
+    border-radius: var(--radio-pequeno);
+    display: inline-block;
+}
+
+/* Acciones premium */
+.col-actions-premium {
+    width: 250px;
+}
+
+.action-buttons-premium {
+    display: flex;
+    gap: 0.8rem;
+}
+
+.btn-action-premium {
+    padding: 10px 20px;
+    border-radius: var(--radio);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--transicion);
+    border: none;
+    min-width: 110px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--sombra-suave);
+}
+
+.btn-action-premium::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: 0.5s;
+}
+
+.btn-action-premium:hover::before {
+    left: 100%;
+}
+
+.btn-edit-premium {
+    background: linear-gradient(135deg, var(--ambar), var(--ambar-oscuro));
+    color: var(--blanco);
+}
+
+.btn-edit-premium:hover {
+    transform: translateY(-3px) rotate(-2deg);
+    box-shadow: 0 8px 20px rgba(255, 152, 0, 0.4);
+}
+
+.btn-delete-premium {
+    background: linear-gradient(135deg, var(--rojo-libreria), var(--rojo-claro));
+    color: var(--blanco);
+}
+
+.btn-delete-premium:hover {
+    transform: translateY(-3px) rotate(2deg);
+    box-shadow: 0 8px 20px rgba(198, 40, 40, 0.4);
+}
+
+/* Estado vacío estilo "estantería vacía" */
+.empty-library {
+    text-align: center;
+    padding: 5rem 2rem;
+    background: linear-gradient(135deg, var(--gris-fondo), var(--beige-papel));
+    border-radius: var(--radio);
+    margin: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.empty-library::before {
+    content: "📚📚📚";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15rem;
+    opacity: 0.03;
+    pointer-events: none;
+}
+
+.empty-icon {
+    font-size: 5rem;
+    margin-bottom: 2rem;
+    color: var(--verde-principal);
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+.empty-library h3 {
+    font-size: 2rem;
+    color: var(--verde-oscuro);
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.empty-library p {
+    color: var(--gris);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    line-height: 1.6;
+}
+
+/* Footer informativo */
+.info-footer {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--verde-suave), var(--azul-claro));
+    border-radius: var(--radio);
+    border-left: 5px solid var(--dorado);
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    box-shadow: var(--sombra-media);
+}
+
+.info-icon {
+    font-size: 3rem;
+    background: linear-gradient(135deg, var(--verde-principal), var(--azul));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.1));
+}
+
+.info-content h4 {
+    color: var(--verde-oscuro);
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.info-content p {
+    color: var(--gris);
+    line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 1400px) {
+    .container {
+        width: 98%;
+    }
+    
+    .hero-title {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .dashboard-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .command-input {
+        width: 200px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .hero-header {
+        padding: 2rem 1.5rem;
+    }
+    
+    .hero-title {
+        font-size: 2.2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .dashboard-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .card-header-library {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+    
+    .card-header-library::before {
+        display: none;
+    }
+    
+    .card-title {
+        margin-left: 0;
+    }
+    
+    .search-command {
+        width: 100%;
+    }
+    
+    .command-input {
+        width: 100%;
+    }
+    
+    .action-buttons-premium {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .btn-action-premium {
+        width: 100%;
+    }
+    
+    .info-footer {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 1.8rem;
+    }
+    
+    .stat-card-premium {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .filter-tags {
+        justify-content: center;
+    }
+    
+    .btn-empire {
+        padding: 15px 25px;
+        font-size: 1rem;
+    }
+}
+
+/* Animaciones especiales */
+@keyframes slideInRow {
+    from {
+        opacity: 0;
+        transform: translateX(-50px) rotateY(-20deg);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) rotateY(0);
+    }
+}
+
+.catalogue-table tbody tr {
+    animation: slideInRow 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    animation-fill-mode: both;
+}
+
+.catalogue-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+.catalogue-table tbody tr:nth-child(2) { animation-delay: 0.2s; }
+.catalogue-table tbody tr:nth-child(3) { animation-delay: 0.3s; }
+.catalogue-table tbody tr:nth-child(4) { animation-delay: 0.4s; }
+.catalogue-table tbody tr:nth-child(5) { animation-delay: 0.5s; }
+.catalogue-table tbody tr:nth-child(6) { animation-delay: 0.6s; }
+.catalogue-table tbody tr:nth-child(7) { animation-delay: 0.7s; }
+.catalogue-table tbody tr:nth-child(8) { animation-delay: 0.8s; }
+.catalogue-table tbody tr:nth-child(9) { animation-delay: 0.9s; }
+.catalogue-table tbody tr:nth-child(10) { animation-delay: 1s; }
+
+/* Efecto de brillo en hover de filas */
+.catalogue-table tbody tr:hover td {
+    position: relative;
+}
+
+.catalogue-table tbody tr:hover td::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.3), 
+        transparent);
+    pointer-events: none;
+    animation: shine 1.5s ease-in-out infinite;
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Scrollbar personalizado */
+.table-container-premium::-webkit-scrollbar {
+    height: 10px;
+}
+
+.table-container-premium::-webkit-scrollbar-track {
+    background: var(--gris-fondo);
+    border-radius: 10px;
+}
+
+.table-container-premium::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--verde-principal), var(--azul));
+    border-radius: 10px;
+    border: 2px solid var(--gris-fondo);
+}
+
+.table-container-premium::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--verde-claro), var(--ambar));
+}
+
+/* Efecto de partículas (simulado con CSS) */
+.particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.particle {
+    position: absolute;
+    background: var(--verde-claro);
+    border-radius: 50%;
+    animation: float 20s infinite linear;
+}
+
+@keyframes float {
+    0% { transform: translateY(100vh) translateX(0) rotate(0deg); }
+    100% { transform: translateY(-100vh) translateX(100px) rotate(360deg); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header épico estilo biblioteca -->
+    <div class="hero-header">
+        <div class="hero-content">
+            <h1 class="hero-title">📚 GESTION DE AUTORES</h1>
+            <p class="hero-subtitle">Explora y gestiona el catálogo completo de escritores de tu biblioteca</p>
+            <a href="{% url 'agregar_autor' %}" class="btn-empire">
+                <span>⭐</span> NUEVO AUTOR
+            </a>
+        </div>
+    </div>
+    
+    <!-- Dashboard de estadísticas -->
+    <div class="dashboard-stats">
+        <div class="stat-card-premium">
+            <div class="stat-icon-wrapper">👑</div>
+            <div class="stat-content-premium">
+                <div class="stat-number" id="total-autores">{{ autores|length }}</div>
+                <div class="stat-label">Autores Totales</div>
+            </div>
+        </div>
+        
+        <div class="stat-card-premium">
+            <div class="stat-icon-wrapper">🌎</div>
+            <div class="stat-content-premium">
+                <div class="stat-number" id="nacionalidades-count">12</div>
+                <div class="stat-label">Países Representados</div>
+            </div>
+        </div>
+        
+        <div class="stat-card-premium">
+            <div class="stat-icon-wrapper">📅</div>
+            <div class="stat-content-premium">
+                <div class="stat-number" id="ultimo-mes">5</div>
+                <div class="stat-label">Nuevos Este Mes</div>
+            </div>
+        </div>
+        
+        <div class="stat-card-premium">
+            <div class="stat-icon-wrapper">🏆</div>
+            <div class="stat-content-premium">
+                <div class="stat-number" id="premios-count">28</div>
+                <div class="stat-label">Premios Totales</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tarjeta principal estilo biblioteca -->
+    <div class="library-card">
+        <!-- Header estilo lomo de libro -->
+        <div class="card-header-library">
+            <div class="card-title">
+                Catálogo de Autores
+            </div>
+            <div class="search-command">
+                <div class="search-icon">🔍</div>
+                <input type="text" 
+                       class="command-input" 
+                       id="searchInput" 
+                       placeholder="Buscar autor, nacionalidad, ID..."
+                       autocomplete="off"
+                       spellcheck="false">
+                <button class="command-btn" onclick="performSearch()">
+                    <span>⚡</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Filtros estilo etiquetas -->
+        <div class="filter-tags">
+            <button class="filter-tag active" data-filter="all">
+                <span>📚</span> Todos los Autores
+            </button>
+            <button class="filter-tag" data-filter="active">
+                <span>⭐</span> Destacados
+            </button>
+            <button class="filter-tag" data-filter="classic">
+                <span>🏛️</span> Clásicos
+            </button>
+            <button class="filter-tag" data-filter="modern">
+                <span>🚀</span> Contemporáneos
+            </button>
+            <button class="filter-tag" data-filter="nobel">
+                <span>🏆</span> Premios Nobel
+            </button>
+        </div>
+        
+        <!-- Tabla tipo catálogo -->
+        <div class="table-container-premium">
+            {% if autores %}
+            <table class="catalogue-table" id="authorsTable">
+                <thead>
+                    <tr>
+                        <th class="sortable" onclick="sortTable(this, 0)">ID</th>
+                        <th class="sortable" onclick="sortTable(this, 1)">Autor</th>
+                        <th class="sortable" onclick="sortTable(this, 2)">Nacionalidad</th>
+                        <th class="sortable" onclick="sortTable(this, 3)">Nacimiento</th>
+                        <th>Biografía</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    {% for autor in autores %}
+                    <tr data-id="{{ autor.autorid }}" 
+                        data-name="{{ autor.nombre|lower }} {{ autor.apellido|lower }}"
+                        data-nationality="{{ autor.nacionalidad|lower }}"
+                        data-date="{{ autor.fechanacimiento|date:'Y-m-d' }}"
+                        data-bio="{{ autor.bibliografia|default:''|lower }}">
+                        <td class="col-id-badge">
+                            <span class="id-badge">#{{ autor.autorid }}</span>
+                        </td>
+                        <td class="col-author">
+                            <span class="author-avatar">
+                                {{ autor.nombre|first }}{{ autor.apellido|first }}
+                            </span>
+                            {{ autor.nombre }} {{ autor.apellido }}
+                        </td>
+                        <td class="col-nationality">
+                            {{ autor.nacionalidad }}
+                        </td>
+                        <td class="col-date">
+                            {{ autor.fechanacimiento|date:"d M Y" }}
+                        </td>
+                        <td>
+                            {% if autor.bibliografia %}
+                            <span style="color: var(--verde-principal);">📖 Completa</span>
+                            {% else %}
+                            <span style="color: var(--gris-claro);">📝 Pendiente</span>
+                            {% endif %}
+                        </td>
+                        <td class="col-actions-premium">
+                            <div class="action-buttons-premium">
+                                <a href="{% url 'editar_autor' autor.autorid %}" 
+                                   class="btn-action-premium btn-edit-premium"
+                                   title="Editar información del autor">
+                                    <span>✏️</span> Editar
+                                </a>
+                                <a href="{% url 'eliminar_autor' autor.autorid %}" 
+                                   class="btn-action-premium btn-delete-premium"
+                                   title="Eliminar autor del sistema">
+                                    <span>🗑️</span> Eliminar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <!-- Estado vacío (oculto por defecto) -->
+            <div class="empty-library" id="emptyState" style="display: none;">
+                <div class="empty-icon">📚</div>
+                <h3>¡Estantería Vacía!</h3>
+                <p>No se encontraron autores que coincidan con tu búsqueda. Intenta con otros criterios o agrega nuevos autores a tu colección.</p>
+                <a href="{% url 'agregar_autor' %}" class="btn-empire" style="max-width: 300px; margin: 0 auto;">
+                    <span>➕</span> Agregar Primer Autor
+                </a>
+            </div>
+            
+            {% else %}
+            <!-- Estado completamente vacío -->
+            <div class="empty-library">
+                <div class="empty-icon">📚</div>
+                <h3>¡Comienza tu Biblioteca!</h3>
+                <p>Aún no hay autores registrados en el sistema. Cada gran biblioteca comienza con su primer autor. ¡Agrega el tuyo ahora!</p>
+                <a href="{% url 'agregar_autor' %}" class="btn-empire" style="max-width: 300px; margin: 0 auto;">
+                    <span>⭐</span> INICIAR COLECCIÓN
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Footer informativo -->
+    <div class="info-footer">
+        <div class="info-icon">💡</div>
+        <div class="info-content">
+            <h4>Consejos del Bibliotecario</h4>
+            <p>
+                • Usa los filtros para encontrar autores por categoría<br>
+                • Haz clic en los encabezados para ordenar la tabla<br>
+                • Mantén las biografías actualizadas para mejores registros<br>
+                • Considera desactivar antes de eliminar autores históricos
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Efecto de partículas (CSS only) -->
+<div class="particles" id="particles"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Crear partículas decorativas
+    createParticles();
+    
+    // Inicializar funcionalidades
+    initializeSorting();
+    initializeFilters();
+    initializeSearch();
+    calculateStats();
+    addHoverEffects();
+    
+    // Animación de entrada para las filas
+    animateTableRows();
+});
+
+function createParticles() {
+    const particlesContainer = document.getElementById('particles');
+    if (!particlesContainer) return;
+    
+    for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // Posición aleatoria
+        const left = Math.random() * 100;
+        const top = Math.random() * 100;
+        
+        // Tamaño aleatorio
+        const size = Math.random() * 4 + 1;
+        
+        // Color aleatorio
+        const colors = ['#2e7d32', '#4caf50', '#2196f3', '#ff9800', '#9c27b0'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        
+        // Aplicar estilos
+        particle.style.left = `${left}%`;
+        particle.style.top = `${top}%`;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.background = color;
+        particle.style.opacity = Math.random() * 0.3 + 0.1;
+        particle.style.animationDuration = `${Math.random() * 20 + 10}s`;
+        particle.style.animationDelay = `${Math.random() * 5}s`;
+        
+        particlesContainer.appendChild(particle);
+    }
+}
+
+function initializeSorting() {
+    let currentSort = { column: -1, direction: 1 };
+    
+    window.sortTable = function(header, columnIndex) {
+        const table = document.getElementById('authorsTable');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        
+        // Remover clases de ordenamiento anteriores
+        table.querySelectorAll('th').forEach(th => {
+            th.classList.remove('sorted-asc', 'sorted-desc');
+        });
+        
+        // Determinar dirección
+        if (currentSort.column === columnIndex) {
+            currentSort.direction *= -1;
+        } else {
+            currentSort.direction = 1;
+        }
+        
+        currentSort.column = columnIndex;
+        
+        // Aplicar clase visual
+        if (currentSort.direction === 1) {
+            header.classList.add('sorted-asc');
+        } else {
+            header.classList.add('sorted-desc');
+        }
+        
+        // Ordenar filas
+        rows.sort((a, b) => {
+            let aValue, bValue;
+            
+            if (columnIndex === 0) {
+                // ID
+                aValue = parseInt(a.cells[0].querySelector('.id-badge').textContent.replace('#', ''));
+                bValue = parseInt(b.cells[0].querySelector('.id-badge').textContent.replace('#', ''));
+            } else if (columnIndex === 1) {
+                // Nombre
+                aValue = a.cells[1].textContent.toLowerCase();
+                bValue = b.cells[1].textContent.toLowerCase();
+            } else if (columnIndex === 2) {
+                // Nacionalidad
+                aValue = a.cells[2].textContent.toLowerCase();
+                bValue = b.cells[2].textContent.toLowerCase();
+            } else if (columnIndex === 3) {
+                // Fecha
+                aValue = new Date(a.getAttribute('data-date'));
+                bValue = new Date(b.getAttribute('data-date'));
+            }
+            
+            if (aValue < bValue) return -1 * currentSort.direction;
+            if (aValue > bValue) return 1 * currentSort.direction;
+            return 0;
+        });
+        
+        // Reorganizar filas con animación
+        rows.forEach((row, index) => {
+            tbody.appendChild(row);
+            
+            // Efecto visual
+            row.style.animation = 'slideInRow 0.5s ease-out';
+            row.style.animationDelay = `${index * 0.05}s`;
+            
+            // Resetear animación después de completar
+            setTimeout(() => {
+                row.style.animation = '';
+            }, 500 + (index * 50));
+        });
+    };
+}
+
+function initializeFilters() {
+    const filterButtons = document.querySelectorAll('.filter-tag');
+    const tableBody = document.getElementById('tableBody');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Actualizar botón activo
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Animación del botón
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 200);
+            
+            // Filtrar tabla
+            const filterType = this.getAttribute('data-filter');
+            filterTable(filterType);
+        });
+    });
+}
+
+function filterTable(filterType) {
+    const rows = document.querySelectorAll('#tableBody tr');
+    const emptyState = document.getElementById('emptyState');
+    let visibleCount = 0;
+    
+    rows.forEach(row => {
+        let showRow = true;
+        
+        switch(filterType) {
+            case 'all':
+                showRow = true;
+                break;
+            case 'active':
+                // Ejemplo: mostrar solo autores con biografía
+                showRow = row.getAttribute('data-bio') !== '';
+                break;
+            case 'classic':
+                // Ejemplo: autores antiguos (nacidos antes de 1900)
+                const birthYear = new Date(row.getAttribute('data-date')).getFullYear();
+                showRow = birthYear < 1900;
+                break;
+            case 'modern':
+                // Ejemplo: autores modernos (nacidos después de 1950)
+                const year = new Date(row.getAttribute('data-date')).getFullYear();
+                showRow = year >= 1950;
+                break;
+            case 'nobel':
+                // Ejemplo: autores con menciones específicas en biografía
+                const bio = row.getAttribute('data-bio');
+                showRow = bio.includes('nobel') || bio.includes('premio');
+                break;
+        }
+        
+        if (showRow) {
+            row.style.display = '';
+            visibleCount++;
+            
+            // Efecto de aparición
+            row.style.animation = 'slideInRow 0.4s ease-out';
+            setTimeout(() => {
+                row.style.animation = '';
+            }, 400);
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // Mostrar/ocultar estado vacío
+    if (emptyState) {
+        if (visibleCount === 0 && rows.length > 0) {
+            emptyState.style.display = 'block';
+        } else {
+            emptyState.style.display = 'none';
+        }
+    }
+    
+    // Actualizar estadísticas
+    updateTotalCount(visibleCount);
+}
+
+function initializeSearch() {
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.querySelector('.command-btn');
+    
+    searchInput.addEventListener('input', performSearch);
+    searchButton.addEventListener('click', performSearch);
+    
+    // Efecto de enfoque
+    searchInput.addEventListener('focus', function() {
+        this.parentElement.style.boxShadow = '0 0 20px rgba(0, 255, 136, 0.3)';
+        this.parentElement.style.borderColor = 'var(--verde-neon)';
+    });
+    
+    searchInput.addEventListener('blur', function() {
+        this.parentElement.style.boxShadow = '';
+        this.parentElement.style.borderColor = 'rgba(255, 215, 0, 0.3)';
+    });
+}
+
+function performSearch() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#tableBody tr');
+    const emptyState = document.getElementById('emptyState');
+    let visibleCount = 0;
+    
+    rows.forEach(row => {
+        const name = row.getAttribute('data-name');
+        const nationality = row.getAttribute('data-nationality');
+        const id = row.cells[0].querySelector('.id-badge').textContent.toLowerCase();
+        
+        const matches = !searchTerm || 
+            name.includes(searchTerm) || 
+            nationality.includes(searchTerm) ||
+            id.includes(searchTerm);
+        
+        if (matches) {
+            row.style.display = '';
+            visibleCount++;
+            
+            // Efecto de resaltado
+            if (searchTerm) {
+                row.style.background = 'linear-gradient(90deg, var(--verde-suave), transparent)';
+                setTimeout(() => {
+                    row.style.background = '';
+                }, 1000);
+            }
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // Mostrar/ocultar estado vacío
+    if (emptyState) {
+        if (visibleCount === 0 && rows.length > 0) {
+            emptyState.style.display = 'block';
+        } else {
+            emptyState.style.display = 'none';
+        }
+    }
+    
+    // Actualizar estadísticas
+    updateTotalCount(visibleCount);
+}
+
+function calculateStats() {
+    const rows = document.querySelectorAll('#tableBody tr');
+    const nacionalidades = new Set();
+    const hoy = new Date();
+    const ultimoMes = new Date();
+    ultimoMes.setMonth(ultimoMes.getMonth() - 1);
+    
+    let autoresRecientes = 0;
+    
+    rows.forEach(row => {
+        const nacionalidad = row.getAttribute('data-nationality');
+        if (nacionalidad) {
+            nacionalidades.add(nacionalidad);
+        }
+        
+        // Ejemplo: contar autores "recientes" (último mes)
+        // Esto es solo un ejemplo - necesitarías datos reales
+        if (Math.random() > 0.7) {
+            autoresRecientes++;
+        }
+    });
+    
+    // Actualizar estadísticas en tiempo real
+    document.getElementById('nacionalidades-count').textContent = nacionalidades.size;
+    document.getElementById('ultimo-mes').textContent = autoresRecientes;
+    
+    // Estadística de ejemplo para premios
+    const premiosCount = Math.floor(rows.length * 1.5);
+    document.getElementById('premios-count').textContent = premiosCount;
+}
+
+function updateTotalCount(count) {
+    const totalElement = document.getElementById('total-autores');
+    const currentCount = parseInt(totalElement.textContent);
+    
+    // Animación de conteo
+    animateCounter(totalElement, currentCount, count);
+}
+
+function animateCounter(element, start, end) {
+    const duration = 500;
+    const steps = 20;
+    const stepValue = (end - start) / steps;
+    let currentStep = 0;
+    
+    const timer = setInterval(() => {
+        currentStep++;
+        const currentValue = Math.round(start + (stepValue * currentStep));
+        element.textContent = currentValue;
+        
+        if (currentStep >= steps) {
+            clearInterval(timer);
+            element.textContent = end;
+        }
+    }, duration / steps);
+}
+
+function addHoverEffects() {
+    // Efectos en botones de acción
+    document.querySelectorAll('.btn-action-premium').forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px) scale(1.05)';
+        });
+        
+        button.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+    
+    // Efectos en badges de ID
+    document.querySelectorAll('.id-badge').forEach(badge => {
+        badge.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.2) rotate(5deg)';
+            this.style.boxShadow = '0 0 20px rgba(0, 255, 136, 0.5)';
+        });
+        
+        badge.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1) rotate(0)';
+            this.style.boxShadow = 'var(--sombra-suave)';
+        });
+    });
+}
+
+function animateTableRows() {
+    const rows = document.querySelectorAll('#tableBody tr');
+    
+    rows.forEach((row, index) => {
+        // Retraso escalonado para la animación
+        row.style.animationDelay = `${index * 0.1}s`;
+        
+        // Efecto al pasar el mouse
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateX(15px) scale(1.01)';
+            this.style.zIndex = '10';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateX(0) scale(1)';
+            this.style.zIndex = '1';
+        });
+    });
+}
+
+// Confirmación antes de eliminar
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.btn-delete-premium')) {
+        const autorRow = e.target.closest('tr');
+        const autorNombre = autorRow.querySelector('.col-author').textContent.trim();
+        const autorId = autorRow.querySelector('.id-badge').textContent;
+        
+        // Diálogo de confirmación mejorado
+        if (!confirm(`⚠️ ELIMINACIÓN PERMANENTE ⚠️\n\n¿Eliminar al autor ${autorNombre} (${autorId})?\n\nEsta acción NO se puede deshacer y afectará a todos los libros asociados.`)) {
+            e.preventDefault();
+        }
+    }
+});
+</script>
+{% endblock %}

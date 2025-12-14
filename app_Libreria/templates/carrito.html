@@ -1,0 +1,457 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis Compras - Librería AJMG{% endblock %}
+
+{% block page_title %}🛒 Mis Compras{% endblock %}
+{% block page_subtitle %}
+<p style="font-size: 1.1rem; color: var(--gris-medio); margin-top: var(--espacio-sm);">
+    Aquí puedes ver el historial de todas tus compras realizadas en nuestra librería.
+</p>
+{% endblock %}
+
+{% block content %}
+{% if ventas %}
+<!-- Estadísticas de compras -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--espacio-md); margin-bottom: var(--espacio-xl);">
+    <div style="background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro)); color: white; border-radius: var(--radio-lg); padding: var(--espacio-md); text-align: center; box-shadow: var(--sombra-mediana);">
+        <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: var(--espacio-xs);">
+            {{ ventas.count }}
+        </div>
+        <div style="font-size: 2rem; margin-bottom: var(--espacio-xs);">
+            <i class="fas fa-shopping-bag"></i>
+        </div>
+        <div style="font-size: 1rem; opacity: 0.9;">Compras Totales</div>
+    </div>
+    
+    <div style="background: linear-gradient(135deg, #28a745, #218838); color: white; border-radius: var(--radio-lg); padding: var(--espacio-md); text-align: center; box-shadow: var(--sombra-mediana);">
+        <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: var(--espacio-xs);">
+            ${{ total_gastado|default:"0" }}
+        </div>
+        <div style="font-size: 2rem; margin-bottom: var(--espacio-xs);">
+            <i class="fas fa-money-bill-wave"></i>
+        </div>
+        <div style="font-size: 1rem; opacity: 0.9;">Total Gastado</div>
+    </div>
+    
+    <div style="background: linear-gradient(135deg, #17a2b8, #138496); color: white; border-radius: var(--radio-lg); padding: var(--espacio-md); text-align: center; box-shadow: var(--sombra-mediana);">
+        <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: var(--espacio-xs);">
+            {{ libros_comprados|default:"0" }}
+        </div>
+        <div style="font-size: 2rem; margin-bottom: var(--espacio-xs);">
+            <i class="fas fa-book"></i>
+        </div>
+        <div style="font-size: 1rem; opacity: 0.9;">Libros Comprados</div>
+    </div>
+    
+    <div style="background: linear-gradient(135deg, #ffc107, #e0a800); color: var(--verde-oscuro); border-radius: var(--radio-lg); padding: var(--espacio-md); text-align: center; box-shadow: var(--sombra-mediana);">
+        <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: var(--espacio-xs);">
+            {{ ultima_compra|date:"d/m"|default:"-" }}
+        </div>
+        <div style="font-size: 2rem; margin-bottom: var(--espacio-xs);">
+            <i class="fas fa-calendar-check"></i>
+        </div>
+        <div style="font-size: 1rem; opacity: 0.9;">Última Compra</div>
+    </div>
+</div>
+
+<!-- Filtros de compras -->
+<div style="display: flex; justify-content: flex-end; gap: var(--espacio-sm); margin-bottom: var(--espacio-md); flex-wrap: wrap;">
+    <select id="filtro-mes" style="padding: 10px 15px; border-radius: var(--radio-md); border: 1px solid var(--gris-medio); background-color: white;">
+        <option value="">Todos los meses</option>
+        <option value="1">Enero</option>
+        <option value="2">Febrero</option>
+        <option value="3">Marzo</option>
+        <option value="4">Abril</option>
+        <option value="5">Mayo</option>
+        <option value="6">Junio</option>
+        <option value="7">Julio</option>
+        <option value="8">Agosto</option>
+        <option value="9">Septiembre</option>
+        <option value="10">Octubre</option>
+        <option value="11">Noviembre</option>
+        <option value="12">Diciembre</option>
+    </select>
+    
+    <select id="filtro-anio" style="padding: 10px 15px; border-radius: var(--radio-md); border: 1px solid var(--gris-medio); background-color: white;">
+        <option value="">Todos los años</option>
+        <option value="2024">2024</option>
+        <option value="2023">2023</option>
+    </select>
+    
+    <button onclick="filtrarCompras()" style="background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro)); color: white; border: none; padding: 10px 20px; border-radius: var(--radio-md); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+        <i class="fas fa-filter"></i> Filtrar
+    </button>
+    
+    <button onclick="limpiarFiltros()" style="background-color: var(--gris-claro); color: var(--gris-oscuro); border: 1px solid var(--gris-medio); padding: 10px 20px; border-radius: var(--radio-md); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+        <i class="fas fa-times"></i> Limpiar
+    </button>
+</div>
+
+<!-- Tabla de compras -->
+<div style="background-color: white; border-radius: var(--radio-lg); overflow: hidden; box-shadow: var(--sombra-mediana); margin-bottom: var(--espacio-xl);">
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal)); color: white;">
+                    <th style="padding: var(--espacio-md); text-align: left; font-weight: 600; border-bottom: 2px solid var(--verde-claro);">ID Venta</th>
+                    <th style="padding: var(--espacio-md); text-align: left; font-weight: 600; border-bottom: 2px solid var(--verde-claro);">Fecha</th>
+                    <th style="padding: var(--espacio-md); text-align: left; font-weight: 600; border-bottom: 2px solid var(--verde-claro);">Total</th>
+                    <th style="padding: var(--espacio-md); text-align: left; font-weight: 600; border-bottom: 2px solid var(--verde-claro);">Estado</th>
+                    <th style="padding: var(--espacio-md); text-align: left; font-weight: 600; border-bottom: 2px solid var(--verde-claro);">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for venta in ventas %}
+                <tr class="compra-item" data-fecha="{{ venta.fechaventa|date:'Y-m-d' }}" style="border-bottom: 1px solid var(--gris-claro);">
+                    <td style="padding: var(--espacio-md); color: var(--verde-oscuro); font-weight: 600;">
+                        #{{ venta.ventaid }}
+                    </td>
+                    <td style="padding: var(--espacio-md);">
+                        <div style="font-weight: 600; color: var(--gris-oscuro);">
+                            {{ venta.fechaventa|date:"d M Y" }}
+                        </div>
+                        <div style="color: var(--gris-medio); font-size: 0.9rem;">
+                            {{ venta.fechaventa|date:"H:i" }}
+                        </div>
+                    </td>
+                    <td style="padding: var(--espacio-md);">
+                        <div style="font-size: 1.2rem; font-weight: bold; color: var(--verde-principal);">
+                            ${{ venta.montototal }}
+                        </div>
+                        <div style="color: var(--gris-medio); font-size: 0.85rem;">
+                            {{ venta.metodopago }}
+                        </div>
+                    </td>
+                    <td style="padding: var(--espacio-md);">
+                        <span class="estado-compra" style="padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; 
+                              {% if venta.estadoventa == 'COMPLETADA' %}
+                              background-color: #28a74520; color: #28a745;
+                              {% elif venta.estadoventa == 'PENDIENTE' %}
+                              background-color: #ffc10720; color: #ffc107;
+                              {% else %}
+                              background-color: #dc354520; color: #dc3545;
+                              {% endif %}">
+                            {{ venta.estadoventa }}
+                        </span>
+                    </td>
+                    <td style="padding: var(--espacio-md);">
+                        <a href="{% url 'detalle_venta' venta.ventaid %}" 
+                           style="background-color: var(--verde-principal); color: white; padding: 8px 16px; border-radius: var(--radio-md); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-size: 0.9rem; font-weight: 600;">
+                            <i class="fas fa-eye"></i> Ver Detalles
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Gráfico de compras (simulado) -->
+<div style="background-color: white; border-radius: var(--radio-lg); padding: var(--espacio-lg); box-shadow: var(--sombra-mediana); margin-bottom: var(--espacio-xl);">
+    <h3 style="color: var(--verde-oscuro); margin-bottom: var(--espacio-md); display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-chart-line"></i> Historial de Compras
+    </h3>
+    
+    <div style="height: 200px; background: linear-gradient(135deg, var(--verde-muy-claro), var(--gris-claro)); border-radius: var(--radio-md); padding: var(--espacio-md); display: flex; align-items: flex-end; justify-content: space-around; gap: 10px;">
+        {% for mes in "123456789101112" %}
+        <div style="text-align: center;">
+            <div style="width: 30px; height: {{ forloop.counter|add:50 }}px; background: linear-gradient(to top, var(--verde-principal), var(--verde-oscuro)); border-radius: 4px; margin: 0 auto 5px;"></div>
+            <div style="font-size: 0.8rem; color: var(--gris-medio);">Mes {{ mes }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div style="text-align: center; margin-top: var(--espacio-md);">
+        <p style="color: var(--gris-medio);">
+            Este gráfico muestra tu actividad de compras durante el último año.
+        </p>
+    </div>
+</div>
+
+<!-- Resumen por año -->
+<div>
+    <h3 style="color: var(--verde-oscuro); margin-bottom: var(--espacio-lg); font-size: 1.3rem;">
+        <i class="fas fa-calendar-alt"></i> Resumen por Año
+    </h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--espacio-md);">
+        <div style="background-color: white; padding: var(--espacio-md); border-radius: var(--radio-md); box-shadow: var(--sombra-suave); border-left: 4px solid var(--verde-principal);">
+            <h4 style="color: var(--verde-oscuro); margin-bottom: var(--espacio-xs);">2024</h4>
+            <div style="display: flex; justify-content: space-between;">
+                <div>
+                    <div style="font-size: 1.5rem; font-weight: bold; color: var(--verde-principal);">
+                        {{ ventas_2024|default:"0" }}
+                    </div>
+                    <div style="color: var(--gris-medio); font-size: 0.9rem;">Compras</div>
+                </div>
+                <div>
+                    <div style="font-size: 1.5rem; font-weight: bold; color: var(--verde-principal);">
+                        ${{ total_2024|default:"0" }}
+                    </div>
+                    <div style="color: var(--gris-medio); font-size: 0.9rem;">Total</div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="background-color: white; padding: var(--espacio-md); border-radius: var(--radio-md); box-shadow: var(--sombra-suave); border-left: 4px solid #17a2b8;">
+            <h4 style="color: var(--verde-oscuro); margin-bottom: var(--espacio-xs);">2023</h4>
+            <div style="display: flex; justify-content: space-between;">
+                <div>
+                    <div style="font-size: 1.5rem; font-weight: bold; color: #17a2b8;">
+                        {{ ventas_2023|default:"0" }}
+                    </div>
+                    <div style="color: var(--gris-medio); font-size: 0.9rem;">Compras</div>
+                </div>
+                <div>
+                    <div style="font-size: 1.5rem; font-weight: bold; color: #17a2b8;">
+                        ${{ total_2023|default:"0" }}
+                    </div>
+                    <div style="color: var(--gris-medio); font-size: 0.9rem;">Total</div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="background-color: white; padding: var(--espacio-md); border-radius: var(--radio-md); box-shadow: var(--sombra-suave); border-left: 4px solid #ffc107;">
+            <h4 style="color: var(--verde-oscuro); margin-bottom: var(--espacio-xs);">Total General</h4>
+            <div style="display: flex; justify-content: space-between;">
+                <div>
+                    <div style="font-size: 1.5rem; font-weight: bold; color: #ffc107;">
+                        {{ ventas.count }}
+                    </div>
+                    <div style="color: var(--gris-medio); font-size: 0.9rem;">Compras Totales</div>
+                </div>
+                <div>
+                    <div style="font-size: 1.5rem; font-weight: bold; color: #ffc107;">
+                        ${{ total_gastado|default:"0" }}
+                    </div>
+                    <div style="color: var(--gris-medio); font-size: 0.9rem;">Gasto Total</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<!-- Mensaje cuando no hay compras -->
+<div style="text-align: center; padding: var(--espacio-xl);">
+    <div style="font-size: 5rem; color: var(--verde-claro); margin-bottom: var(--espacio-md); opacity: 0.5;">
+        <i class="fas fa-shopping-cart"></i>
+    </div>
+    <h3 style="color: var(--gris-oscuro); margin-bottom: var(--espacio-sm);">No tienes compras realizadas</h3>
+    <p style="color: var(--gris-medio); margin-bottom: var(--espacio-lg); max-width: 500px; margin-left: auto; margin-right: auto;">
+        Aún no has realizado ninguna compra en nuestra librería. 
+        ¡Explora nuestro catálogo y encuentra libros increíbles para comenzar tu colección!
+    </p>
+    <div style="display: flex; gap: var(--espacio-sm); justify-content: center; flex-wrap: wrap;">
+        <a href="{% url 'libros' %}" style="background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro)); color: white; padding: 12px 24px; border-radius: var(--radio-md); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-weight: 600;">
+            <i class="fas fa-book"></i> Explorar Libros
+        </a>
+        <a href="{% url 'inicio' %}" style="background-color: var(--verde-claro); color: var(--verde-oscuro); padding: 12px 24px; border-radius: var(--radio-md); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-weight: 600; border: 2px solid var(--verde-principal);">
+            <i class="fas fa-home"></i> Volver al Inicio
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<script>
+// Funciones para filtrar compras
+function filtrarCompras() {
+    const mes = document.getElementById('filtro-mes').value;
+    const anio = document.getElementById('filtro-anio').value;
+    const compras = document.querySelectorAll('.compra-item');
+    
+    let visibles = 0;
+    
+    compras.forEach(compra => {
+        const fechaCompra = new Date(compra.getAttribute('data-fecha'));
+        const mesCompra = fechaCompra.getMonth() + 1; // getMonth() devuelve 0-11
+        const anioCompra = fechaCompra.getFullYear();
+        
+        let mostrar = true;
+        
+        if (mes && mesCompra != parseInt(mes)) {
+            mostrar = false;
+        }
+        
+        if (anio && anioCompra != parseInt(anio)) {
+            mostrar = false;
+        }
+        
+        compra.style.display = mostrar ? '' : 'none';
+        if (mostrar) visibles++;
+    });
+    
+    if (visibles === 0) {
+        alert('No se encontraron compras con los filtros seleccionados.');
+    } else {
+        alert(`Mostrando ${visibles} compras con los filtros aplicados.`);
+    }
+}
+
+function limpiarFiltros() {
+    document.getElementById('filtro-mes').value = '';
+    document.getElementById('filtro-anio').value = '';
+    
+    const compras = document.querySelectorAll('.compra-item');
+    compras.forEach(compra => {
+        compra.style.display = '';
+    });
+    
+    alert('Filtros limpiados. Mostrando todas las compras.');
+}
+
+// Estilos CSS para la página de compras
+const comprasStyle = document.createElement('style');
+comprasStyle.textContent = `
+    .compra-item:hover {
+        background-color: var(--verde-muy-claro);
+        transition: background-color 0.2s ease;
+    }
+    
+    /* Estilos para selects */
+    select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%232e8b57' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 16px;
+        padding-right: 40px !important;
+        cursor: pointer;
+    }
+    
+    select:hover {
+        border-color: var(--verde-principal);
+    }
+    
+    select:focus {
+        outline: none;
+        border-color: var(--verde-principal);
+        box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.2);
+    }
+    
+    /* Estilos para botones */
+    button:hover {
+        transform: translateY(-2px);
+        transition: transform 0.2s ease;
+    }
+    
+    a[style*="background-color: var(--verde-principal)"]:hover {
+        background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal)) !important;
+        transform: translateY(-2px);
+        box-shadow: var(--sombra-suave);
+    }
+    
+    /* Scrollbar para tabla */
+    div[style*="overflow-x: auto"]::-webkit-scrollbar {
+        height: 8px;
+    }
+    
+    div[style*="overflow-x: auto"]::-webkit-scrollbar-track {
+        background: var(--gris-claro);
+        border-radius: 4px;
+    }
+    
+    div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb {
+        background: var(--verde-principal);
+        border-radius: 4px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+        
+        table {
+            font-size: 0.9rem;
+        }
+        
+        td, th {
+            padding: var(--espacio-sm) !important;
+        }
+        
+        .estado-compra {
+            font-size: 0.75rem !important;
+            padding: 4px 8px !important;
+        }
+        
+        .filtros-container {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        select, button {
+            width: 100%;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: 1fr !important;
+        }
+        
+        table {
+            display: block;
+        }
+        
+        thead {
+            display: none;
+        }
+        
+        tr {
+            display: block;
+            margin-bottom: var(--espacio-md);
+            border: 1px solid var(--gris-claro) !important;
+            border-radius: var(--radio-md);
+            padding: var(--espacio-sm);
+        }
+        
+        td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--espacio-xs) !important;
+            border-bottom: 1px solid var(--gris-claro);
+        }
+        
+        td:last-child {
+            border-bottom: none;
+        }
+        
+        td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--verde-oscuro);
+            margin-right: var(--espacio-sm);
+        }
+    }
+`;
+document.head.appendChild(comprasStyle);
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', function() {
+    // Añadir labels para responsive
+    const celdas = document.querySelectorAll('td');
+    const headers = ['ID Venta', 'Fecha', 'Total', 'Estado', 'Acciones'];
+    
+    celdas.forEach((celda, index) => {
+        const headerIndex = index % headers.length;
+        celda.setAttribute('data-label', headers[headerIndex]);
+    });
+    
+    // Efecto hover en filas
+    const filas = document.querySelectorAll('tbody tr');
+    filas.forEach(fila => {
+        fila.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateX(5px)';
+            this.style.transition = 'transform 0.2s ease';
+        });
+        
+        fila.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateX(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

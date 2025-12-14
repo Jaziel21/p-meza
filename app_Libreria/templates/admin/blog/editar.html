@@ -1,0 +1,370 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Editar Entrada del Blog</h1>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label>Título *</label>
+                    <input type="text" class="form-control" name="titulo" value="{{ entrada.titulo }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <input type="text" class="form-control" name="categoria" value="{{ entrada.categoria|default:'General' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label>Resumen</label>
+                    <textarea class="form-control" name="resumen" rows="3">{{ entrada.resumen|default:'' }}</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Contenido *</label>
+                    <textarea class="form-control" name="contenido" rows="10" required>{{ entrada.contenido }}</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Imagen Actual</label>
+                    {% if entrada.imagen %}
+                    <div class="current-image">
+                        <img src="{{ entrada.imagen.url }}" width="150" class="img-thumbnail">
+                    </div>
+                    {% endif %}
+                    <input type="file" class="form-control" name="imagen" accept="image/*">
+                </div>
+                
+                <div class="form-check">
+                    <input type="checkbox" name="activo" id="activo" {% if entrada.activo %}checked{% endif %}>
+                    <label for="activo">
+                        Entrada activa (visible al público)
+                    </label>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-verde">Actualizar Entrada</button>
+                    <a href="{% url 'admin_blog' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos específicos para la página de edición */
+.container {
+    width: 90%;
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+h1 {
+    color: #2e8b57;
+    margin-bottom: 30px;
+    font-size: 2rem;
+    text-align: center;
+}
+
+/* Tarjeta */
+.card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.card-body {
+    padding: 30px;
+}
+
+/* Formulario */
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-group label[for] {
+    display: inline-block;
+    margin-left: 8px;
+    font-weight: normal;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border 0.3s;
+    font-family: inherit;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #2e8b57;
+    box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.2);
+}
+
+textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Checkbox */
+.form-check {
+    margin-bottom: 25px;
+    padding-left: 30px;
+    position: relative;
+}
+
+.form-check input[type="checkbox"] {
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.form-check label {
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Imagen actual */
+.current-image {
+    margin-bottom: 15px;
+}
+
+.img-thumbnail {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px;
+    background: white;
+}
+
+/* Botones */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 12px 25px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-block;
+    text-align: center;
+    min-width: 150px;
+}
+
+.btn-verde {
+    background: #2e8b57;
+    color: white;
+}
+
+.btn-verde:hover {
+    background: #1e6b3a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(46, 139, 87, 0.2);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .form-control {
+        padding: 10px;
+    }
+    
+    .form-check {
+        padding-left: 25px;
+    }
+}
+
+/* Estilo para el campo de archivo */
+input[type="file"] {
+    padding: 10px;
+    border: 2px dashed #ddd;
+    background: #f9f9f9;
+    cursor: pointer;
+}
+
+input[type="file"]:hover {
+    border-color: #2e8b57;
+    background: #f5f9f7;
+}
+
+/* Estilo para campos requeridos */
+.form-group label[for]::after {
+    content: " *";
+    color: #dc3545;
+}
+
+/* Placeholder styling */
+.form-control::placeholder {
+    color: #999;
+    opacity: 1;
+}
+
+/* Estilo para checkbox personalizado */
+.form-check input[type="checkbox"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-check input[type="checkbox"]:checked {
+    background: #2e8b57;
+    border-color: #2e8b57;
+    position: relative;
+}
+
+.form-check input[type="checkbox"]:checked::after {
+    content: "✓";
+    position: absolute;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Validación básica del formulario
+    const form = document.querySelector('form');
+    const requiredFields = form.querySelectorAll('[required]');
+    
+    form.addEventListener('submit', function(e) {
+        let valid = true;
+        
+        requiredFields.forEach(function(field) {
+            if (!field.value.trim()) {
+                valid = false;
+                field.style.borderColor = '#dc3545';
+                
+                // Crear mensaje de error si no existe
+                if (!field.nextElementSibling || !field.nextElementSibling.classList.contains('error-message')) {
+                    const error = document.createElement('div');
+                    error.className = 'error-message';
+                    error.style.color = '#dc3545';
+                    error.style.fontSize = '0.875rem';
+                    error.style.marginTop = '5px';
+                    error.textContent = 'Este campo es requerido';
+                    field.parentNode.appendChild(error);
+                }
+            } else {
+                field.style.borderColor = '';
+                const error = field.parentNode.querySelector('.error-message');
+                if (error) {
+                    error.remove();
+                }
+            }
+        });
+        
+        if (!valid) {
+            e.preventDefault();
+            alert('Por favor, complete todos los campos requeridos.');
+        }
+    });
+    
+    // Previsualización de imagen al seleccionar
+    const fileInput = document.querySelector('input[type="file"]');
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                const currentImage = document.querySelector('.current-image');
+                
+                // Si ya hay una imagen actual, reemplazarla
+                let imgContainer = currentImage;
+                if (!imgContainer) {
+                    imgContainer = document.createElement('div');
+                    imgContainer.className = 'current-image';
+                    fileInput.parentNode.insertBefore(imgContainer, fileInput);
+                } else {
+                    imgContainer.innerHTML = '';
+                }
+                
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.width = 150;
+                    img.className = 'img-thumbnail';
+                    imgContainer.appendChild(img);
+                }
+                
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+    
+    // Auto-resize del textarea
+    const textareas = document.querySelectorAll('textarea');
+    textareas.forEach(function(textarea) {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+        
+        // Trigger inicial
+        textarea.dispatchEvent(new Event('input'));
+    });
+});
+</script>
+{% endblock %}

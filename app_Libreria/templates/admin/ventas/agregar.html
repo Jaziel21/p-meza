@@ -1,0 +1,552 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-verde mb-4">Agregar Nueva Venta</h1>
+    
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post" id="ventaForm">
+                {% csrf_token %}
+                
+                <!-- Información Básica de la Venta -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Cliente *</label>
+                            <select class="form-control" name="clienteid" required id="clienteSelect">
+                                <option value="">Seleccionar cliente</option>
+                                {% for cliente in clientes %}
+                                <option value="{{ cliente.id }}">
+                                    {{ cliente.username }} 
+                                    {% if cliente.first_name or cliente.last_name %}
+                                    - {{ cliente.first_name }} {{ cliente.last_name }}
+                                    {% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            {% if not clientes %}
+                            <div class="alert alert-warning mt-2">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                No hay clientes registrados. 
+                                <a href="/admin/auth/user/add/" target="_blank" class="alert-link">
+                                    Crear cliente en el admin primero
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Método de Pago *</label>
+                            <select class="form-control" name="metodopago" required id="metodoPago">
+                                <option value="">Seleccionar método</option>
+                                <option value="EFECTIVO">Efectivo</option>
+                                <option value="TARJETA">Tarjeta</option>
+                                <option value="TRANSFERENCIA">Transferencia</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección para Agregar Libros -->
+                <div class="card mt-4">
+                    <div class="card-header bg-verde text-white">
+                        <h5 class="mb-0">📚 Libros de la Venta</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="librosContainer">
+                            <div class="libro-item mb-3 p-3 border rounded">
+                                <div class="row align-items-center">
+                                    <div class="col-md-5">
+                                        <label class="form-label">Libro *</label>
+                                        <select class="form-control libro-select" name="libros" required>
+                                            <option value="">Seleccionar libro</option>
+                                            {% for libro in libros %}
+                                            <option value="{{ libro.libroid }}" 
+                                                    data-precio="{{ libro.precioventa }}"
+                                                    data-stock="{{ libro.stock }}">
+                                                {{ libro.titulo }} - ${{ libro.precioventa }} (Stock: {{ libro.stock }})
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Cantidad *</label>
+                                        <input type="number" class="form-control cantidad-input" name="cantidades" 
+                                               min="1" value="1" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Precio Unitario</label>
+                                        <input type="number" step="0.01" class="form-control precio-input" 
+                                               name="precios" readonly>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label class="form-label">&nbsp;</label>
+                                        <button type="button" class="btn btn-danger btn-sm w-100" onclick="eliminarLibro(this)" disabled>
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <small class="text-muted info-libro"></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="btn btn-outline-verde mt-3" onclick="agregarLibro()">
+                            ➕ Agregar Otro Libro
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Resumen de la Venta -->
+                <div class="row mt-4">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h6 class="mb-0">💰 Resumen de la Venta</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="resumenLibros">
+                                    <div class="text-muted text-center">Agrega libros para ver el resumen</div>
+                                </div>
+                                
+                                <hr>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Descuento Aplicado</label>
+                                            <input type="number" step="0.01" min="0" class="form-control" 
+                                                   name="descuentoaplicado" value="0" id="descuento" placeholder="0.00">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Pago Recibido</label>
+                                            <input type="number" step="0.01" min="0" class="form-control" 
+                                                   name="pagorecibido" value="0" id="pagoRecibido" placeholder="0.00">
+                                            <small class="text-muted" id="textoPagoRecibido">
+                                                Para pago en efectivo, ingrese la cantidad recibida
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="alert alert-success">
+                                    <div class="row text-center">
+                                        <div class="col-md-4">
+                                            <h5 id="totalLibros">0</h5>
+                                            <small>Libros</small>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h5 id="totalItems">0</h5>
+                                            <small>Items</small>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h5 class="text-success" id="montoTotalDisplay">$0.00</h5>
+                                            <small>Total Venta</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header bg-warning text-dark">
+                                <h6 class="mb-0">⚡ Información de Pago</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <strong>Método:</strong><br>
+                                    <span id="displayMetodoPago" class="text-muted">No seleccionado</span>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Subtotal:</strong><br>
+                                    <span id="displaySubtotal">$0.00</span>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Descuento:</strong><br>
+                                    <span id="displayDescuento">$0.00</span>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Total:</strong><br>
+                                    <span id="displayTotal" class="h5 text-success">$0.00</span>
+                                </div>
+                                <div class="mb-3" id="campoCambio" style="display: none;">
+                                    <strong>Cambio:</strong><br>
+                                    <span id="displayCambio" class="text-info">$0.00</span>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Estado:</strong><br>
+                                    <span id="displayEstado" class="badge bg-secondary">INCOMPLETO</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Campo oculto para el total -->
+                <input type="hidden" name="montototal" id="montototalHidden" value="0">
+                
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-verde btn-lg" id="btnSubmit">
+                        💰 Guardar Venta
+                    </button>
+                    <a href="{% url 'admin_ventas' %}" class="btn btn-secondary btn-lg">❌ Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Variables globales
+let contadorLibros = 1;
+
+// Función para agregar un nuevo campo de libro
+function agregarLibro() {
+    contadorLibros++;
+    const libroHTML = `
+        <div class="libro-item mb-3 p-3 border rounded">
+            <div class="row align-items-center">
+                <div class="col-md-5">
+                    <label class="form-label">Libro *</label>
+                    <select class="form-control libro-select" name="libros" required>
+                        <option value="">Seleccionar libro</option>
+                        {% for libro in libros %}
+                        <option value="{{ libro.libroid }}" 
+                                data-precio="{{ libro.precioventa }}"
+                                data-stock="{{ libro.stock }}">
+                            {{ libro.titulo }} - ${{ libro.precioventa }} (Stock: {{ libro.stock }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Cantidad *</label>
+                    <input type="number" class="form-control cantidad-input" name="cantidades" 
+                           min="1" value="1" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Precio Unitario</label>
+                    <input type="number" step="0.01" class="form-control precio-input" 
+                           name="precios" readonly>
+                </div>
+                <div class="col-md-1">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="button" class="btn btn-danger btn-sm w-100" onclick="eliminarLibro(this)">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <small class="text-muted info-libro"></small>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('librosContainer').insertAdjacentHTML('beforeend', libroHTML);
+    
+    // Agregar event listeners al nuevo libro
+    const nuevoLibro = document.querySelector('#librosContainer .libro-item:last-child');
+    const select = nuevoLibro.querySelector('.libro-select');
+    const cantidadInput = nuevoLibro.querySelector('.cantidad-input');
+    
+    select.addEventListener('change', function() { actualizarPrecio(this); });
+    cantidadInput.addEventListener('input', function() { actualizarSubtotal(this); });
+    
+    // Habilitar eliminación en el primer libro si hay más de uno
+    actualizarBotonesEliminar();
+}
+
+// Función para eliminar un libro
+function eliminarLibro(boton) {
+    const libroItem = boton.closest('.libro-item');
+    libroItem.remove();
+    contadorLibros--;
+    actualizarBotonesEliminar();
+    calcularTotal();
+}
+
+// Actualizar botones de eliminar (deshabilitar si solo hay un libro)
+function actualizarBotonesEliminar() {
+    const botones = document.querySelectorAll('.libro-item .btn-danger');
+    botones.forEach((boton, index) => {
+        if (botones.length === 1) {
+            boton.disabled = true;
+        } else {
+            boton.disabled = false;
+        }
+    });
+}
+
+// Actualizar precio cuando se selecciona un libro
+function actualizarPrecio(select) {
+    const selectedOption = select.options[select.selectedIndex];
+    const precio = selectedOption.getAttribute('data-precio');
+    const stock = selectedOption.getAttribute('data-stock');
+    const titulo = selectedOption.text.split(' - ')[0];
+    
+    const precioInput = select.closest('.row').querySelector('.precio-input');
+    const infoLibro = select.closest('.libro-item').querySelector('.info-libro');
+    
+    if (precio && selectedOption.value) {
+        precioInput.value = precio;
+        infoLibro.textContent = `${titulo} - Stock disponible: ${stock} unidades`;
+        
+        // Actualizar cantidad máxima según stock
+        const cantidadInput = select.closest('.row').querySelector('.cantidad-input');
+        cantidadInput.max = stock;
+        
+        if (parseInt(cantidadInput.value) > parseInt(stock)) {
+            cantidadInput.value = stock;
+        }
+    } else {
+        precioInput.value = '';
+        infoLibro.textContent = '';
+    }
+    
+    calcularTotal();
+}
+
+// Actualizar subtotal cuando cambia la cantidad
+function actualizarSubtotal(input) {
+    const libroItem = input.closest('.libro-item');
+    const select = libroItem.querySelector('.libro-select');
+    const stock = select.options[select.selectedIndex]?.getAttribute('data-stock') || 0;
+    
+    if (parseInt(input.value) > parseInt(stock)) {
+        input.value = stock;
+    }
+    
+    calcularTotal();
+}
+
+// Calcular total de la venta
+function calcularTotal() {
+    let total = 0;
+    let totalLibros = 0;
+    let totalItems = 0;
+    
+    // Calcular subtotal de libros
+    const libroItems = document.querySelectorAll('.libro-item');
+    libroItems.forEach(item => {
+        const precioInput = item.querySelector('.precio-input');
+        const cantidadInput = item.querySelector('.cantidad-input');
+        const select = item.querySelector('.libro-select');
+        
+        if (select.value && precioInput.value && cantidadInput.value) {
+            const subtotal = parseFloat(precioInput.value) * parseInt(cantidadInput.value);
+            total += subtotal;
+            totalLibros++;
+            totalItems += parseInt(cantidadInput.value);
+        }
+    });
+    
+    // Aplicar descuento
+    const descuento = parseFloat(document.getElementById('descuento').value) || 0;
+    const totalConDescuento = Math.max(total - descuento, 0);
+    
+    // Información de pago
+    const pagoRecibido = parseFloat(document.getElementById('pagoRecibido').value) || 0;
+    const metodoPago = document.getElementById('metodoPago').value;
+    
+    // Calcular cambio
+    let cambio = 0;
+    if (metodoPago === 'EFECTIVO' && pagoRecibido > 0) {
+        cambio = Math.max(pagoRecibido - totalConDescuento, 0);
+    }
+    
+    // Actualizar displays
+    document.getElementById('totalLibros').textContent = totalLibros;
+    document.getElementById('totalItems').textContent = totalItems;
+    document.getElementById('montoTotalDisplay').textContent = `$${totalConDescuento.toFixed(2)}`;
+    document.getElementById('displaySubtotal').textContent = `$${total.toFixed(2)}`;
+    document.getElementById('displayDescuento').textContent = `$${descuento.toFixed(2)}`;
+    document.getElementById('displayTotal').textContent = `$${totalConDescuento.toFixed(2)}`;
+    document.getElementById('displayCambio').textContent = `$${cambio.toFixed(2)}`;
+    document.getElementById('montototalHidden').value = totalConDescuento.toFixed(2);
+    
+    // Actualizar método de pago
+    document.getElementById('displayMetodoPago').textContent = metodoPago || 'No seleccionado';
+    
+    // Mostrar/ocultar campo de cambio
+    const campoCambio = document.getElementById('campoCambio');
+    if (metodoPago === 'EFECTIVO' && pagoRecibido > 0) {
+        campoCambio.style.display = 'block';
+    } else {
+        campoCambio.style.display = 'none';
+    }
+    
+    // Validar estado del formulario
+    const btnSubmit = document.getElementById('btnSubmit');
+    const clienteSelect = document.getElementById('clienteSelect');
+    const tieneLibros = totalLibros > 0;
+    const tieneCliente = clienteSelect.value !== '';
+    const tieneMetodoPago = metodoPago !== '';
+    
+    let estado = 'INCOMPLETO';
+    let estadoClass = 'bg-secondary';
+    
+    if (tieneLibros && tieneCliente && tieneMetodoPago) {
+        if (metodoPago === 'EFECTIVO') {
+            if (pagoRecibido >= totalConDescuento) {
+                estado = 'LISTO';
+                estadoClass = 'bg-success';
+            } else {
+                estado = 'PAGO INSUFICIENTE';
+                estadoClass = 'bg-danger';
+            }
+        } else {
+            estado = 'LISTO';
+            estadoClass = 'bg-success';
+        }
+    }
+    
+    document.getElementById('displayEstado').textContent = estado;
+    document.getElementById('displayEstado').className = `badge ${estadoClass}`;
+    
+    // Actualizar resumen de libros
+    actualizarResumenLibros();
+}
+
+// Actualizar resumen visual de libros
+function actualizarResumenLibros() {
+    const resumenContainer = document.getElementById('resumenLibros');
+    let resumenHTML = '';
+    
+    const libroItems = document.querySelectorAll('.libro-item');
+    libroItems.forEach((item, index) => {
+        const select = item.querySelector('.libro-select');
+        const cantidadInput = item.querySelector('.cantidad-input');
+        const precioInput = item.querySelector('.precio-input');
+        
+        if (select.value && cantidadInput.value && precioInput.value) {
+            const titulo = select.options[select.selectedIndex].text.split(' - ')[0];
+            const subtotal = parseFloat(precioInput.value) * parseInt(cantidadInput.value);
+            
+            resumenHTML += `
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <strong>${titulo}</strong><br>
+                        <small class="text-muted">${cantidadInput.value} x $${parseFloat(precioInput.value).toFixed(2)}</small>
+                    </div>
+                    <strong class="text-success">$${subtotal.toFixed(2)}</strong>
+                </div>
+            `;
+        }
+    });
+    
+    if (resumenHTML === '') {
+        resumenHTML = '<div class="text-muted text-center">Agrega libros para ver el resumen</div>';
+    }
+    
+    resumenContainer.innerHTML = resumenHTML;
+}
+
+// Inicializar event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Event listeners para el primer libro
+    const primerSelect = document.querySelector('.libro-select');
+    const primerCantidad = document.querySelector('.cantidad-input');
+    
+    if (primerSelect) {
+        primerSelect.addEventListener('change', function() { actualizarPrecio(this); });
+    }
+    if (primerCantidad) {
+        primerCantidad.addEventListener('input', function() { actualizarSubtotal(this); });
+    }
+    
+    // Event listener para método de pago
+    document.getElementById('metodoPago').addEventListener('change', function() {
+        const textoPagoRecibido = document.getElementById('textoPagoRecibido');
+        
+        if (this.value === 'EFECTIVO') {
+            textoPagoRecibido.innerHTML = '<strong class="text-danger">Para pago en efectivo, ingrese la cantidad recibida (debe ser mayor o igual al total)</strong>';
+        } else {
+            textoPagoRecibido.innerHTML = 'Para pago en efectivo, ingrese la cantidad recibida';
+        }
+        
+        calcularTotal();
+    });
+    
+    // Event listeners para descuento y pago recibido
+    document.getElementById('descuento').addEventListener('input', calcularTotal);
+    document.getElementById('pagoRecibido').addEventListener('input', calcularTotal);
+    
+    // Inicializar
+    actualizarBotonesEliminar();
+    calcularTotal();
+});
+
+// Prevenir envío del formulario si hay errores
+document.getElementById('ventaForm').addEventListener('submit', function(e) {
+    const metodoPago = document.getElementById('metodoPago').value;
+    const pagoRecibido = parseFloat(document.getElementById('pagoRecibido').value) || 0;
+    const total = parseFloat(document.getElementById('montototalHidden').value) || 0;
+    
+    if (metodoPago === 'EFECTIVO' && pagoRecibido < total) {
+        e.preventDefault();
+        alert('❌ Error: Para pago en efectivo, el pago recibido debe ser mayor o igual al total de la venta');
+        return false;
+    }
+    
+    // Validar que hay al menos un libro
+    const libroItems = document.querySelectorAll('.libro-item');
+    let librosValidos = 0;
+    libroItems.forEach(item => {
+        const select = item.querySelector('.libro-select');
+        if (select.value) librosValidos++;
+    });
+    
+    if (librosValidos === 0) {
+        e.preventDefault();
+        alert('❌ Error: Debes agregar al menos un libro a la venta');
+        return false;
+    }
+});
+</script>
+
+<style>
+.libro-item {
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.libro-item:hover {
+    background-color: #e9ecef;
+}
+
+.card-header {
+    font-weight: 600;
+}
+
+.form-control:focus {
+    border-color: var(--verde-principal);
+    box-shadow: 0 0 0 0.2rem rgba(46, 139, 87, 0.25);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+</style>
+{% endblock %}

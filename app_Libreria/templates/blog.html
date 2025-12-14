@@ -1,0 +1,518 @@
+{% extends 'base.html' %}
+
+{% block title %}Blog Literario - Librería AJMG{% endblock %}
+
+{% block page_title %}📚 Nuestro Blog Literario{% endblock %}
+{% block page_subtitle %}
+<p style="font-size: 1.1rem; color: var(--gris-medio); margin-top: var(--espacio-sm); max-width: 800px; margin-left: auto; margin-right: auto;">
+    Descubre artículos, reseñas, entrevistas y reflexiones sobre el maravilloso mundo de los libros. 
+    Explora contenido exclusivo escrito por autores, críticos literarios y nuestro equipo editorial.
+</p>
+{% endblock %}
+
+{% block content %}
+<!-- Estadísticas del blog -->
+<div style="display: flex; justify-content: center; gap: var(--espacio-lg); margin-bottom: var(--espacio-xl); flex-wrap: wrap;">
+    <div style="text-align: center;">
+        <div style="font-size: 2.5rem; color: var(--verde-principal); font-weight: bold;">{{ entradas.count }}</div>
+        <div style="font-size: 0.9rem; color: var(--gris-medio);">Artículos Publicados</div>
+    </div>
+    
+    <div style="height: 50px; width: 1px; background-color: var(--gris-medio); opacity: 0.3;"></div>
+    
+    <div style="text-align: center;">
+        <div style="font-size: 2.5rem; color: var(--verde-principal); font-weight: bold;">{% now "Y" %}</div>
+        <div style="font-size: 0.9rem; color: var(--gris-medio);">Año Actual</div>
+    </div>
+    
+    <div style="height: 50px; width: 1px; background-color: var(--gris-medio); opacity: 0.3;"></div>
+    
+    <div style="text-align: center;">
+        <div style="font-size: 2.5rem; color: var(--verde-principal); font-weight: bold;">+10</div>
+        <div style="font-size: 0.9rem; color: var(--gris-medio);">Autores Colaboradores</div>
+    </div>
+</div>
+
+<!-- Lista de artículos del blog -->
+{% if entradas %}
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: var(--espacio-lg); margin-bottom: var(--espacio-xl);">
+    {% for entrada in entradas %}
+    <div class="blog-card">
+        <!-- Imagen del artículo -->
+        <div class="blog-imagen-container">
+            {% if entrada.imagen %}
+            <img src="{{ entrada.imagen.url }}" alt="{{ entrada.titulo }}" class="blog-imagen">
+            {% else %}
+            <div class="blog-imagen-placeholder">
+                <i class="fas fa-book-open"></i>
+            </div>
+            {% endif %}
+            
+            <!-- Categoría -->
+            <div class="blog-categoria-badge">
+                {{ entrada.get_categoria_display }}
+            </div>
+            
+            <!-- Fecha de publicación -->
+            <div class="blog-fecha-badge">
+                <i class="far fa-calendar-alt"></i>
+                {{ entrada.fechapublicacion|date:"d M" }}
+            </div>
+        </div>
+        
+        <!-- Contenido del artículo -->
+        <div class="blog-contenido">
+            <!-- Título -->
+            <h3 class="blog-titulo">{{ entrada.titulo }}</h3>
+            
+            <!-- Resumen -->
+            <p class="blog-resumen">
+                {% if entrada.resumen %}
+                    {{ entrada.resumen|truncatewords:30 }}
+                {% else %}
+                    {{ entrada.contenido|striptags|truncatewords:30 }}
+                {% endif %}
+            </p>
+            
+            <!-- Información del autor -->
+            <div class="blog-autor">
+                <div style="display: flex; align-items: center; gap: var(--espacio-xs);">
+                    <div style="width: 35px; height: 35px; background-color: var(--verde-claro); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--verde-oscuro);">
+                        <i class="fas fa-user-edit"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.9rem; color: var(--gris-medio);">Por</div>
+                        <div style="font-weight: 600; color: var(--verde-oscuro);">
+                            {{ entrada.autor.get_full_name|default:entrada.autor.username }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botón para leer más -->
+            <div class="blog-acciones">
+                <a href="{% url 'detalle_blog' entrada.blogid %}" class="blog-leer-mas-btn">
+                    <i class="fas fa-book-reader"></i>
+                    <span>Leer Artículo</span>
+                </a>
+                
+                <div style="display: flex; align-items: center; gap: var(--espacio-xs);">
+                    <button onclick="compartirBlog({{ entrada.blogid }}, '{{ entrada.titulo }}')" class="blog-compartir-btn" title="Compartir artículo">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    
+                    {% if user.is_authenticated and user.is_staff %}
+                    <a href="{% url 'editar_entrada_blog' entrada.blogid %}" class="blog-editar-btn" title="Editar artículo">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<!-- Mensaje cuando no hay artículos -->
+<div style="text-align: center; padding: var(--espacio-xl);">
+    <div style="font-size: 5rem; color: var(--verde-claro); margin-bottom: var(--espacio-md); opacity: 0.5;">
+        <i class="fas fa-book-open"></i>
+    </div>
+    <h3 style="color: var(--gris-oscuro); margin-bottom: var(--espacio-sm);">No hay artículos publicados aún</h3>
+    <p style="color: var(--gris-medio); margin-bottom: var(--espacio-lg); max-width: 500px; margin-left: auto; margin-right: auto;">
+        Estamos preparando contenido interesante sobre el mundo literario. 
+        Vuelve pronto para descubrir reseñas, entrevistas y artículos exclusivos.
+    </p>
+    <div style="display: flex; gap: var(--espacio-sm); justify-content: center; flex-wrap: wrap;">
+        <a href="{% url 'inicio' %}" style="background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro)); color: white; padding: 12px 24px; border-radius: var(--radio-md); text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+            <i class="fas fa-home"></i> Volver al Inicio
+        </a>
+        <a href="{% url 'libros' %}" style="background-color: var(--verde-claro); color: var(--verde-oscuro); padding: 12px 24px; border-radius: var(--radio-md); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border: 2px solid var(--verde-principal);">
+            <i class="fas fa-book"></i> Explorar Libros
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Sección de suscripción al blog -->
+{% if entradas %}
+<div style="background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal)); padding: var(--espacio-xl); border-radius: var(--radio-lg); margin-top: var(--espacio-xl); text-align: center;">
+    <h3 style="color: white; margin-bottom: var(--espacio-sm); font-size: 1.8rem;">¿No quieres perderte ningún artículo?</h3>
+    <p style="color: var(--verde-claro); margin-bottom: var(--espacio-lg); font-size: 1.1rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+        Suscríbete a nuestro boletín y recibe los nuevos artículos directamente en tu correo.
+    </p>
+    
+    <div style="max-width: 500px; margin: 0 auto;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <input type="email" id="email-suscripcion" placeholder="Tu correo electrónico" 
+                   style="flex-grow: 1; padding: 12px 15px; border-radius: var(--radio-md); border: none; min-width: 200px;">
+            <button onclick="suscribirseBlog()" 
+                    style="background-color: var(--dorado); color: var(--verde-oscuro); border: none; padding: 12px 24px; border-radius: var(--radio-md); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fas fa-envelope"></i> Suscribirme
+            </button>
+        </div>
+        <p style="color: var(--verde-claro); font-size: 0.9rem; margin-top: var(--espacio-sm); opacity: 0.8;">
+            Sin spam. Solo contenido literario de calidad.
+        </p>
+    </div>
+</div>
+
+<!-- Categorías del blog -->
+<div style="margin-top: var(--espacio-xl);">
+    <h3 style="color: var(--verde-oscuro); margin-bottom: var(--espacio-lg); text-align: center; font-size: 1.8rem;">
+        <span style="font-size: 1.5rem; margin-right: 10px;">🏷️</span>
+        Categorías del Blog
+    </h3>
+    
+    <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: var(--espacio-sm); margin-bottom: var(--espacio-xl);">
+        <span class="blog-categoria-tag" onclick="filtrarPorCategoria('GENERAL')">
+            <i class="fas fa-globe"></i> General
+        </span>
+        <span class="blog-categoria-tag" onclick="filtrarPorCategoria('RESENA')">
+            <i class="fas fa-star"></i> Reseñas
+        </span>
+        <span class="blog-categoria-tag" onclick="filtrarPorCategoria('AUTOR')">
+            <i class="fas fa-user-pen"></i> Autores
+        </span>
+        <span class="blog-categoria-tag" onclick="filtrarPorCategoria('EVENTO')">
+            <i class="fas fa-calendar"></i> Eventos
+        </span>
+        <span class="blog-categoria-tag" onclick="filtrarPorCategoria('TALLER')">
+            <i class="fas fa-pen-nib"></i> Talleres
+        </span>
+        <span class="blog-categoria-tag" onclick="filtrarPorCategoria('NOTICIA')">
+            <i class="fas fa-newspaper"></i> Noticias
+        </span>
+        <span class="blog-categoria-tag" onclick="filtrarPorCategoria('RECOMENDACION')">
+            <i class="fas fa-thumbs-up"></i> Recomendaciones
+        </span>
+        <span class="blog-categoria-tag" onclick="filtrarPorCategoria('ENTREVISTA')">
+            <i class="fas fa-microphone"></i> Entrevistas
+        </span>
+    </div>
+</div>
+
+<!-- Artículos más recientes -->
+<div style="margin-top: var(--espacio-xl);">
+    <h3 style="color: var(--verde-oscuro); margin-bottom: var(--espacio-lg); text-align: center; font-size: 1.8rem;">
+        <span style="font-size: 1.5rem; margin-right: 10px;">🆕</span>
+        Artículos Más Recientes
+    </h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: var(--espacio-md);">
+        {% for entrada in entradas|slice:":4" %}
+        <div style="background-color: white; border-radius: var(--radio-md); padding: var(--espacio-md); box-shadow: var(--sombra-suave); border: 1px solid var(--gris-claro);">
+            <h4 style="color: var(--verde-oscuro); margin-bottom: var(--espacio-xs); font-size: 1rem; line-height: 1.4;">
+                {{ entrada.titulo|truncatechars:60 }}
+            </h4>
+            <p style="color: var(--gris-medio); font-size: 0.85rem; margin-bottom: var(--espacio-sm);">
+                {{ entrada.resumen|default:entrada.contenido|striptags|truncatechars:80 }}
+            </p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <small style="color: var(--gris-medio);">
+                    {{ entrada.fechapublicacion|date:"d M" }}
+                </small>
+                <a href="{% url 'detalle_blog' entrada.blogid %}" style="color: var(--verde-principal); text-decoration: none; font-size: 0.85rem; font-weight: 600;">
+                    Leer <i class="fas fa-arrow-right" style="font-size: 0.8rem;"></i>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<script>
+// Funciones para el blog
+function compartirBlog(blogId, titulo) {
+    const url = window.location.origin + "{% url 'detalle_blog' 0 %}".replace('0', blogId);
+    const textoCompartir = `¡Echa un vistazo a este artículo: "${titulo}" en el blog de Librería AJMG!\n\n${url}`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: titulo,
+            text: textoCompartir,
+            url: url
+        });
+    } else {
+        navigator.clipboard.writeText(textoCompartir).then(() => {
+            alert('Enlace del artículo copiado al portapapeles. ¡Compártelo!');
+        });
+    }
+}
+
+function suscribirseBlog() {
+    const email = document.getElementById('email-suscripcion').value;
+    
+    if (!email || !email.includes('@')) {
+        alert('Por favor, ingresa un correo electrónico válido.');
+        return;
+    }
+    
+    // Aquí iría la lógica para suscribirse
+    alert(`¡Gracias por suscribirte con ${email}! Recibirás nuestros próximos artículos.`);
+    document.getElementById('email-suscripcion').value = '';
+}
+
+function filtrarPorCategoria(categoria) {
+    const tarjetas = document.querySelectorAll('.blog-card');
+    
+    tarjetas.forEach(tarjeta => {
+        const categoriaTarjeta = tarjeta.querySelector('.blog-categoria-badge').textContent;
+        // Esto es un ejemplo básico - en producción necesitarías mapear categorías
+        tarjeta.style.display = 'block';
+    });
+    
+    // Mostrar mensaje de filtro activo
+    alert(`Filtrando por categoría: ${categoria}`);
+}
+
+// Efectos visuales
+document.addEventListener('DOMContentLoaded', function() {
+    // Animación de aparición para tarjetas
+    const tarjetas = document.querySelectorAll('.blog-card');
+    tarjetas.forEach((tarjeta, index) => {
+        tarjeta.style.animationDelay = `${index * 0.1}s`;
+        tarjeta.classList.add('fade-in-up');
+    });
+    
+    // Efecto hover en botones de categoría
+    const tags = document.querySelectorAll('.blog-categoria-tag');
+    tags.forEach(tag => {
+        tag.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-3px)';
+        });
+        
+        tag.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+
+// Estilos CSS para el blog
+const blogStyle = document.createElement('style');
+blogStyle.textContent = `
+    .blog-card {
+        background: var(--blanco);
+        border-radius: var(--radio-lg);
+        overflow: hidden;
+        box-shadow: var(--sombra-suave);
+        transition: var(--transicion-media);
+        border: 1px solid var(--gris-claro);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .blog-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--sombra-fuerte);
+        border-color: var(--verde-principal);
+    }
+    
+    .blog-imagen-container {
+        height: 220px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .blog-imagen {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: var(--transicion-lenta);
+    }
+    
+    .blog-card:hover .blog-imagen {
+        transform: scale(1.08);
+    }
+    
+    .blog-imagen-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 3rem;
+    }
+    
+    .blog-categoria-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background-color: var(--verde-principal);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        z-index: 2;
+    }
+    
+    .blog-fecha-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background-color: rgba(255, 255, 255, 0.95);
+        color: var(--verde-oscuro);
+        padding: 5px 10px;
+        border-radius: var(--radio-sm);
+        font-size: 0.8rem;
+        font-weight: 600;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .blog-contenido {
+        padding: var(--espacio-md);
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .blog-titulo {
+        font-size: 1.3rem;
+        color: var(--verde-oscuro);
+        margin-bottom: var(--espacio-xs);
+        line-height: 1.3;
+    }
+    
+    .blog-resumen {
+        color: var(--gris-medio);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: var(--espacio-md);
+        flex-grow: 1;
+    }
+    
+    .blog-autor {
+        margin-bottom: var(--espacio-md);
+        padding-top: var(--espacio-sm);
+        border-top: 1px solid var(--gris-claro);
+    }
+    
+    .blog-acciones {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+    }
+    
+    .blog-leer-mas-btn {
+        background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro));
+        color: white;
+        padding: 10px 20px;
+        border-radius: var(--radio-md);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        transition: var(--transicion-media);
+    }
+    
+    .blog-leer-mas-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--sombra-suave);
+    }
+    
+    .blog-compartir-btn, .blog-editar-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        background-color: var(--gris-claro);
+        color: var(--gris-medio);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transicion-rapida);
+    }
+    
+    .blog-compartir-btn:hover {
+        background-color: var(--verde-principal);
+        color: white;
+    }
+    
+    .blog-editar-btn {
+        background-color: var(--dorado);
+        color: var(--verde-oscuro);
+        text-decoration: none;
+    }
+    
+    .blog-editar-btn:hover {
+        background-color: #c69500;
+    }
+    
+    .blog-categoria-tag {
+        background-color: var(--verde-muy-claro);
+        color: var(--verde-oscuro);
+        padding: 8px 16px;
+        border-radius: var(--radio-md);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        transition: var(--transicion-media);
+        border: 1px solid var(--verde-claro);
+    }
+    
+    .blog-categoria-tag:hover {
+        background-color: var(--verde-claro);
+        transform: translateY(-2px);
+        box-shadow: var(--sombra-suave);
+    }
+    
+    /* Animaciones */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .fade-in-up {
+        animation: fadeInUp 0.5s ease forwards;
+        opacity: 0;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1200px) {
+        .blog-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .blog-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .blog-imagen-container {
+            height: 180px;
+        }
+    }
+    
+    /* Estilos para el input de suscripción */
+    #email-suscripcion {
+        transition: var(--transicion-rapida);
+    }
+    
+    #email-suscripcion:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.2);
+    }
+`;
+document.head.appendChild(blogStyle);
+</script>
+{% endblock %}

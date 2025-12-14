@@ -1,0 +1,942 @@
+<!-- app_Libreria/templates/admin/libros/listado.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1 class="page-title">Gestión de Libros</h1>
+        <a href="{% url 'agregar_libro' %}" class="btn btn-primary">
+            <span class="btn-icon">➕</span> Agregar Libro
+        </a>
+    </div>
+    
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-success">
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="card">
+        <div class="card-content">
+            <div class="table-wrapper">
+                <table class="data-table" id="libros-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Portada</th>
+                            <th>Título</th>
+                            <th>Autor</th>
+                            <th>Editorial</th>
+                            <th>ISBN</th>
+                            <th>Año Publicación</th>
+                            <th>Género</th>
+                            <th>Precio Venta</th>
+                            <th>Stock</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for libro in libros %}
+                        <tr class="table-row" data-stock="{{ libro.stock }}" data-precio="{{ libro.precioventa }}">
+                            <td class="cell-id"><strong>#{{ libro.libroid }}</strong></td>
+                            <td class="cell-image">
+                                {% if libro.portada %}
+                                <img src="{{ libro.portada.url }}" alt="{{ libro.titulo }}" class="book-cover">
+                                {% else %}
+                                <div class="book-cover-placeholder" title="Sin portada">📚</div>
+                                {% endif %}
+                            </td>
+                            <td class="cell-title">
+                                <strong class="book-title">{{ libro.titulo }}</strong>
+                                {% if libro.descripcion %}
+                                <p class="book-description">{{ libro.descripcion|truncatewords:10 }}</p>
+                                {% endif %}
+                            </td>
+                            <td class="cell-author">
+                                <span class="author-name">{{ libro.autorid.nombre }} {{ libro.autorid.apellido }}</span>
+                                <br>
+                                <span class="author-country">{{ libro.autorid.nacionalidad }}</span>
+                            </td>
+                            <td class="cell-publisher">
+                                <span class="publisher-name">{{ libro.editorialid.nombre }}</span>
+                                <br>
+                                <span class="publisher-country">{{ libro.editorialid.pais }}</span>
+                            </td>
+                            <td class="cell-isbn">
+                                <code class="isbn-code">{{ libro.isbn }}</code>
+                            </td>
+                            <td class="cell-year">{{ libro.aniopublicacion }}</td>
+                            <td class="cell-genre">
+                                <span class="genre-badge genre-{{ libro.genero|lower }}">
+                                    {{ libro.get_genero_display }}
+                                </span>
+                            </td>
+                            <td class="cell-price">
+                                <strong class="price-value">${{ libro.precioventa }}</strong>
+                            </td>
+                            <td class="cell-stock">
+                                {% if libro.stock > 10 %}
+                                <span class="stock-badge stock-high">{{ libro.stock }} unidades</span>
+                                {% elif libro.stock > 0 %}
+                                <span class="stock-badge stock-medium">{{ libro.stock }} unidades</span>
+                                {% else %}
+                                <span class="stock-badge stock-low">Agotado</span>
+                                {% endif %}
+                            </td>
+                            <td class="cell-status">
+                                {% if libro.disponible %}
+                                <span class="status-badge status-available">Disponible</span>
+                                {% else %}
+                                <span class="status-badge status-unavailable">No disponible</span>
+                                {% endif %}
+                            </td>
+                            <td class="cell-actions">
+                                <div class="action-buttons">
+                                    <a href="{% url 'editar_libro' libro.libroid %}" class="btn-action btn-edit" title="Editar">
+                                        <span class="action-icon">✏️</span> Editar
+                                    </a>
+                                    <a href="{% url 'eliminar_libro' libro.libroid %}" class="btn-action btn-delete" title="Eliminar">
+                                        <span class="action-icon">🗑️</span> Eliminar
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="12" class="empty-state">
+                                <div class="empty-content">
+                                    <div class="empty-icon">📚</div>
+                                    <h3>No hay libros registrados</h3>
+                                    <p>Comienza agregando el primer libro a tu catálogo.</p>
+                                    <a href="{% url 'agregar_libro' %}" class="btn btn-primary">Agregar Primer Libro</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Estadísticas -->
+            {% if libros %}
+            <div class="stats-container">
+                <div class="stats-grid">
+                    <div class="stat-card stat-primary">
+                        <div class="stat-content">
+                            <h3 class="stat-number">{{ libros.count }}</h3>
+                            <p class="stat-label">Total Libros</p>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-success">
+                        <div class="stat-content">
+                            <h3 class="stat-number">{{ libros|length }}</h3>
+                            <p class="stat-label">Libros Activos</p>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-warning">
+                        <div class="stat-content">
+                            <h3 class="stat-number">{{ total_stock }}</h3>
+                            <p class="stat-label">Stock Total</p>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-info">
+                        <div class="stat-content">
+                            <h3 class="stat-number">${{ valor_total|floatformat:2 }}</h3>
+                            <p class="stat-label">Valor Inventario</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+/* Variables CSS */
+:root {
+    --verde-principal: #2e8b57;
+    --verde-claro: rgba(46, 139, 87, 0.1);
+    --blanco: #ffffff;
+    --gris-claro: #f8f9fa;
+    --gris-medio: #e9ecef;
+    --gris-oscuro: #343a40;
+    --texto: #212529;
+    --texto-secundario: #6c757d;
+    --primario: #2e8b57;
+    --secundario: #28a745;
+    --peligro: #dc3545;
+    --advertencia: #ffc107;
+    --info: #17a2b8;
+    --sombra: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --sombra-hover: 0 4px 8px rgba(0, 0, 0, 0.15);
+    --radio-borde: 8px;
+    --radio-input: 6px;
+}
+
+/* Contenedor principal */
+.admin-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Encabezado */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.page-title {
+    color: var(--verde-principal);
+    font-size: 28px;
+    margin: 0;
+}
+
+/* Botones */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 25px;
+    border-radius: var(--radio-input);
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+    font-size: 15px;
+    gap: 8px;
+}
+
+.btn-primary {
+    background-color: var(--verde-principal);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #247449;
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-hover);
+}
+
+.btn-icon {
+    font-size: 16px;
+}
+
+/* Alertas */
+.messages-container {
+    margin-bottom: 20px;
+}
+
+.alert {
+    padding: 15px 20px;
+    border-radius: var(--radio-borde);
+    margin-bottom: 10px;
+    animation: slideIn 0.3s ease;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Card */
+.card {
+    background: var(--blanco);
+    border-radius: var(--radio-borde);
+    box-shadow: var(--sombra);
+    overflow: hidden;
+}
+
+.card-content {
+    padding: 25px;
+}
+
+/* Tabla */
+.table-wrapper {
+    overflow-x: auto;
+    border-radius: var(--radio-borde);
+    border: 1px solid var(--gris-medio);
+    margin-bottom: 30px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1200px;
+}
+
+.data-table thead {
+    background-color: var(--verde-principal);
+}
+
+.data-table th {
+    padding: 16px;
+    text-align: left;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--verde-principal);
+}
+
+.data-table td {
+    padding: 16px;
+    border-bottom: 1px solid var(--gris-medio);
+    vertical-align: top;
+}
+
+.table-row:hover {
+    background-color: var(--verde-claro);
+    transform: translateX(5px);
+    transition: all 0.2s ease;
+}
+
+/* Celdas específicas */
+.cell-id {
+    font-weight: 600;
+    color: var(--verde-principal);
+    font-size: 14px;
+}
+
+.cell-image {
+    width: 70px;
+}
+
+.book-cover {
+    width: 50px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 4px;
+    box-shadow: var(--sombra);
+    border: 2px solid var(--blanco);
+}
+
+.book-cover-placeholder {
+    width: 50px;
+    height: 70px;
+    background: linear-gradient(135deg, var(--verde-principal), #3cb371);
+    color: white;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: var(--sombra);
+}
+
+.cell-title {
+    min-width: 200px;
+}
+
+.book-title {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--texto);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.book-description {
+    margin: 0;
+    color: var(--texto-secundario);
+    font-size: 13px;
+    line-height: 1.4;
+    max-width: 250px;
+}
+
+.cell-author,
+.cell-publisher {
+    min-width: 150px;
+}
+
+.author-name,
+.publisher-name {
+    font-weight: 500;
+    color: var(--texto);
+    font-size: 14px;
+}
+
+.author-country,
+.publisher-country {
+    color: var(--texto-secundario);
+    font-size: 12px;
+    display: block;
+    margin-top: 3px;
+}
+
+.cell-isbn {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    background-color: var(--gris-claro);
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: var(--texto);
+}
+
+.cell-year {
+    font-weight: 500;
+    color: var(--texto);
+    text-align: center;
+}
+
+/* Badges de género */
+.genre-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.genre-fic { background-color: #007bff; color: white; }
+.genre-rom { background-color: #dc3545; color: white; }
+.genre-ter { background-color: #343a40; color: white; }
+.genre-cie { background-color: #17a2b8; color: white; }
+.genre-fan { background-color: #ffc107; color: #212529; }
+.genre-his { background-color: #6c757d; color: white; }
+.genre-bio { background-color: #28a745; color: white; }
+.genre-inf { background-color: #f8f9fa; color: #212529; border: 1px solid #dee2e6; }
+
+/* Precio */
+.cell-price {
+    text-align: right;
+}
+
+.price-value {
+    color: var(--secundario);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+/* Stock */
+.stock-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.stock-high {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.stock-medium {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.stock-low {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Estado */
+.status-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-available {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-unavailable {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Botones de acción */
+.cell-actions {
+    min-width: 180px;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-action {
+    padding: 8px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid transparent;
+    justify-content: center;
+}
+
+.btn-edit {
+    background-color: transparent;
+    border-color: var(--advertencia);
+    color: var(--advertencia);
+}
+
+.btn-edit:hover {
+    background-color: var(--advertencia);
+    color: white;
+}
+
+.btn-delete {
+    background-color: transparent;
+    border-color: var(--peligro);
+    color: var(--peligro);
+}
+
+.btn-delete:hover {
+    background-color: var(--peligro);
+    color: white;
+}
+
+.action-icon {
+    font-size: 14px;
+}
+
+/* Estado vacío */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px !important;
+}
+
+.empty-content {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.empty-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    opacity: 0.3;
+}
+
+.empty-content h3 {
+    color: var(--texto);
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.empty-content p {
+    color: var(--texto-secundario);
+    margin-bottom: 25px;
+    font-size: 15px;
+}
+
+/* Estadísticas */
+.stats-container {
+    margin-top: 30px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    border-radius: var(--radio-borde);
+    padding: 25px;
+    color: white;
+    text-align: center;
+    box-shadow: var(--sombra);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--sombra-hover);
+}
+
+.stat-primary {
+    background: linear-gradient(135deg, var(--primario), #3cb371);
+}
+
+.stat-success {
+    background: linear-gradient(135deg, var(--secundario), #5cb85c);
+}
+
+.stat-warning {
+    background: linear-gradient(135deg, var(--advertencia), #f0ad4e);
+}
+
+.stat-info {
+    background: linear-gradient(135deg, var(--info), #5bc0de);
+}
+
+.stat-content {
+    position: relative;
+    z-index: 2;
+}
+
+.stat-number {
+    font-size: 32px;
+    margin: 0 0 10px;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stat-label {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-container {
+        padding: 15px;
+    }
+    
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .page-title {
+        font-size: 24px;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .data-table {
+        font-size: 14px;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 12px 8px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        min-width: 100px;
+    }
+    
+    .btn-action {
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-card {
+        padding: 20px;
+    }
+    
+    .stat-number {
+        font-size: 28px;
+    }
+    
+    .book-cover,
+    .book-cover-placeholder {
+        width: 40px;
+        height: 56px;
+    }
+    
+    .empty-icon {
+        font-size: 48px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tabla = document.getElementById('libros-table');
+    const filas = document.querySelectorAll('.table-row');
+    
+    // Información de estadísticas
+    console.log('📊 Estadísticas de libros:');
+    console.log('   - Total libros: {{ libros.count }}');
+    console.log('   - Stock total: {{ total_stock }}');
+    console.log('   - Valor inventario: ${{ valor_total|floatformat:2 }}');
+    
+    // Función para ordenar la tabla
+    function ordenarTabla(columna, orden) {
+        const tbody = tabla.querySelector('tbody');
+        const filasArray = Array.from(filas);
+        
+        filasArray.sort((a, b) => {
+            const valorA = obtenerValorCelda(a, columna);
+            const valorB = obtenerValorCelda(b, columna);
+            
+            if (orden === 'asc') {
+                return compararValores(valorA, valorB);
+            } else {
+                return compararValores(valorB, valorA);
+            }
+        });
+        
+        // Reordenar filas
+        filasArray.forEach(fila => tbody.appendChild(fila));
+    }
+    
+    function obtenerValorCelda(fila, columna) {
+        const celdas = fila.cells;
+        switch(columna) {
+            case 0: // ID
+                return parseInt(celdas[0].textContent.replace('#', ''));
+            case 2: // Título
+                return celdas[2].querySelector('.book-title').textContent.toLowerCase();
+            case 6: // Año
+                return parseInt(celdas[6].textContent);
+            case 8: // Precio
+                return parseFloat(celdas[8].querySelector('.price-value').textContent.replace('$', ''));
+            case 9: // Stock
+                return fila.getAttribute('data-stock');
+            default:
+                return celdas[columna].textContent.toLowerCase();
+        }
+    }
+    
+    function compararValores(a, b) {
+        if (typeof a === 'number' && typeof b === 'number') {
+            return a - b;
+        }
+        return String(a).localeCompare(String(b));
+    }
+    
+    // Hacer encabezados ordenables
+    const encabezados = tabla.querySelectorAll('th');
+    encabezados.forEach((encabezado, index) => {
+        if (index !== 1 && index !== 3 && index !== 4 && index !== 11) { // Excluir imagen, autor, editorial y acciones
+            encabezado.style.cursor = 'pointer';
+            encabezado.title = 'Click para ordenar';
+            
+            encabezado.addEventListener('click', function() {
+                const ordenActual = this.getAttribute('data-orden') || 'asc';
+                const nuevoOrden = ordenActual === 'asc' ? 'desc' : 'asc';
+                
+                // Limpiar indicadores de orden
+                encabezados.forEach(h => {
+                    h.removeAttribute('data-orden');
+                    h.style.backgroundImage = '';
+                });
+                
+                // Establecer nuevo orden
+                this.setAttribute('data-orden', nuevoOrden);
+                this.style.backgroundImage = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="white" viewBox="0 0 16 16"><path d="M7.247 4.86l-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/></svg>')`;
+                this.style.backgroundRepeat = 'no-repeat';
+                this.style.backgroundPosition = 'right 10px center';
+                this.style.paddingRight = '30px';
+                
+                ordenarTabla(index, nuevoOrden);
+            });
+        }
+    });
+    
+    // Filtro rápido por stock
+    const botonFiltroStock = document.createElement('button');
+    botonFiltroStock.className = 'btn btn-secondary';
+    botonFiltroStock.style.marginRight = '10px';
+    botonFiltroStock.innerHTML = '<span class="btn-icon">🔍</span> Filtrar por stock';
+    
+    botonFiltroStock.addEventListener('click', function() {
+        const filtro = prompt('Filtrar libros por stock:\n\n1. Con stock (mayor a 0)\n2. Sin stock (0 unidades)\n3. Stock bajo (1-10 unidades)\n4. Todos\n\nIngresa el número:');
+        
+        if (filtro) {
+            filas.forEach(fila => {
+                const stock = parseInt(fila.getAttribute('data-stock'));
+                let mostrar = true;
+                
+                switch(filtro) {
+                    case '1':
+                        mostrar = stock > 0;
+                        break;
+                    case '2':
+                        mostrar = stock === 0;
+                        break;
+                    case '3':
+                        mostrar = stock > 0 && stock <= 10;
+                        break;
+                    case '4':
+                    default:
+                        mostrar = true;
+                }
+                
+                fila.style.display = mostrar ? '' : 'none';
+            });
+        }
+    });
+    
+    // Agregar botón de filtro al header si hay libros
+    if (filas.length > 0) {
+        const headerActions = document.createElement('div');
+        headerActions.className = 'header-actions';
+        headerActions.style.display = 'flex';
+        headerActions.style.gap = '10px';
+        headerActions.style.marginTop = '15px';
+        
+        headerActions.appendChild(botonFiltroStock);
+        
+        // Botón para exportar datos
+        const botonExportar = document.createElement('button');
+        botonExportar.className = 'btn btn-secondary';
+        botonExportar.innerHTML = '<span class="btn-icon">📋</span> Exportar datos';
+        
+        botonExportar.addEventListener('click', function() {
+            exportarDatos();
+        });
+        
+        headerActions.appendChild(botonExportar);
+        
+        document.querySelector('.admin-header').appendChild(headerActions);
+    }
+    
+    // Función para exportar datos
+    function exportarDatos() {
+        const datos = [];
+        
+        // Encabezados
+        const encabezadosArray = [];
+        encabezados.forEach((encabezado, index) => {
+            if (index !== 11) { // Excluir columna de acciones
+                encabezadosArray.push(encabezado.textContent.trim());
+            }
+        });
+        datos.push(encabezadosArray);
+        
+        // Filas de datos
+        filas.forEach(fila => {
+            if (fila.style.display !== 'none') {
+                const celdas = fila.cells;
+                const filaDatos = [];
+                
+                for (let i = 0; i < celdas.length; i++) {
+                    if (i !== 11) { // Excluir columna de acciones
+                        let texto = celdas[i].textContent.trim();
+                        
+                        // Limpiar texto
+                        texto = texto.replace(/\s+/g, ' ').trim();
+                        texto = texto.replace(/\n/g, ' | ');
+                        
+                        filaDatos.push(texto);
+                    }
+                }
+                
+                datos.push(filaDatos);
+            }
+        });
+        
+        // Convertir a CSV
+        const csv = datos.map(fila => 
+            fila.map(celda => `"${celda}"`).join(',')
+        ).join('\n');
+        
+        // Crear y descargar archivo
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `libros_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+        
+        alert('✅ Datos exportados correctamente');
+    }
+    
+    // Efecto hover para estadísticas
+    const statCards = document.querySelectorAll('.stat-card');
+    statCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.05)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = '';
+        });
+    });
+    
+    // Buscador rápido
+    const buscador = document.createElement('input');
+    buscador.type = 'text';
+    buscador.placeholder = '🔍 Buscar libro por título, autor, ISBN...';
+    buscador.className = 'search-input';
+    buscador.style.marginTop = '10px';
+    buscador.style.width = '100%';
+    buscador.style.padding = '10px 15px';
+    buscador.style.border = '2px solid var(--gris-medio)';
+    buscador.style.borderRadius = 'var(--radio-input)';
+    buscador.style.fontSize = '14px';
+    
+    buscador.addEventListener('input', function() {
+        const busqueda = this.value.toLowerCase();
+        
+        filas.forEach(fila => {
+            const textoFila = fila.textContent.toLowerCase();
+            fila.style.display = textoFila.includes(busqueda) ? '' : 'none';
+        });
+    });
+    
+    // Insertar buscador antes de la tabla
+    const cardContent = document.querySelector('.card-content');
+    const tableWrapper = document.querySelector('.table-wrapper');
+    cardContent.insertBefore(buscador, tableWrapper);
+});
+</script>
+{% endblock %}

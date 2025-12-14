@@ -1,0 +1,457 @@
+{% extends 'base.html' %}
+
+{% block title %}Contáctanos - Librería AJMG{% endblock %}
+
+{% block page_title %}📞 Contáctanos{% endblock %}
+{% block page_subtitle %}
+<p style="font-size: 1.1rem; color: var(--gris-medio); margin-top: var(--espacio-sm); max-width: 800px; margin-left: auto; margin-right: auto;">
+    ¿Tienes preguntas, sugerencias o necesitas ayuda? Estamos aquí para escucharte. 
+    Completa el formulario o utiliza cualquiera de nuestros canales de contacto.
+</p>
+{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--espacio-lg); margin-bottom: var(--espacio-xl);">
+    <!-- Formulario de contacto -->
+    <div>
+        <div style="background-color: white; border-radius: var(--radio-lg); overflow: hidden; box-shadow: var(--sombra-mediana);">
+            <div style="background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal)); color: white; padding: var(--espacio-md);">
+                <h3 style="margin: 0; font-size: 1.5rem; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-envelope"></i> Envíanos un Mensaje
+                </h3>
+            </div>
+            
+            <div style="padding: var(--espacio-lg);">
+                <form id="formContacto">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--espacio-md); margin-bottom: var(--espacio-md);">
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--verde-oscuro);">
+                                <span style="color: #dc3545;">*</span> Nombre Completo
+                            </label>
+                            <input type="text" required 
+                                   style="width: 100%; padding: 12px; border: 1px solid var(--gris-medio); border-radius: var(--radio-sm); font-size: 1rem;"
+                                   placeholder="Tu nombre completo">
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--verde-oscuro);">
+                                <span style="color: #dc3545;">*</span> Email
+                            </label>
+                            <input type="email" required 
+                                   style="width: 100%; padding: 12px; border: 1px solid var(--gris-medio); border-radius: var(--radio-sm); font-size: 1rem;"
+                                   placeholder="tucorreo@ejemplo.com">
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: var(--espacio-md);">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--verde-oscuro);">
+                            <span style="color: #dc3545;">*</span> Asunto
+                        </label>
+                        <select required 
+                                style="width: 100%; padding: 12px; border: 1px solid var(--gris-medio); border-radius: var(--radio-sm); font-size: 1rem; background-color: white; cursor: pointer;">
+                            <option value="">Seleccionar asunto...</option>
+                            <option value="consulta">Consulta General</option>
+                            <option value="pedido">Información de Pedidos</option>
+                            <option value="eventos">Eventos y Actividades</option>
+                            <option value="sugerencia">Sugerencias</option>
+                            <option value="problema">Reportar Problema</option>
+                            <option value="otros">Otros</option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom: var(--espacio-md);">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--verde-oscuro);">
+                            <span style="color: #dc3545;">*</span> Mensaje
+                        </label>
+                        <textarea required rows="6" 
+                                  style="width: 100%; padding: 12px; border: 1px solid var(--gris-medio); border-radius: var(--radio-sm); font-size: 1rem; resize: vertical;"
+                                  placeholder="Escribe tu mensaje aquí..."></textarea>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: var(--espacio-lg);">
+                        <input type="checkbox" id="newsletter" checked 
+                               style="width: 20px; height: 20px; cursor: pointer;">
+                        <label for="newsletter" style="color: var(--gris-medio); cursor: pointer;">
+                            Suscribirme al newsletter para recibir novedades
+                        </label>
+                    </div>
+                    
+                    <button type="submit" 
+                            style="background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro)); color: white; border: none; padding: 15px 30px; border-radius: var(--radio-md); font-weight: 600; font-size: 1.1rem; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; width: 100%; justify-content: center;">
+                        <i class="fas fa-paper-plane"></i> Enviar Mensaje
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Información de contacto y redes -->
+    <div>
+        <!-- Tarjeta de información -->
+        <div style="background-color: white; border-radius: var(--radio-lg); overflow: hidden; box-shadow: var(--sombra-mediana); margin-bottom: var(--espacio-lg);">
+            <div style="background: linear-gradient(135deg, #17a2b8, #138496); color: white; padding: var(--espacio-md);">
+                <h3 style="margin: 0; font-size: 1.5rem; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-info-circle"></i> Información de Contacto
+                </h3>
+            </div>
+            
+            <div style="padding: var(--espacio-md);">
+                <!-- Dirección -->
+                <div style="margin-bottom: var(--espacio-md);">
+                    <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 5px;">
+                        <i class="fas fa-map-marker-alt" style="color: var(--verde-principal); margin-top: 3px;"></i>
+                        <div>
+                            <h4 style="margin: 0; color: var(--verde-oscuro); font-size: 1.1rem;">📍 Dirección</h4>
+                        </div>
+                    </div>
+                    <p style="margin: 0; color: var(--gris-medio); margin-left: 28px; line-height: 1.5;">
+                        Av. Librería 123<br>
+                        Col. Centro<br>
+                        Ciudad de México, 06000
+                    </p>
+                </div>
+                
+                <!-- Teléfonos -->
+                <div style="margin-bottom: var(--espacio-md);">
+                    <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 5px;">
+                        <i class="fas fa-phone" style="color: var(--verde-principal); margin-top: 3px;"></i>
+                        <div>
+                            <h4 style="margin: 0; color: var(--verde-oscuro); font-size: 1.1rem;">📞 Teléfonos</h4>
+                        </div>
+                    </div>
+                    <p style="margin: 0; color: var(--gris-medio); margin-left: 28px; line-height: 1.5;">
+                        +52 55 1234 5678<br>
+                        +52 55 9876 5432
+                    </p>
+                </div>
+                
+                <!-- Email -->
+                <div style="margin-bottom: var(--espacio-md);">
+                    <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 5px;">
+                        <i class="fas fa-envelope" style="color: var(--verde-principal); margin-top: 3px;"></i>
+                        <div>
+                            <h4 style="margin: 0; color: var(--verde-oscuro); font-size: 1.1rem;">📧 Email</h4>
+                        </div>
+                    </div>
+                    <p style="margin: 0; color: var(--gris-medio); margin-left: 28px; line-height: 1.5;">
+                        info@libreriaajmg.com<br>
+                        ventas@libreriaajmg.com
+                    </p>
+                </div>
+                
+                <!-- Horario -->
+                <div>
+                    <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 5px;">
+                        <i class="fas fa-clock" style="color: var(--verde-principal); margin-top: 3px;"></i>
+                        <div>
+                            <h4 style="margin: 0; color: var(--verde-oscuro); font-size: 1.1rem;">🕒 Horario de Atención</h4>
+                        </div>
+                    </div>
+                    <p style="margin: 0; color: var(--gris-medio); margin-left: 28px; line-height: 1.5;">
+                        Lunes a Viernes: 9:00 - 19:00<br>
+                        Sábados: 10:00 - 16:00<br>
+                        Domingos: Cerrado
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tarjeta de redes sociales -->
+        <div style="background-color: white; border-radius: var(--radio-lg); overflow: hidden; box-shadow: var(--sombra-mediana);">
+            <div style="background: linear-gradient(135deg, #ffc107, #e0a800); color: var(--verde-oscuro); padding: var(--espacio-md);">
+                <h3 style="margin: 0; font-size: 1.5rem; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-hashtag"></i> Síguenos en Redes
+                </h3>
+            </div>
+            
+            <div style="padding: var(--espacio-md); text-align: center;">
+                <p style="color: var(--gris-medio); margin-bottom: var(--espacio-md);">
+                    Mantente al día con nuestras novedades y promociones
+                </p>
+                
+                <div style="display: grid; grid-template-columns: 1fr; gap: var(--espacio-sm);">
+                    <a href="#" style="background-color: #1877f2; color: white; padding: 12px; border-radius: var(--radio-md); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; transition: var(--transicion-media);">
+                        <i class="fab fa-facebook-f"></i> Facebook
+                    </a>
+                    
+                    <a href="#" style="background-color: #1da1f2; color: white; padding: 12px; border-radius: var(--radio-md); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; transition: var(--transicion-media);">
+                        <i class="fab fa-twitter"></i> Twitter
+                    </a>
+                    
+                    <a href="#" style="background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d); color: white; padding: 12px; border-radius: var(--radio-md); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; transition: var(--transicion-media);">
+                        <i class="fab fa-instagram"></i> Instagram
+                    </a>
+                    
+                    <a href="#" style="background-color: #ff0000; color: white; padding: 12px; border-radius: var(--radio-md); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; transition: var(--transicion-media);">
+                        <i class="fab fa-youtube"></i> YouTube
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mapa de ubicación -->
+<div style="background-color: white; border-radius: var(--radio-lg); overflow: hidden; box-shadow: var(--sombra-mediana); margin-top: var(--espacio-lg);">
+    <div style="background: linear-gradient(135deg, #28a745, #218838); color: white; padding: var(--espacio-md);">
+        <h3 style="margin: 0; font-size: 1.5rem; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-map-marked-alt"></i> Nuestra Ubicación
+        </h3>
+    </div>
+    
+    <div style="padding: var(--espacio-lg);">
+        <!-- Mapa de ejemplo (en producción usarías Google Maps) -->
+        <div style="background: linear-gradient(135deg, var(--gris-claro), #e9ecef); border-radius: var(--radio-md); padding: var(--espacio-xl); text-align: center; margin-bottom: var(--espacio-lg);">
+            <div style="font-size: 4rem; color: var(--verde-principal); margin-bottom: var(--espacio-md);">
+                <i class="fas fa-map"></i>
+            </div>
+            <h4 style="color: var(--gris-oscuro); margin-bottom: var(--espacio-sm);">📍 Mapa Interactivo</h4>
+            <p style="color: var(--gris-medio); max-width: 500px; margin: 0 auto var(--espacio-lg);">
+                Aquí se mostraría un mapa interactivo con nuestra ubicación exacta en Google Maps
+            </p>
+            
+            <div style="display: flex; gap: var(--espacio-sm); justify-content: center; flex-wrap: wrap;">
+                <button onclick="abrirGoogleMaps()" 
+                        style="background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro)); color: white; border: none; padding: 12px 24px; border-radius: var(--radio-md); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fab fa-google"></i> Ver en Google Maps
+                </button>
+                
+                <button onclick="mostrarComoLlegar()" 
+                        style="background-color: white; color: var(--verde-principal); border: 2px solid var(--verde-principal); padding: 12px 24px; border-radius: var(--radio-md); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-directions"></i> Cómo Llegar
+                </button>
+            </div>
+        </div>
+        
+        <!-- Información adicional del mapa -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--espacio-md);">
+            <div style="text-align: center;">
+                <div style="font-size: 2rem; color: var(--verde-principal); margin-bottom: var(--espacio-xs);">
+                    <i class="fas fa-car"></i>
+                </div>
+                <h5 style="color: var(--verde-oscuro); margin-bottom: 5px;">Estacionamiento</h5>
+                <p style="color: var(--gris-medio); margin: 0; font-size: 0.9rem;">
+                    Disponible en el edificio (tarifa especial para clientes)
+                </p>
+            </div>
+            
+            <div style="text-align: center;">
+                <div style="font-size: 2rem; color: var(--verde-principal); margin-bottom: var(--espacio-xs);">
+                    <i class="fas fa-subway"></i>
+                </div>
+                <h5 style="color: var(--verde-oscuro); margin-bottom: 5px;">Metro más cercano</h5>
+                <p style="color: var(--gris-medio); margin: 0; font-size: 0.9rem;">
+                    Estación Centro (Línea 1), a 5 minutos caminando
+                </p>
+            </div>
+            
+            <div style="text-align: center;">
+                <div style="font-size: 2rem; color: var(--verde-principal); margin-bottom: var(--espacio-xs);">
+                    <i class="fas fa-wheelchair"></i>
+                </div>
+                <h5 style="color: var(--verde-oscuro); margin-bottom: 5px;">Accesibilidad</h5>
+                <p style="color: var(--gris-medio); margin: 0; font-size: 0.9rem;">
+                    Totalmente accesible para personas con movilidad reducida
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ rápida -->
+<div style="margin-top: var(--espacio-xl);">
+    <h3 style="color: var(--verde-oscuro); margin-bottom: var(--espacio-lg); text-align: center; font-size: 1.8rem;">
+        <span style="font-size: 1.5rem; margin-right: 10px;">❓</span>
+        Preguntas Frecuentes
+    </h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--espacio-md);">
+        <div style="background-color: white; padding: var(--espacio-md); border-radius: var(--radio-md); box-shadow: var(--sombra-suave);">
+            <h4 style="color: var(--verde-principal); margin-bottom: var(--espacio-xs);">¿Cuánto tarda la entrega?</h4>
+            <p style="color: var(--gris-medio); margin: 0;">
+                En la Ciudad de México entregamos en 24-48 horas. Para el interior del país, de 3 a 5 días hábiles.
+            </p>
+        </div>
+        
+        <div style="background-color: white; padding: var(--espacio-md); border-radius: var(--radio-md); box-shadow: var(--sombra-suave);">
+            <h4 style="color: var(--verde-principal); margin-bottom: var(--espacio-xs);">¿Hacen envíos internacionales?</h4>
+            <p style="color: var(--gris-medio); margin: 0;">
+                Sí, realizamos envíos a toda Latinoamérica. El tiempo y costo varían según el destino.
+            </p>
+        </div>
+        
+        <div style="background-color: white; padding: var(--espacio-md); border-radius: var(--radio-md); box-shadow: var(--sombra-suave);">
+            <h4 style="color: var(--verde-principal); margin-bottom: var(--espacio-xs);">¿Puedo devolver un libro?</h4>
+            <p style="color: var(--gris-medio); margin: 0;">
+                Aceptamos devoluciones en un plazo de 7 días si el libro está en perfecto estado.
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Manejo del formulario
+document.getElementById('formContacto').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Validación básica
+    const inputs = this.querySelectorAll('input[required], select[required], textarea[required]');
+    let isValid = true;
+    
+    inputs.forEach(input => {
+        if (!input.value.trim()) {
+            isValid = false;
+            input.style.borderColor = '#dc3545';
+        } else {
+            input.style.borderColor = '#28a745';
+        }
+    });
+    
+    if (isValid) {
+        // Simulación de envío (en producción harías una petición AJAX)
+        const boton = this.querySelector('button[type="submit"]');
+        const textoOriginal = boton.innerHTML;
+        
+        boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        boton.disabled = true;
+        
+        setTimeout(() => {
+            boton.innerHTML = '<i class="fas fa-check"></i> ¡Mensaje Enviado!';
+            boton.style.backgroundColor = '#28a745';
+            
+            setTimeout(() => {
+                boton.innerHTML = textoOriginal;
+                boton.disabled = false;
+                boton.style.backgroundColor = '';
+                this.reset();
+                
+                // Mostrar mensaje de éxito
+                alert('¡Gracias por tu mensaje! Te contactaremos en un plazo de 24-48 horas.');
+            }, 2000);
+        }, 1500);
+    } else {
+        alert('Por favor, completa todos los campos obligatorios (*)');
+    }
+});
+
+// Efecto en inputs
+document.querySelectorAll('#formContacto input, #formContacto select, #formContacto textarea').forEach(input => {
+    input.addEventListener('focus', function() {
+        this.style.borderColor = 'var(--verde-principal)';
+        this.style.boxShadow = '0 0 0 2px rgba(46, 139, 87, 0.2)';
+    });
+    
+    input.addEventListener('blur', function() {
+        this.style.boxShadow = 'none';
+        if (this.value.trim()) {
+            this.style.borderColor = '#28a745';
+        }
+    });
+});
+
+// Funciones para el mapa
+function abrirGoogleMaps() {
+    alert('En una implementación real, esto abriría Google Maps con nuestra ubicación.');
+    // window.open('https://maps.google.com/?q=Av.+Librería+123+Ciudad+de+México');
+}
+
+function mostrarComoLlegar() {
+    alert('Aquí se mostrarían instrucciones detalladas para llegar a nuestra librería.');
+}
+
+// Efectos hover en tarjetas
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('div[style*="box-shadow: var"]');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.transition = 'transform 0.3s ease';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+
+// Estilos adicionales para el formulario
+const contactoStyle = document.createElement('style');
+contactoStyle.textContent = `
+    /* Estilos para selects personalizados */
+    select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%232e8b57' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 16px;
+        padding-right: 40px !important;
+    }
+    
+    /* Placeholder personalizado */
+    ::placeholder {
+        color: #adb5bd;
+        opacity: 0.8;
+    }
+    
+    /* Focus states */
+    input:focus, select:focus, textarea:focus {
+        outline: none;
+    }
+    
+    /* Checkbox personalizado */
+    input[type="checkbox"] {
+        accent-color: var(--verde-principal);
+    }
+    
+    /* Botones de redes sociales con efectos hover */
+    a[style*="background-color: #1877f2"]:hover {
+        background-color: #166fe5 !important;
+        transform: translateY(-2px);
+    }
+    
+    a[style*="background-color: #1da1f2"]:hover {
+        background-color: #1a8cd8 !important;
+        transform: translateY(-2px);
+    }
+    
+    a[style*="gradient(45deg, #405de6"]:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+    }
+    
+    a[style*="background-color: #ff0000"]:hover {
+        background-color: #e60000 !important;
+        transform: translateY(-2px);
+    }
+    
+    /* Responsive */
+    @media (max-width: 992px) {
+        .contacto-grid {
+            grid-template-columns: 1fr !important;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr !important;
+        }
+        
+        button {
+            width: 100%;
+        }
+    }
+    
+    /* Animaciones para mensajes */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    button:active {
+        animation: pulse 0.2s ease;
+    }
+`;
+document.head.appendChild(contactoStyle);
+</script>
+{% endblock %}

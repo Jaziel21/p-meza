@@ -1,0 +1,609 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Gestión de Detalles de Venta</h1>
+        <a href="{% url 'agregar_detalle_venta' %}" class="btn btn-verde">➕ Agregar Detalle</a>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID Detalle</th>
+                            <th>Venta ID</th>
+                            <th>Libro</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unit.</th>
+                            <th>Subtotal</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for detalle in detalles %}
+                        <tr>
+                            <td><strong>#{{ detalle.detalleventaid }}</strong></td>
+                            <td>#{{ detalle.ventaid.ventaid }}</td>
+                            <td>
+                                <strong>{{ detalle.libroid.titulo }}</strong><br>
+                                <small class="text-muted">{{ detalle.libroid.autorid.nombre }}</small>
+                            </td>
+                            <td>{{ detalle.cantidad }}</td>
+                            <td>${{ detalle.preciounitario }}</td>
+                            <td><strong class="text-success">${{ detalle.subtotal }}</strong></td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'editar_detalle_venta' detalle.detalleventaid %}" class="btn btn-sm btn-warning" title="Editar">
+                                        ✏️
+                                    </a>
+                                    <a href="{% url 'eliminar_detalle_venta' detalle.detalleventaid %}" class="btn btn-sm btn-danger" title="Eliminar" onclick="return confirmDelete()">
+                                        🗑️
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                <div class="empty-content">
+                                    <div class="empty-icon">🧾</div>
+                                    <h5>No hay detalles de venta registrados</h5>
+                                    <a href="{% url 'agregar_detalle_venta' %}" class="btn btn-verde">Agregar Primer Detalle</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Estadísticas -->
+            {% if detalles %}
+            <div class="stats-summary">
+                <div class="stat-item">
+                    <span>Total Detalles:</span>
+                    <strong>{{ detalles.count }}</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Total Ventas:</span>
+                    <strong>{{ ventas_count|default:"0" }}</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Total Ingresos:</span>
+                    <strong class="text-success">${{ total_ingresos|default:"0.00" }}</strong>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos específicos para la página de detalles de venta */
+.container {
+    width: 90%;
+    max-width: 1400px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.page-header h1 {
+    color: #2e8b57;
+    font-size: 2rem;
+    margin: 0;
+}
+
+.btn-verde {
+    background: #2e8b57;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.btn-verde:hover {
+    background: #1e6b3a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(46, 139, 87, 0.2);
+}
+
+/* Tarjeta */
+.card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* Tabla */
+.table-container {
+    overflow-x: auto;
+    margin-bottom: 30px;
+    border-radius: 5px;
+    border: 1px solid #e9ecef;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.data-table thead {
+    background: #2e8b57;
+}
+
+.data-table th {
+    color: white;
+    padding: 15px 12px;
+    text-align: left;
+    font-weight: 600;
+    border: none;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.data-table tbody tr {
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+}
+
+.data-table tbody tr:hover {
+    background: rgba(46, 139, 87, 0.05);
+}
+
+.data-table td {
+    padding: 15px 12px;
+    vertical-align: middle;
+    font-size: 0.95rem;
+}
+
+.data-table td strong {
+    font-weight: 600;
+}
+
+.text-muted {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+.text-success {
+    color: #28a745;
+    font-weight: 600;
+}
+
+/* Botones */
+.btn-group {
+    display: flex;
+    gap: 8px;
+}
+
+.btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    border: 1px solid transparent;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    min-width: 36px;
+    height: 36px;
+}
+
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    min-width: 32px;
+    height: 32px;
+}
+
+.btn-warning {
+    background: transparent;
+    color: #ffc107;
+    border-color: #ffc107;
+}
+
+.btn-warning:hover {
+    background: #ffc107;
+    color: #212529;
+    transform: scale(1.1);
+}
+
+.btn-danger {
+    background: transparent;
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background: #dc3545;
+    color: white;
+    transform: scale(1.1);
+}
+
+/* Estado vacío */
+.empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    background: #f8f9fa;
+}
+
+.empty-content {
+    color: #6c757d;
+}
+
+.empty-icon {
+    font-size: 3.5rem;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.empty-content h5 {
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+/* Estadísticas */
+.stats-summary {
+    display: flex;
+    justify-content: space-around;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.stat-item {
+    text-align: center;
+    flex: 1;
+    min-width: 200px;
+}
+
+.stat-item span {
+    display: block;
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.stat-item strong {
+    display: block;
+    font-size: 1.5rem;
+    color: #2e8b57;
+}
+
+.stat-item .text-success {
+    color: #28a745;
+    font-size: 1.6rem;
+}
+
+/* Efectos de hover para botones de acción */
+.btn-group a {
+    transition: all 0.2s;
+}
+
+.btn-group a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+/* Resaltar números importantes */
+.data-table td:nth-child(6) {
+    font-weight: 600;
+    color: #28a745;
+    font-size: 1.05rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .data-table {
+        min-width: 700px;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .page-header h1 {
+        font-size: 1.7rem;
+    }
+    
+    .stats-summary {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .stat-item {
+        min-width: 100%;
+        padding: 10px;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .stat-item:last-child {
+        border-bottom: none;
+    }
+    
+    .container {
+        padding: 15px;
+    }
+    
+    .card-body {
+        padding: 15px;
+    }
+    
+    .empty-state {
+        padding: 30px 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .btn-verde {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 10px 8px;
+        font-size: 0.85rem;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .btn-sm {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .empty-icon {
+        font-size: 2.5rem;
+    }
+}
+
+/* Efectos de animación para filas */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.data-table tbody tr {
+    animation: fadeIn 0.3s ease-out;
+    animation-fill-mode: both;
+}
+
+.data-table tbody tr:nth-child(1) { animation-delay: 0.05s; }
+.data-table tbody tr:nth-child(2) { animation-delay: 0.1s; }
+.data-table tbody tr:nth-child(3) { animation-delay: 0.15s; }
+.data-table tbody tr:nth-child(4) { animation-delay: 0.2s; }
+.data-table tbody tr:nth-child(5) { animation-delay: 0.25s; }
+.data-table tbody tr:nth-child(6) { animation-delay: 0.3s; }
+.data-table tbody tr:nth-child(7) { animation-delay: 0.35s; }
+.data-table tbody tr:nth-child(8) { animation-delay: 0.4s; }
+.data-table tbody tr:nth-child(9) { animation-delay: 0.45s; }
+.data-table tbody tr:nth-child(10) { animation-delay: 0.5s; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Confirmación para eliminar
+    function confirmDelete() {
+        return confirm('¿Estás seguro de que quieres eliminar este detalle de venta?\nEsta acción no se puede deshacer.');
+    }
+    
+    // Asignar evento a todos los botones de eliminar
+    const deleteButtons = document.querySelectorAll('.btn-danger');
+    deleteButtons.forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            if (!confirmDelete()) {
+                e.preventDefault();
+            }
+        });
+    });
+    
+    // Efecto hover mejorado para filas
+    const tableRows = document.querySelectorAll('.data-table tbody tr');
+    tableRows.forEach(function(row) {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = 'rgba(46, 139, 87, 0.08)';
+            this.style.transform = 'translateX(5px)';
+            this.style.transition = 'all 0.2s ease';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+            this.style.transform = 'translateX(0)';
+        });
+    });
+    
+    // Ordenar por columna al hacer clic en el encabezado (opcional)
+    const tableHeaders = document.querySelectorAll('.data-table th');
+    tableHeaders.forEach(function(header, index) {
+        header.style.cursor = 'pointer';
+        header.addEventListener('click', function() {
+            sortTable(index);
+        });
+        
+        // Agregar indicador de orden
+        header.innerHTML += ' <span class="sort-indicator">↕</span>';
+    });
+    
+    // Función para ordenar tabla (solo visual, no afecta datos del servidor)
+    function sortTable(columnIndex) {
+        const table = document.querySelector('.data-table');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        
+        // Omitir fila vacía si existe
+        const filteredRows = rows.filter(row => !row.classList.contains('empty-state'));
+        
+        if (filteredRows.length === 0) return;
+        
+        // Determinar orden actual y alternar
+        const currentOrder = table.getAttribute('data-sort-order') || 'asc';
+        const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+        table.setAttribute('data-sort-order', newOrder);
+        
+        // Ordenar filas
+        filteredRows.sort(function(a, b) {
+            let aValue = a.cells[columnIndex].textContent.trim();
+            let bValue = b.cells[columnIndex].textContent.trim();
+            
+            // Convertir a número si es posible
+            const aNum = parseFloat(aValue.replace(/[^0-9.-]+/g, ""));
+            const bNum = parseFloat(bValue.replace(/[^0-9.-]+/g, ""));
+            
+            if (!isNaN(aNum) && !isNaN(bNum)) {
+                aValue = aNum;
+                bValue = bNum;
+            }
+            
+            if (newOrder === 'asc') {
+                return aValue > bValue ? 1 : -1;
+            } else {
+                return aValue < bValue ? 1 : -1;
+            }
+        });
+        
+        // Reorganizar filas en la tabla
+        tbody.innerHTML = '';
+        filteredRows.forEach(row => tbody.appendChild(row));
+        
+        // Actualizar indicadores visuales
+        tableHeaders.forEach(header => {
+            header.querySelector('.sort-indicator').textContent = '↕';
+        });
+        tableHeaders[columnIndex].querySelector('.sort-indicator').textContent = 
+            newOrder === 'asc' ? '↑' : '↓';
+    }
+    
+    // Agregar búsqueda rápida (opcional)
+    const searchContainer = document.createElement('div');
+    searchContainer.className = 'search-box';
+    searchContainer.innerHTML = `
+        <input type="text" placeholder="Buscar detalles..." id="searchInput">
+        <button type="button" id="clearSearch">×</button>
+    `;
+    
+    const cardBody = document.querySelector('.card-body');
+    const tableContainer = document.querySelector('.table-container');
+    cardBody.insertBefore(searchContainer, tableContainer);
+    
+    // Estilos para la búsqueda
+    const searchStyles = document.createElement('style');
+    searchStyles.textContent = `
+        .search-box {
+            margin-bottom: 15px;
+            position: relative;
+            max-width: 300px;
+        }
+        
+        #searchInput {
+            width: 100%;
+            padding: 10px 35px 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        #searchInput:focus {
+            outline: none;
+            border-color: #2e8b57;
+            box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.2);
+        }
+        
+        #clearSearch {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        #clearSearch:hover {
+            color: #dc3545;
+        }
+    `;
+    document.head.appendChild(searchStyles);
+    
+    // Funcionalidad de búsqueda
+    const searchInput = document.getElementById('searchInput');
+    const clearSearch = document.getElementById('clearSearch');
+    
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.data-table tbody tr');
+        
+        rows.forEach(row => {
+            if (row.classList.contains('empty-state')) return;
+            
+            const text = row.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        clearSearch.style.display = searchTerm ? 'block' : 'none';
+    });
+    
+    clearSearch.addEventListener('click', function() {
+        searchInput.value = '';
+        searchInput.dispatchEvent(new Event('input'));
+        searchInput.focus();
+    });
+    
+    clearSearch.style.display = 'none';
+});
+</script>
+{% endblock %}

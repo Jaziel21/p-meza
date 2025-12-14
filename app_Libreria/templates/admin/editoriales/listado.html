@@ -1,0 +1,1136 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Gestión de Editoriales</h1>
+        <a href="{% url 'agregar_editorial' %}" class="btn btn-verde">➕ Agregar Editorial</a>
+    </div>
+    
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-success" data-auto-dismiss="5000">
+            {{ message }}
+            <button type="button" class="alert-close" onclick="this.parentElement.remove()">×</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="card">
+        <div class="card-body">
+            <!-- Filtros de búsqueda -->
+            <div class="table-controls">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Buscar editoriales..." class="search-input">
+                    <button type="button" id="clearSearch" class="search-clear">×</button>
+                </div>
+                <div class="filter-controls">
+                    <select id="paisFilter" class="filter-select">
+                        <option value="">Todos los países</option>
+                        <option value="México">México</option>
+                        <option value="España">España</option>
+                        <option value="Argentina">Argentina</option>
+                        <option value="Colombia">Colombia</option>
+                        <option value="Otro">Otros</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table" id="editorialesTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="id">ID</th>
+                            <th data-sort="nombre">Nombre Editorial</th>
+                            <th data-sort="telefono">Teléfono</th>
+                            <th data-sort="email">Email</th>
+                            <th data-sort="pais">País</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        {% for editorial in editoriales %}
+                        <tr data-id="{{ editorial.editorialid }}" data-pais="{{ editorial.pais }}">
+                            <td class="id-cell">{{ editorial.editorialid }}</td>
+                            <td class="nombre-cell">{{ editorial.nombre }}</td>
+                            <td class="telefono-cell">{{ editorial.telefono }}</td>
+                            <td class="email-cell">
+                                <a href="mailto:{{ editorial.email }}" class="email-link">{{ editorial.email }}</a>
+                            </td>
+                            <td class="pais-cell">
+                                <span class="pais-badge">{{ editorial.pais }}</span>
+                            </td>
+                            <td class="actions-cell">
+                                <div class="btn-group">
+                                    <a href="{% url 'editar_editorial' editorial.editorialid %}" class="btn btn-warning btn-sm" title="Editar">
+                                        ✏️
+                                    </a>
+                                    <a href="{% url 'eliminar_editorial' editorial.editorialid %}" class="btn btn-danger btn-sm" title="Eliminar" onclick="return confirmDelete()">
+                                        🗑️
+                                    </a>
+                                    <button type="button" class="btn btn-info btn-sm" title="Ver detalles" onclick="showDetails({{ editorial.editorialid }})">
+                                        👁️
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr id="emptyRow">
+                            <td colspan="6" class="empty-state">
+                                <div class="empty-content">
+                                    <div class="empty-icon">📚</div>
+                                    <h5>No hay editoriales registradas</h5>
+                                    <p>Comienza agregando la primera editorial.</p>
+                                    <a href="{% url 'agregar_editorial' %}" class="btn btn-verde">Agregar Primera Editorial</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Estadísticas -->
+            {% if editoriales %}
+            <div class="stats-summary">
+                <div class="stat-item">
+                    <span>Total Editoriales:</span>
+                    <strong>{{ editoriales.count }}</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Países diferentes:</span>
+                    <strong>{{ paises_count|default:"1" }}</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Editoriales activas:</span>
+                    <strong>{{ editoriales.count }}</strong>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Modal de detalles -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Detalles de Editorial</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Los detalles se cargan aquí con JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos específicos para la página de gestión de editoriales */
+.container {
+    width: 90%;
+    max-width: 1400px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.page-header h1 {
+    color: #2e8b57;
+    font-size: 2rem;
+    margin: 0;
+}
+
+.btn-verde {
+    background: #2e8b57;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+    border: none;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(46, 139, 87, 0.2);
+}
+
+.btn-verde:hover {
+    background: #1e6b3a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(46, 139, 87, 0.3);
+}
+
+/* Mensajes */
+.messages-container {
+    margin-bottom: 25px;
+}
+
+.alert {
+    padding: 15px 40px 15px 20px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    position: relative;
+    animation: slideIn 0.4s ease-out;
+    border-left: 4px solid;
+}
+
+.alert-success {
+    background: #f0fff4;
+    color: #155724;
+    border-color: #c3e6cb;
+}
+
+.alert-close {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.6;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.alert-close:hover {
+    opacity: 1;
+    background: rgba(0,0,0,0.1);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Controles de tabla */
+.table-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.search-box {
+    position: relative;
+    flex: 1;
+    max-width: 400px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 40px 12px 15px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #2e8b57;
+    box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);
+}
+
+.search-clear {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #999;
+    display: none;
+}
+
+.search-clear:hover {
+    color: #dc3545;
+}
+
+.filter-select {
+    padding: 11px 15px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: white;
+    cursor: pointer;
+    min-width: 200px;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #2e8b57;
+}
+
+/* Tarjeta */
+.card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    overflow: hidden;
+    margin-bottom: 30px;
+    border: 1px solid #e9ecef;
+}
+
+.card-body {
+    padding: 30px;
+}
+
+/* Tabla */
+.table-container {
+    overflow-x: auto;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+}
+
+.data-table thead {
+    background: linear-gradient(135deg, #2e8b57 0%, #3cb371 100%);
+}
+
+.data-table th {
+    color: white;
+    padding: 18px 15px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+}
+
+.data-table th:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.data-table th::after {
+    content: "↕";
+    margin-left: 8px;
+    opacity: 0.7;
+    font-size: 0.9rem;
+}
+
+.data-table th.sorted-asc::after {
+    content: "↑";
+    opacity: 1;
+}
+
+.data-table th.sorted-desc::after {
+    content: "↓";
+    opacity: 1;
+}
+
+.data-table tbody tr {
+    border-bottom: 1px solid #eee;
+    transition: all 0.2s;
+}
+
+.data-table tbody tr:hover {
+    background: rgba(46, 139, 87, 0.05);
+    transform: translateX(3px);
+}
+
+.data-table td {
+    padding: 16px 15px;
+    vertical-align: middle;
+    font-size: 0.95rem;
+}
+
+/* Celdas específicas */
+.id-cell {
+    font-weight: 600;
+    color: #495057;
+    font-family: monospace;
+}
+
+.nombre-cell {
+    font-weight: 600;
+    color: #2e8b57;
+}
+
+.telefono-cell {
+    font-family: monospace;
+    color: #6c757d;
+}
+
+.email-cell .email-link {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.email-cell .email-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.pais-cell .pais-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #e8f5e9;
+    color: #2e8b57;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid rgba(46, 139, 87, 0.2);
+}
+
+/* Botones de acción */
+.actions-cell .btn-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    min-width: 36px;
+    height: 36px;
+}
+
+.btn-sm {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    min-width: 32px;
+    height: 32px;
+}
+
+.btn-warning {
+    background: transparent;
+    color: #ffc107;
+    border-color: #ffc107;
+}
+
+.btn-warning:hover {
+    background: #ffc107;
+    color: #212529;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(255, 193, 7, 0.3);
+}
+
+.btn-danger {
+    background: transparent;
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background: #dc3545;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(220, 53, 69, 0.3);
+}
+
+.btn-info {
+    background: transparent;
+    color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.btn-info:hover {
+    background: #17a2b8;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(23, 162, 184, 0.3);
+}
+
+/* Estado vacío */
+.empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    background: #f8f9fa;
+}
+
+.empty-content {
+    color: #6c757d;
+}
+
+.empty-icon {
+    font-size: 3.5rem;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.empty-content h5 {
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.empty-content p {
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+/* Estadísticas */
+.stats-summary {
+    display: flex;
+    justify-content: space-around;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 25px;
+    border-radius: 10px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+    border: 1px solid #dee2e6;
+}
+
+.stat-item {
+    text-align: center;
+    flex: 1;
+    min-width: 200px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.stat-item span {
+    display: block;
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-item strong {
+    display: block;
+    font-size: 1.8rem;
+    color: #2e8b57;
+    font-weight: 700;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    animation: slideUp 0.4s ease-out;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #2e8b57 0%, #3cb371 100%);
+    color: white;
+    padding: 20px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.8rem;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.modal-close:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.modal-body {
+    padding: 25px;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding: 20px 25px;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    text-align: right;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .data-table {
+        min-width: 900px;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .table-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-box {
+        max-width: 100%;
+    }
+    
+    .filter-select {
+        width: 100%;
+    }
+    
+    .stats-summary {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .stat-item {
+        min-width: 100%;
+    }
+    
+    .container {
+        padding: 15px;
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+    
+    .btn-group {
+        flex-wrap: nowrap;
+    }
+    
+    .btn-sm {
+        min-width: 28px;
+        height: 28px;
+        padding: 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 12px 10px;
+        font-size: 0.9rem;
+    }
+    
+    .empty-icon {
+        font-size: 2.5rem;
+    }
+    
+    .modal-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+}
+
+/* Efectos de animación para filas */
+@keyframes fadeInRow {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.data-table tbody tr:not(#emptyRow) {
+    animation: fadeInRow 0.3s ease-out;
+    animation-fill-mode: both;
+}
+
+.data-table tbody tr:nth-child(1) { animation-delay: 0.05s; }
+.data-table tbody tr:nth-child(2) { animation-delay: 0.1s; }
+.data-table tbody tr:nth-child(3) { animation-delay: 0.15s; }
+.data-table tbody tr:nth-child(4) { animation-delay: 0.2s; }
+.data-table tbody tr:nth-child(5) { animation-delay: 0.25s; }
+.data-table tbody tr:nth-child(6) { animation-delay: 0.3s; }
+.data-table tbody tr:nth-child(7) { animation-delay: 0.35s; }
+.data-table tbody tr:nth-child(8) { animation-delay: 0.4s; }
+.data-table tbody tr:nth-child(9) { animation-delay: 0.45s; }
+.data-table tbody tr:nth-child(10) { animation-delay: 0.5s; }
+</style>
+
+<script>
+// Datos de editoriales para el modal (simulados, en producción vendrían de una API)
+const editorialesData = {
+    {% for editorial in editoriales %}
+    {{ editorial.editorialid }}: {
+        id: {{ editorial.editorialid }},
+        nombre: "{{ editorial.nombre }}",
+        direccion: "{{ editorial.direccion }}",
+        telefono: "{{ editorial.telefono }}",
+        email: "{{ editorial.email }}",
+        pais: "{{ editorial.pais }}",
+        sitioweb: "{{ editorial.sitioweb|default:'No especificado' }}",
+        libros_count: "{{ libros_por_editorial|default:'0' }}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    const table = document.getElementById('editorialesTable');
+    const tableBody = document.getElementById('tableBody');
+    const searchInput = document.getElementById('searchInput');
+    const clearSearch = document.getElementById('clearSearch');
+    const paisFilter = document.getElementById('paisFilter');
+    const headers = table.querySelectorAll('th[data-sort]');
+    let currentSort = { column: null, direction: 'asc' };
+    
+    // Auto-ocultar mensajes después de 5 segundos
+    const alerts = document.querySelectorAll('.alert[data-auto-dismiss]');
+    alerts.forEach(alert => {
+        const timeout = parseInt(alert.dataset.autoDismiss);
+        setTimeout(() => {
+            if (alert.parentNode) {
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateX(20px)';
+                setTimeout(() => alert.remove(), 300);
+            }
+        }, timeout);
+    });
+    
+    // Confirmación para eliminar
+    function confirmDelete() {
+        return confirm('¿Estás seguro de que quieres eliminar esta editorial?\nEsta acción no se puede deshacer.');
+    }
+    
+    // Mostrar detalles en modal
+    window.showDetails = function(editorialId) {
+        const editorial = editorialesData[editorialId];
+        if (!editorial) return;
+        
+        const modal = document.getElementById('detailsModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        
+        modalTitle.textContent = `Editorial: ${editorial.nombre}`;
+        
+        modalBody.innerHTML = `
+            <div class="editorial-details-modal">
+                <div class="detail-section">
+                    <h4>Información Básica</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <strong>ID:</strong> <span>#${editorial.id}</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>País:</strong> <span class="pais-badge">${editorial.pais}</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Libros publicados:</strong> <span>${editorial.libros_count} libros</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>Contacto</h4>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <strong>📞 Teléfono:</strong>
+                            <a href="tel:${editorial.telefono}">${editorial.telefono}</a>
+                        </div>
+                        <div class="contact-item">
+                            <strong>📧 Email:</strong>
+                            <a href="mailto:${editorial.email}">${editorial.email}</a>
+                        </div>
+                        <div class="contact-item">
+                            <strong>🏢 Dirección:</strong>
+                            <span>${editorial.direccion}</span>
+                        </div>
+                        ${editorial.sitioweb !== 'No especificado' ? `
+                        <div class="contact-item">
+                            <strong>🌐 Sitio Web:</strong>
+                            <a href="${editorial.sitioweb}" target="_blank">${editorial.sitioweb}</a>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>Acciones Rápidas</h4>
+                    <div class="quick-actions">
+                        <a href="{% url 'editar_editorial' 0 %}" class="btn btn-warning">
+                            ✏️ Editar Editorial
+                        </a>
+                        <a href="{% url 'eliminar_editorial' 0 %}" class="btn btn-danger" onclick="return confirmDelete()">
+                            🗑️ Eliminar Editorial
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <style>
+                .editorial-details-modal {
+                    color: #333;
+                }
+                
+                .detail-section {
+                    margin-bottom: 25px;
+                    padding-bottom: 20px;
+                    border-bottom: 1px solid #eee;
+                }
+                
+                .detail-section:last-child {
+                    border-bottom: none;
+                    margin-bottom: 0;
+                }
+                
+                .detail-section h4 {
+                    color: #2e8b57;
+                    margin-bottom: 15px;
+                    font-size: 1.1rem;
+                    border-left: 3px solid #2e8b57;
+                    padding-left: 10px;
+                }
+                
+                .detail-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                    gap: 15px;
+                }
+                
+                .detail-item {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 5px;
+                }
+                
+                .detail-item strong {
+                    color: #495057;
+                    font-size: 0.9rem;
+                }
+                
+                .detail-item span {
+                    color: #2e8b57;
+                    font-weight: 500;
+                }
+                
+                .contact-info {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
+                }
+                
+                .contact-item {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 5px;
+                }
+                
+                .contact-item a {
+                    color: #007bff;
+                    text-decoration: none;
+                    transition: color 0.2s;
+                }
+                
+                .contact-item a:hover {
+                    color: #0056b3;
+                    text-decoration: underline;
+                }
+                
+                .quick-actions {
+                    display: flex;
+                    gap: 10px;
+                    flex-wrap: wrap;
+                }
+                
+                .quick-actions .btn {
+                    min-width: auto;
+                    padding: 10px 15px;
+                }
+            </style>
+        `;
+        
+        // Reemplazar IDs en los enlaces
+        const links = modalBody.querySelectorAll('a[href*="/editar/"], a[href*="/eliminar/"]');
+        links.forEach(link => {
+            link.href = link.href.replace('/0/', `/${editorialId}/`);
+        });
+        
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    };
+    
+    // Cerrar modal
+    window.closeModal = function() {
+        const modal = document.getElementById('detailsModal');
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    };
+    
+    // Cerrar modal con ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal();
+        }
+    });
+    
+    // Cerrar modal al hacer clic fuera
+    document.getElementById('detailsModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+    
+    // Función de búsqueda
+    function performSearch() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const filterPais = paisFilter.value;
+        const rows = tableBody.querySelectorAll('tr:not(#emptyRow)');
+        let visibleCount = 0;
+        
+        rows.forEach(row => {
+            const rowText = row.textContent.toLowerCase();
+            const rowPais = row.dataset.pais;
+            const isMatchSearch = searchTerm === '' || rowText.includes(searchTerm);
+            const isMatchPais = filterPais === '' || 
+                (filterPais === 'Otro' ? !['México','España','Argentina','Colombia'].includes(rowPais) : rowPais === filterPais);
+            
+            if (isMatchSearch && isMatchPais) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        // Mostrar/ocultar fila vacía
+        const emptyRow = document.getElementById('emptyRow');
+        if (emptyRow) {
+            if (visibleCount === 0 && (searchTerm || filterPais)) {
+                emptyRow.style.display = '';
+                emptyRow.innerHTML = `
+                    <td colspan="6" class="empty-state">
+                        <div class="empty-content">
+                            <div class="empty-icon">🔍</div>
+                            <h5>No se encontraron editoriales</h5>
+                            <p>No hay editoriales que coincidan con la búsqueda.</p>
+                            <button type="button" class="btn btn-secondary" onclick="clearFilters()">
+                                Limpiar filtros
+                            </button>
+                        </div>
+                    </td>
+                `;
+            } else if (visibleCount === 0) {
+                emptyRow.style.display = '';
+            } else {
+                emptyRow.style.display = 'none';
+            }
+        }
+        
+        // Mostrar/ocultar botón de limpiar
+        clearSearch.style.display = searchTerm ? 'block' : 'none';
+    }
+    
+    // Limpiar filtros
+    window.clearFilters = function() {
+        searchInput.value = '';
+        paisFilter.value = '';
+        performSearch();
+    };
+    
+    // Eventos de búsqueda y filtro
+    searchInput.addEventListener('input', performSearch);
+    clearSearch.addEventListener('click', clearFilters);
+    paisFilter.addEventListener('change', performSearch);
+    
+    // Ordenar tabla
+    headers.forEach(header => {
+        header.addEventListener('click', () => {
+            const column = header.dataset.sort;
+            const direction = currentSort.column === column && currentSort.direction === 'asc' ? 'desc' : 'asc';
+            
+            // Ordenar datos
+            sortTable(column, direction);
+            
+            // Actualizar indicadores visuales
+            headers.forEach(h => {
+                h.classList.remove('sorted-asc', 'sorted-desc');
+            });
+            header.classList.add(`sorted-${direction}`);
+            
+            // Guardar estado actual
+            currentSort = { column, direction };
+        });
+    });
+    
+    function sortTable(column, direction) {
+        const rows = Array.from(tableBody.querySelectorAll('tr:not(#emptyRow)'));
+        const emptyRow = document.getElementById('emptyRow');
+        
+        rows.sort((a, b) => {
+            let aValue = a.querySelector(`.${column}-cell`).textContent.trim();
+            let bValue = b.querySelector(`.${column}-cell`).textContent.trim();
+            
+            // Convertir a número si es posible
+            const aNum = parseFloat(aValue.replace(/[^0-9.-]+/g, ""));
+            const bNum = parseFloat(bValue.replace(/[^0-9.-]+/g, ""));
+            
+            if (!isNaN(aNum) && !isNaN(bNum)) {
+                aValue = aNum;
+                bValue = bNum;
+            } else if (column === 'pais') {
+                // Ordenar países especiales primero
+                const paisesOrden = ['México', 'España', 'Argentina', 'Colombia', 'Chile', 'Perú'];
+                const aIndex = paisesOrden.indexOf(aValue);
+                const bIndex = paisesOrden.indexOf(bValue);
+                if (aIndex !== -1) aValue = aIndex;
+                if (bIndex !== -1) bValue = bIndex;
+            }
+            
+            let comparison = 0;
+            if (aValue > bValue) comparison = 1;
+            if (aValue < bValue) comparison = -1;
+            
+            return direction === 'asc' ? comparison : -comparison;
+        });
+        
+        // Reorganizar filas
+        rows.forEach(row => tableBody.appendChild(row));
+        if (emptyRow) tableBody.appendChild(emptyRow);
+    }
+    
+    // Exportar a CSV
+    const exportBtn = document.createElement('button');
+    exportBtn.className = 'btn btn-outline';
+    exportBtn.innerHTML = '📥 Exportar CSV';
+    exportBtn.style.marginLeft = 'auto';
+    exportBtn.onclick = exportToCSV;
+    
+    const tableControls = document.querySelector('.table-controls');
+    if (tableControls) {
+        const filterDiv = tableControls.querySelector('.filter-controls');
+        filterDiv.appendChild(exportBtn);
+    }
+    
+    function exportToCSV() {
+        const rows = tableBody.querySelectorAll('tr:not(#emptyRow)');
+        const headers = Array.from(table.querySelectorAll('th:not(:last-child)')).map(th => th.textContent.trim());
+        
+        const csvContent = [
+            headers.join(','),
+            ...Array.from(rows).map(row => {
+                const cells = row.querySelectorAll('td:not(.actions-cell)');
+                return Array.from(cells).map(cell => {
+                    let text = cell.textContent.trim();
+                    // Escapar comas y comillas
+                    text = text.replace(/"/g, '""');
+                    if (text.includes(',') || text.includes('"') || text.includes('\n')) {
+                        text = `"${text}"`;
+                    }
+                    return text;
+                }).join(',');
+            })
+        ].join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `editoriales_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    
+    // Inicializar
+    performSearch();
+});
+</script>
+{% endblock %}

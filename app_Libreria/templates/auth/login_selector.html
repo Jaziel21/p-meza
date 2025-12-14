@@ -1,0 +1,1068 @@
+<!-- app_Libreria/templates/auth/login_selector.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="login-selector-container">
+    <div class="login-selector-card">
+        <!-- Header con branding -->
+        <div class="selector-header">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                <span>Librería</span>
+            </div>
+            <div class="selector-title">
+                <h1>Bienvenido</h1>
+                <p>Selecciona cómo quieres acceder</p>
+            </div>
+        </div>
+
+        <!-- Opciones de acceso -->
+        <div class="selector-options">
+            <!-- Opción Cliente -->
+            <a href="{% url 'login_cliente' %}" class="option-card option-client">
+                <div class="option-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                </div>
+                <div class="option-content">
+                    <div class="option-header">
+                        <h3>Acceso Cliente</h3>
+                        <span class="option-badge popular">Más popular</span>
+                    </div>
+                    <p class="option-description">
+                        Para realizar compras, ver tu historial y gestionar tu cuenta personal
+                    </p>
+                    <div class="option-features">
+                        <span class="feature-tag">🛒 Compras</span>
+                        <span class="feature-tag">📚 Favoritos</span>
+                        <span class="feature-tag">📊 Historial</span>
+                    </div>
+                    <div class="option-stats">
+                        <div class="stat-item">
+                            <strong>10,000+</strong>
+                            <small>Clientes activos</small>
+                        </div>
+                        <div class="stat-item">
+                            <strong>98%</strong>
+                            <small>Satisfacción</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="option-action">
+                    <button class="btn-option">
+                        <span>Ingresar como Cliente</span>
+                        <svg viewBox="0 0 24 24">
+                            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                        </svg>
+                    </button>
+                </div>
+            </a>
+
+            <!-- Opción Administrador -->
+            <a href="{% url 'login_admin' %}" class="option-card option-admin">
+                <div class="option-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.18l7 3.11v4.81c0 2.33-1.17 4.52-3.13 5.83L12 18.9l-3.87-2.97C6.17 14.62 5 12.43 5 10.1V6.3l7-3.12zM12 7c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                    </svg>
+                </div>
+                <div class="option-content">
+                    <div class="option-header">
+                        <h3>Panel Administrativo</h3>
+                        <span class="option-badge restricted">Acceso restringido</span>
+                    </div>
+                    <p class="option-description">
+                        Para gestionar inventario, ventas, usuarios y contenido del sistema
+                    </p>
+                    <div class="option-features">
+                        <span class="feature-tag">📊 Dashboard</span>
+                        <span class="feature-tag">📚 Inventario</span>
+                        <span class="feature-tag">💰 Ventas</span>
+                    </div>
+                    <div class="option-warning">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                        </svg>
+                        <p>Solo para personal autorizado</p>
+                    </div>
+                </div>
+                <div class="option-action">
+                    <button class="btn-option btn-admin">
+                        <span>Acceso Administrativo</span>
+                        <svg viewBox="0 0 24 24">
+                            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                        </svg>
+                    </button>
+                </div>
+            </a>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="selector-info">
+            <div class="info-item">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                <div>
+                    <h4>¿Primera vez aquí?</h4>
+                    <p>Los clientes nuevos deben registrarse en el mostrador de la librería</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                </svg>
+                <div>
+                    <h4>Seguridad garantizada</h4>
+                    <p>Todos los accesos están encriptados y monitoreados</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botón de volver -->
+        <div class="selector-footer">
+            <a href="{% url 'inicio' %}" class="btn-back">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+                Volver al inicio
+            </a>
+            <div class="help-link">
+                <a href="#" onclick="showHelp()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/>
+                    </svg>
+                    ¿Necesitas ayuda?
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de ayuda -->
+    <div class="modal-overlay" id="helpModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Ayuda - Selección de Acceso</h3>
+                <button class="modal-close" onclick="closeHelpModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="help-section">
+                    <h4>¿Cuál opción debo elegir?</h4>
+                    
+                    <div class="option-guide">
+                        <div class="guide-item client-guide">
+                            <div class="guide-header">
+                                <strong>Acceso Cliente</strong>
+                                <span class="guide-badge">Para la mayoría</span>
+                            </div>
+                            <ul>
+                                <li>Quiero comprar libros online</li>
+                                <li>Necesito ver mi historial de compras</li>
+                                <li>Quiero crear una lista de deseos</li>
+                                <li>Necesito hacer seguimiento a mis pedidos</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="guide-item admin-guide">
+                            <div class="guide-header">
+                                <strong>Panel Administrativo</strong>
+                                <span class="guide-badge">Personal autorizado</span>
+                            </div>
+                            <ul>
+                                <li>Soy empleado de la librería</li>
+                                <li>Necesito gestionar inventario</li>
+                                <li>Debo procesar ventas y reportes</li>
+                                <li>Tengo permisos administrativos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="help-section">
+                    <h4>Contacto de soporte</h4>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z"/>
+                            </svg>
+                            <div>
+                                <strong>Clientes</strong>
+                                <span>clientes@libreria.com</span>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55.45 1 1 1 9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                            </svg>
+                            <div>
+                                <strong>Soporte técnico</strong>
+                                <span>(55) 1234-5678</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" onclick="closeHelpModal()">Entendido</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estilos CSS -->
+<style>
+/* Variables del sistema */
+:root {
+    --primary: #10b981;
+    --primary-dark: #059669;
+    --primary-light: #d1fae5;
+    --secondary: #3b82f6;
+    --secondary-dark: #2563eb;
+    --secondary-light: #dbeafe;
+    --accent: #8b5cf6;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    --radius-sm: 0.375rem;
+    --radius: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --transition: all 0.2s ease;
+}
+
+/* Reset y base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--gray-800);
+    line-height: 1.5;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+/* Contenedor principal */
+.login-selector-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-selector-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg"><path d="M30 0L0 30l30 30 30-30z" fill="%23ffffff" fill-opacity="0.05"/></svg>');
+}
+
+/* Tarjeta principal */
+.login-selector-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    max-width: 800px;
+    width: 100%;
+    overflow: hidden;
+    z-index: 1;
+    animation: slideUp 0.5s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header */
+.selector-header {
+    padding: 3rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.selector-header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: white;
+    border-radius: 2px;
+}
+
+.brand-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.brand-logo svg {
+    width: 32px;
+    height: 32px;
+    fill: white;
+}
+
+.brand-logo span {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+}
+
+.selector-title h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.selector-title p {
+    opacity: 0.9;
+    font-size: 1.125rem;
+}
+
+/* Opciones de acceso */
+.selector-options {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.option-card {
+    display: flex;
+    align-items: stretch;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: var(--transition);
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+}
+
+.option-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: transparent;
+}
+
+.option-client:hover {
+    border-color: var(--primary);
+    box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.2);
+}
+
+.option-admin:hover {
+    border-color: var(--secondary);
+    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2);
+}
+
+.option-icon {
+    width: 80px;
+    background: var(--gray-50);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.option-client .option-icon {
+    background: var(--primary-light);
+}
+
+.option-admin .option-icon {
+    background: var(--secondary-light);
+}
+
+.option-icon svg {
+    width: 32px;
+    height: 32px;
+}
+
+.option-client .option-icon svg {
+    fill: var(--primary);
+}
+
+.option-admin .option-icon svg {
+    fill: var(--secondary);
+}
+
+.option-content {
+    flex: 1;
+    padding: 1.5rem;
+}
+
+.option-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+}
+
+.option-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.option-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.option-badge.popular {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.option-badge.restricted {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.option-description {
+    color: var(--gray-600);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.option-features {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.feature-tag {
+    padding: 0.25rem 0.75rem;
+    background: var(--gray-100);
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    color: var(--gray-700);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.option-stats {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-item strong {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    line-height: 1;
+}
+
+.stat-item small {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+.option-warning {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: #fee2e2;
+    border-radius: var(--radius-sm);
+    margin-top: 0.5rem;
+}
+
+.option-warning svg {
+    width: 16px;
+    height: 16px;
+    fill: #dc2626;
+    flex-shrink: 0;
+}
+
+.option-warning p {
+    font-size: 0.875rem;
+    color: #991b1b;
+    margin: 0;
+    font-weight: 500;
+}
+
+.option-action {
+    padding: 1.5rem;
+    border-left: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    flex-shrink: 0;
+}
+
+.btn-option {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+}
+
+.option-client .btn-option {
+    background: var(--primary);
+    color: white;
+}
+
+.option-client .btn-option:hover {
+    background: var(--primary-dark);
+}
+
+.option-admin .btn-option {
+    background: var(--secondary);
+    color: white;
+}
+
+.option-admin .btn-option:hover {
+    background: var(--secondary-dark);
+}
+
+.btn-option svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+/* Información adicional */
+.selector-info {
+    padding: 2rem;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.info-item svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--primary);
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+}
+
+.info-item h4 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 0.25rem;
+}
+
+.info-item p {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Footer */
+.selector-footer {
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--gray-200);
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.btn-back:hover {
+    background: var(--gray-200);
+    transform: translateX(-4px);
+}
+
+.btn-back svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+.help-link a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gray-600);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: var(--transition);
+}
+
+.help-link a:hover {
+    color: var(--primary);
+}
+
+.help-link svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+/* Modal */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    max-width: 600px;
+    width: 100%;
+    animation: modalSlideUp 0.3s ease;
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.modal-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--gray-500);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.modal-close:hover {
+    background: var(--gray-100);
+    color: var(--gray-700);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.help-section {
+    margin-bottom: 2rem;
+}
+
+.help-section h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 1rem;
+}
+
+.option-guide {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.guide-item {
+    padding: 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+}
+
+.client-guide {
+    border-left: 4px solid var(--primary);
+}
+
+.admin-guide {
+    border-left: 4px solid var(--secondary);
+}
+
+.guide-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.guide-header strong {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.guide-badge {
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.client-guide .guide-badge {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+}
+
+.admin-guide .guide-badge {
+    background: var(--secondary-light);
+    color: var(--secondary-dark);
+}
+
+.guide-item ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.guide-item li {
+    padding: 0.375rem 0;
+    color: var(--gray-600);
+    font-size: 0.875rem;
+    position: relative;
+    padding-left: 1.25rem;
+}
+
+.guide-item li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--success);
+    font-weight: bold;
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--gray-50);
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+}
+
+.contact-item svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--primary);
+    flex-shrink: 0;
+}
+
+.contact-item div {
+    flex: 1;
+}
+
+.contact-item strong {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--gray-900);
+    margin-bottom: 0.25rem;
+}
+
+.contact-item span {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+}
+
+.modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--gray-200);
+    text-align: right;
+}
+
+.btn-primary {
+    padding: 0.75rem 1.5rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .login-selector-container {
+        padding: 1rem;
+    }
+    
+    .selector-header {
+        padding: 2rem 1.5rem;
+    }
+    
+    .selector-title h1 {
+        font-size: 2rem;
+    }
+    
+    .selector-options {
+        padding: 1.5rem;
+    }
+    
+    .option-card {
+        flex-direction: column;
+    }
+    
+    .option-icon {
+        width: 100%;
+        height: 60px;
+    }
+    
+    .option-action {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid var(--gray-200);
+    }
+    
+    .option-stats {
+        justify-content: flex-start;
+    }
+    
+    .selector-info {
+        grid-template-columns: 1fr;
+        padding: 1.5rem;
+    }
+    
+    .selector-footer {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .btn-back {
+        justify-content: center;
+    }
+    
+    .help-link {
+        text-align: center;
+    }
+    
+    .option-guide {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .option-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .option-stats {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+</style>
+
+<!-- JavaScript interactivo -->
+<script>
+// Modal de ayuda
+function showHelp() {
+    const modal = document.getElementById('helpModal');
+    if (modal) {
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeHelpModal() {
+    const modal = document.getElementById('helpModal');
+    if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+}
+
+// Cerrar modal con ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeHelpModal();
+    }
+});
+
+// Cerrar modal haciendo clic fuera
+document.getElementById('helpModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeHelpModal();
+    }
+});
+
+// Efectos hover en las opciones
+document.addEventListener('DOMContentLoaded', function() {
+    const optionCards = document.querySelectorAll('.option-card');
+    
+    optionCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-4px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+    
+    // Animación de entrada escalonada
+    const optionClient = document.querySelector('.option-client');
+    const optionAdmin = document.querySelector('.option-admin');
+    
+    if (optionClient) {
+        optionClient.style.animationDelay = '0.1s';
+        optionClient.style.animation = 'slideUp 0.5s ease 0.1s both';
+    }
+    
+    if (optionAdmin) {
+        optionAdmin.style.animationDelay = '0.2s';
+        optionAdmin.style.animation = 'slideUp 0.5s ease 0.2s both';
+    }
+    
+    // Mostrar modal de ayuda en primer acceso (solo una vez)
+    const firstAccess = !localStorage.getItem('selector_first_access');
+    if (firstAccess) {
+        setTimeout(() => {
+            showHelp();
+            localStorage.setItem('selector_first_access', 'true');
+        }, 1000);
+    }
+});
+
+// Trackeo de selección
+document.querySelectorAll('.option-card').forEach(card => {
+    card.addEventListener('click', function() {
+        const option = this.classList.contains('option-client') ? 'cliente' : 'admin';
+        console.log(`Usuario seleccionó: ${option}`);
+        // Aquí podrías agregar tracking de analytics
+    });
+});
+</script>
+{% endblock %}

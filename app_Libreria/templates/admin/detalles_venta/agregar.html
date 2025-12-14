@@ -1,0 +1,469 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Agregar Detalle de Venta</h1>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post" id="detalleForm">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="form-col-6">
+                        <div class="form-group">
+                            <label>Venta *</label>
+                            <select class="form-control" name="ventaid" id="ventaSelect" required>
+                                <option value="">Seleccionar venta</option>
+                                {% for venta in ventas %}
+                                <option value="{{ venta.ventaid }}">Venta #{{ venta.ventaid }} - {{ venta.clienteid.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Libro *</label>
+                            <select class="form-control" name="libroid" id="libroSelect" required>
+                                <option value="">Seleccionar libro</option>
+                                {% for libro in libros %}
+                                <option value="{{ libro.libroid }}" data-precio="{{ libro.precioventa }}">
+                                    {{ libro.titulo }} - ${{ libro.precioventa }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-col-6">
+                        <div class="form-group">
+                            <label>Cantidad *</label>
+                            <input type="number" class="form-control" name="cantidad" id="cantidadInput" required min="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Precio Unitario *</label>
+                            <input type="number" step="0.01" class="form-control" name="preciounitario" id="precioInput" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>IVA (%)</label>
+                            <input type="number" step="0.01" class="form-control" name="iva" id="ivaInput" value="16.00">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Cálculos automáticos -->
+                <div class="calculos-box">
+                    <div class="calculo-item">
+                        <span>Subtotal:</span>
+                        <strong id="subtotalDisplay">$0.00</strong>
+                    </div>
+                    <div class="calculo-item">
+                        <span>IVA:</span>
+                        <strong id="ivaDisplay">$0.00</strong>
+                    </div>
+                    <div class="calculo-item total">
+                        <span>Total:</span>
+                        <strong id="totalDisplay">$0.00</strong>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-verde">Guardar Detalle</button>
+                    <a href="{% url 'admin_detalles_venta' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos específicos para la página de agregar detalle de venta */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+h1 {
+    color: #2e8b57;
+    margin-bottom: 30px;
+    font-size: 2rem;
+    text-align: center;
+}
+
+/* Tarjeta */
+.card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.card-body {
+    padding: 30px;
+}
+
+/* Sistema de grid para formulario */
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -15px;
+}
+
+.form-col-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding: 0 15px;
+}
+
+/* Formulario */
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: all 0.3s;
+    font-family: inherit;
+    background: white;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #2e8b57;
+    box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.15);
+}
+
+select.form-control {
+    height: 46px;
+    cursor: pointer;
+}
+
+input[type="number"].form-control {
+    -moz-appearance: textfield;
+}
+
+input[type="number"].form-control::-webkit-outer-spin-button,
+input[type="number"].form-control::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Caja de cálculos */
+.calculos-box {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 30px 0;
+}
+
+.calculo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #dee2e6;
+}
+
+.calculo-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.calculo-item span {
+    font-size: 1rem;
+    color: #495057;
+}
+
+.calculo-item strong {
+    font-size: 1.2rem;
+    color: #212529;
+}
+
+.calculo-item.total {
+    background: #e8f5e9;
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.calculo-item.total span {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #2e8b57;
+}
+
+.calculo-item.total strong {
+    font-size: 1.4rem;
+    color: #2e8b57;
+}
+
+/* Botones */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 12px 25px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-block;
+    text-align: center;
+    min-width: 180px;
+}
+
+.btn-verde {
+    background: #2e8b57;
+    color: white;
+}
+
+.btn-verde:hover {
+    background: #1e6b3a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(46, 139, 87, 0.2);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+/* Estilo para campos requeridos */
+.form-group label::after {
+    content: " *";
+    color: #dc3545;
+}
+
+/* Estilo para opciones de select */
+option {
+    padding: 10px;
+}
+
+/* Placeholder styling */
+.form-control::placeholder {
+    color: #999;
+    opacity: 1;
+}
+
+/* Validación visual */
+.form-control.error {
+    border-color: #dc3545;
+    background-color: #fff5f5;
+}
+
+.form-control.success {
+    border-color: #28a745;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-col-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    .container {
+        padding: 15px;
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .form-row {
+        margin: 0;
+    }
+    
+    .calculos-box {
+        padding: 15px;
+    }
+    
+    .calculo-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .calculo-item strong {
+        align-self: flex-end;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .form-control {
+        padding: 10px;
+    }
+    
+    .calculo-item span,
+    .calculo-item strong {
+        font-size: 0.9rem;
+    }
+    
+    .calculo-item.total span,
+    .calculo-item.total strong {
+        font-size: 1rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('detalleForm');
+    const libroSelect = document.getElementById('libroSelect');
+    const cantidadInput = document.getElementById('cantidadInput');
+    const precioInput = document.getElementById('precioInput');
+    const ivaInput = document.getElementById('ivaInput');
+    
+    // Elementos de visualización
+    const subtotalDisplay = document.getElementById('subtotalDisplay');
+    const ivaDisplay = document.getElementById('ivaDisplay');
+    const totalDisplay = document.getElementById('totalDisplay');
+    
+    // Función para calcular totales
+    function calcularTotales() {
+        const cantidad = parseFloat(cantidadInput.value) || 0;
+        const precio = parseFloat(precioInput.value) || 0;
+        const ivaPorcentaje = parseFloat(ivaInput.value) || 0;
+        
+        const subtotal = cantidad * precio;
+        const ivaMonto = subtotal * (ivaPorcentaje / 100);
+        const total = subtotal + ivaMonto;
+        
+        // Actualizar displays
+        subtotalDisplay.textContent = '$' + subtotal.toFixed(2);
+        ivaDisplay.textContent = '$' + ivaMonto.toFixed(2);
+        totalDisplay.textContent = '$' + total.toFixed(2);
+        
+        // Validación visual
+        if (cantidad > 0 && precio > 0) {
+            cantidadInput.classList.remove('error');
+            precioInput.classList.remove('error');
+            cantidadInput.classList.add('success');
+            precioInput.classList.add('success');
+        } else {
+            cantidadInput.classList.remove('success');
+            precioInput.classList.remove('success');
+            if (cantidad <= 0) cantidadInput.classList.add('error');
+            if (precio <= 0) precioInput.classList.add('error');
+        }
+    }
+    
+    // Auto-completar precio cuando se selecciona un libro
+    libroSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption && selectedOption.dataset.precio) {
+            precioInput.value = selectedOption.dataset.precio;
+            calcularTotales();
+        }
+    });
+    
+    // Calcular al cambiar cualquier campo
+    cantidadInput.addEventListener('input', calcularTotales);
+    precioInput.addEventListener('input', calcularTotales);
+    ivaInput.addEventListener('input', calcularTotales);
+    
+    // Validación del formulario
+    form.addEventListener('submit', function(e) {
+        let valid = true;
+        const errorMessages = [];
+        
+        // Validar campos requeridos
+        const requiredFields = form.querySelectorAll('[required]');
+        requiredFields.forEach(function(field) {
+            if (!field.value.trim()) {
+                valid = false;
+                field.classList.add('error');
+                errorMessages.push(`"${field.previousElementSibling.textContent.replace(' *', '')}" es requerido.`);
+            } else {
+                field.classList.remove('error');
+            }
+        });
+        
+        // Validar valores numéricos positivos
+        const numericFields = [
+            { input: cantidadInput, name: 'Cantidad', min: 1 },
+            { input: precioInput, name: 'Precio Unitario', min: 0.01 },
+            { input: ivaInput, name: 'IVA', min: 0 }
+        ];
+        
+        numericFields.forEach(function(field) {
+            const value = parseFloat(field.input.value);
+            if (isNaN(value) || value < field.min) {
+                valid = false;
+                field.input.classList.add('error');
+                errorMessages.push(`${field.name} debe ser mayor o igual a ${field.min}`);
+            } else {
+                field.input.classList.remove('error');
+            }
+        });
+        
+        // Validar stock del libro (simulada - en realidad necesitarías consultar la BD)
+        const libroId = libroSelect.value;
+        const cantidad = parseInt(cantidadInput.value);
+        if (libroId && cantidad > 0) {
+            // Aquí podrías agregar una llamada AJAX para verificar el stock real
+            // Por ahora solo validamos que haya un libro seleccionado
+        }
+        
+        if (!valid) {
+            e.preventDefault();
+            alert('Por favor, corrija los siguientes errores:\n\n' + errorMessages.join('\n'));
+        }
+    });
+    
+    // Prevenir valores negativos
+    [cantidadInput, precioInput, ivaInput].forEach(function(input) {
+        input.addEventListener('input', function() {
+            if (parseFloat(this.value) < 0) {
+                this.value = Math.abs(parseFloat(this.value));
+            }
+        });
+    });
+    
+    // Inicializar cálculos
+    calcularTotales();
+});
+</script>
+{% endblock %}

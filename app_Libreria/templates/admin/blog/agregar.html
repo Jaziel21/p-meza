@@ -1,0 +1,569 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Agregar Nueva Entrada al Blog</h1>
+    
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data" id="blogForm">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="form-col-8">
+                        <div class="form-group">
+                            <label>Título *</label>
+                            <input type="text" class="form-control" name="titulo" required>
+                        </div>
+                    </div>
+                    <div class="form-col-4">
+                        <div class="form-group">
+                            <label>Categoría *</label>
+                            <select class="form-control" name="categoria" required>
+                                <option value="GENERAL">General</option>
+                                <option value="RESENA">Reseñas de Libros</option>
+                                <option value="AUTOR">Autores y Escritores</option>
+                                <option value="EVENTO">Eventos Literarios</option>
+                                <option value="TALLER">Talleres y Cursos</option>
+                                <option value="NOTICIA">Noticias Editoriales</option>
+                                <option value="RECOMENDACION">Recomendaciones</option>
+                                <option value="ENTREVISTA">Entrevistas</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Resumen *</label>
+                    <textarea class="form-control" name="resumen" rows="3" required placeholder="Resumen breve que aparecerá en la lista de artículos..."></textarea>
+                    <div class="form-text">Máximo 200 caracteres. Este resumen aparecerá en la vista previa.</div>
+                    <div class="char-counter">Caracteres: <span id="charCount">0</span>/200</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Contenido *</label>
+                    <textarea class="form-control" name="contenido" rows="10" required placeholder="Escribe aquí el contenido completo del artículo..."></textarea>
+                    <div class="form-text">Usa párrafos claros, subtítulos y listas para mejor legibilidad.</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Imagen Destacada</label>
+                    <input type="file" class="form-control" name="imagen" accept="image/*" id="imagenInput">
+                    <div class="form-text">Tamaño recomendado: 1200x630px para redes sociales. Formatos: JPG, PNG</div>
+                    <div class="image-preview" id="imagePreview"></div>
+                </div>
+                
+                <div class="form-check">
+                    <input type="checkbox" name="activo" id="activo" checked>
+                    <label for="activo">
+                        Publicar inmediatamente (visible al público)
+                    </label>
+                </div>
+                
+                <div class="tips-box">
+                    <h6>💡 Consejos para un buen artículo:</h6>
+                    <ul>
+                        <li>Usa un título atractivo y descriptivo</li>
+                        <li>Estructura el contenido con subtítulos</li>
+                        <li>Incluye imágenes relevantes</li>
+                        <li>Revisa ortografía y gramática</li>
+                        <li>Termina con una conclusión o llamado a la acción</li>
+                    </ul>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-verde">Publicar Entrada</button>
+                    <a href="{% url 'admin_blog' %}" class="btn btn-secondary">Cancelar</a>
+                    <button type="button" class="btn btn-info-outline" onclick="guardarBorrador()">
+                        Guardar como Borrador
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos específicos para la página de agregar blog */
+.container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+h1 {
+    color: #2e8b57;
+    margin-bottom: 30px;
+    font-size: 2rem;
+    text-align: center;
+}
+
+/* Alertas */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    position: relative;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Tarjeta */
+.card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.card-body {
+    padding: 30px;
+}
+
+/* Sistema de grid para formulario */
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -15px;
+}
+
+.form-col-8 {
+    flex: 0 0 66.666667%;
+    max-width: 66.666667%;
+    padding: 0 15px;
+}
+
+.form-col-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+    padding: 0 15px;
+}
+
+/* Formulario */
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: all 0.3s;
+    font-family: inherit;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #2e8b57;
+    box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.15);
+}
+
+select.form-control {
+    height: 46px;
+    background: white;
+}
+
+textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Texto de ayuda */
+.form-text {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Contador de caracteres */
+.char-counter {
+    text-align: right;
+    font-size: 0.875rem;
+    margin-top: 5px;
+    color: #6c757d;
+}
+
+#charCount {
+    font-weight: bold;
+}
+
+/* Previsualización de imagen */
+.image-preview {
+    margin-top: 15px;
+    display: none;
+}
+
+.image-preview img {
+    max-width: 200px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px;
+    background: white;
+}
+
+/* Checkbox */
+.form-check {
+    margin-bottom: 25px;
+    padding-left: 30px;
+    position: relative;
+}
+
+.form-check input[type="checkbox"] {
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.form-check label {
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Caja de consejos */
+.tips-box {
+    background: #e7f3ff;
+    border-left: 4px solid #17a2b8;
+    padding: 15px 20px;
+    margin: 25px 0;
+    border-radius: 0 5px 5px 0;
+}
+
+.tips-box h6 {
+    color: #0c5460;
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.tips-box ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #0c5460;
+}
+
+.tips-box li {
+    margin-bottom: 5px;
+}
+
+/* Botones */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 12px 25px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-block;
+    text-align: center;
+    min-width: 180px;
+}
+
+.btn-verde {
+    background: #2e8b57;
+    color: white;
+}
+
+.btn-verde:hover {
+    background: #1e6b3a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(46, 139, 87, 0.2);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+.btn-info-outline {
+    background: transparent;
+    color: #17a2b8;
+    border: 1px solid #17a2b8;
+}
+
+.btn-info-outline:hover {
+    background: #17a2b8;
+    color: white;
+}
+
+/* Estilo para campos requeridos */
+.form-group label::after {
+    content: " *";
+    color: #dc3545;
+}
+
+/* Placeholder styling */
+.form-control::placeholder {
+    color: #999;
+    opacity: 1;
+}
+
+/* Estilo para checkbox personalizado */
+.form-check input[type="checkbox"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-check input[type="checkbox"]:checked {
+    background: #2e8b57;
+    border-color: #2e8b57;
+    position: relative;
+}
+
+.form-check input[type="checkbox"]:checked::after {
+    content: "✓";
+    position: absolute;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Campo de archivo personalizado */
+input[type="file"] {
+    padding: 10px;
+    border: 2px dashed #ddd;
+    background: #f9f9f9;
+    cursor: pointer;
+    width: 100%;
+}
+
+input[type="file"]:hover {
+    border-color: #2e8b57;
+    background: #f5f9f7;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-col-8,
+    .form-col-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 15px;
+    }
+    
+    .container {
+        padding: 15px;
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .form-row {
+        margin: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .form-control {
+        padding: 10px;
+    }
+    
+    .form-check {
+        padding-left: 25px;
+    }
+    
+    .tips-box {
+        padding: 12px 15px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('blogForm');
+    const resumenTextarea = document.querySelector('textarea[name="resumen"]');
+    const charCount = document.getElementById('charCount');
+    const imagenInput = document.getElementById('imagenInput');
+    const imagePreview = document.getElementById('imagePreview');
+    
+    // Contador de caracteres para resumen
+    resumenTextarea.addEventListener('input', function() {
+        const longitud = this.value.length;
+        charCount.textContent = longitud;
+        
+        if (longitud > 200) {
+            charCount.style.color = '#dc3545';
+            charCount.textContent += ' (¡Demasiado largo!)';
+            this.style.borderColor = '#dc3545';
+        } else if (longitud > 180) {
+            charCount.style.color = '#ffc107';
+            this.style.borderColor = '#ffc107';
+        } else {
+            charCount.style.color = '#28a745';
+            this.style.borderColor = '#ddd';
+        }
+    });
+    
+    // Disparar evento para calcular longitud inicial
+    resumenTextarea.dispatchEvent(new Event('input'));
+    
+    // Previsualización de imagen
+    imagenInput.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                imagePreview.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.alt = 'Previsualización de imagen';
+                imagePreview.appendChild(img);
+                imagePreview.style.display = 'block';
+            }
+            
+            reader.readAsDataURL(this.files[0]);
+            
+            // Validar tamaño de archivo (max 5MB)
+            if (this.files[0].size > 5 * 1024 * 1024) {
+                alert('La imagen es demasiado grande. Máximo 5MB.');
+                this.value = '';
+                imagePreview.style.display = 'none';
+                return;
+            }
+            
+            // Validar tipo de archivo
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            if (!validTypes.includes(this.files[0].type)) {
+                alert('Formato de imagen no válido. Use JPG, PNG o GIF.');
+                this.value = '';
+                imagePreview.style.display = 'none';
+                return;
+            }
+        } else {
+            imagePreview.style.display = 'none';
+        }
+    });
+    
+    // Validación del formulario
+    form.addEventListener('submit', function(e) {
+        let valid = true;
+        const requiredFields = form.querySelectorAll('[required]');
+        const errorMessages = [];
+        
+        // Validar campos requeridos
+        requiredFields.forEach(function(field) {
+            if (!field.value.trim()) {
+                valid = false;
+                field.style.borderColor = '#dc3545';
+                
+                // Crear mensaje de error si no existe
+                if (!field.nextElementSibling || !field.nextElementSibling.classList.contains('error-message')) {
+                    const error = document.createElement('div');
+                    error.className = 'error-message';
+                    error.style.color = '#dc3545';
+                    error.style.fontSize = '0.875rem';
+                    error.style.marginTop = '5px';
+                    error.textContent = 'Este campo es requerido';
+                    field.parentNode.appendChild(error);
+                }
+                
+                errorMessages.push(`"${field.previousElementSibling.textContent.replace(' *', '')}" es requerido.`);
+            } else {
+                field.style.borderColor = '';
+                const error = field.parentNode.querySelector('.error-message');
+                if (error) {
+                    error.remove();
+                }
+            }
+        });
+        
+        // Validar longitud del resumen
+        if (resumenTextarea.value.length > 200) {
+            valid = false;
+            errorMessages.push('El resumen no puede tener más de 200 caracteres.');
+        }
+        
+        if (!valid) {
+            e.preventDefault();
+            alert('Por favor, corrija los siguientes errores:\n\n' + errorMessages.join('\n'));
+        }
+    });
+    
+    // Auto-resize del textarea de contenido
+    const contenidoTextarea = document.querySelector('textarea[name="contenido"]');
+    contenidoTextarea.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+    
+    // Disparar auto-resize inicial
+    contenidoTextarea.dispatchEvent(new Event('input'));
+});
+
+function guardarBorrador() {
+    // Desmarcar la casilla de activo
+    document.getElementById('activo').checked = false;
+    // Cambiar texto del botón
+    const submitBtn = document.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Guardando borrador...';
+    submitBtn.disabled = true;
+    
+    // Enviar el formulario
+    document.querySelector('form').submit();
+    
+    // Restaurar después de 3 segundos (por si hay error)
+    setTimeout(function() {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }, 3000);
+}
+</script>
+{% endblock %}

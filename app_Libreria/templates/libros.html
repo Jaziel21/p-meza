@@ -1,0 +1,510 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if mostrar_solo_sin_stock %}Libros Agotados{% else %}Todos Nuestros Libros{% endif %} - Librería AJMG
+{% endblock %}
+
+{% block page_title %}
+    {% if mostrar_solo_sin_stock %}📚 Libros Agotados{% else %}📚 Todos Nuestros Libros{% endif %}
+{% endblock %}
+
+{% block page_subtitle %}
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+    <p>Explora nuestro catálogo completo de libros</p>
+    
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <label for="toggleSinStock" style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="toggleSinStock" 
+                   {% if mostrar_solo_sin_stock %}checked{% endif %}
+                   onchange="toggleLibrosSinStock()"
+                   style="width: 20px; height: 20px; cursor: pointer;">
+            <span>Mostrar SOLO libros sin stock</span>
+        </label>
+        
+        {% if user.is_authenticated and not user.is_staff %}
+        <a href="{% url 'ver_carrito' %}" style="background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro)); color: white; padding: 10px 20px; border-radius: var(--radio-md); text-decoration: none; display: flex; align-items: center; gap: 8px;">
+            🛒 Carrito 
+            {% with cart_count=user.carrito_set.count %}
+            {% if cart_count > 0 %}
+            <span style="background-color: var(--dorado); color: var(--verde-oscuro); padding: 2px 8px; border-radius: 12px; margin-left: 5px; font-weight: bold;">
+                {{ cart_count }}
+            </span>
+            {% endif %}
+            {% endwith %}
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Información del modo actual -->
+{% if mostrar_solo_sin_stock %}
+<div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: var(--espacio-sm); margin-bottom: var(--espacio-md); border-radius: var(--radio-sm);">
+    <div style="display: flex; align-items: flex-start; gap: 10px;">
+        <div style="color: #856404; font-size: 1.2rem;">⚠️</div>
+        <div>
+            <strong style="color: #856404;">Modo de visualización:</strong> Mostrando <strong>SÓLO libros agotados</strong> (sin stock).
+            <a href="{% url 'libros' %}" style="color: var(--verde-oscuro); text-decoration: underline; margin-left: 10px;">Ver todos los libros disponibles</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Filtros -->
+<div style="background-color: var(--gris-claro); padding: var(--espacio-md); border-radius: var(--radio-md); margin-bottom: var(--espacio-md);">
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--espacio-sm);">
+        <!-- Filtro por género -->
+        <div>
+            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--verde-oscuro);">Género</label>
+            <select id="filtroGenero" style="width: 100%; padding: 10px; border-radius: var(--radio-sm); border: 1px solid var(--gris-medio); background-color: white; cursor: pointer;">
+                <option value="">Todos los géneros</option>
+                <option value="FIC">Ficción</option>
+                <option value="ROM">Romance</option>
+                <option value="TER">Terror</option>
+                <option value="CIE">Ciencia Ficción</option>
+                <option value="FAN">Fantasía</option>
+                <option value="HIS">Histórico</option>
+                <option value="BIO">Biografía</option>
+                <option value="INF">Infantil</option>
+            </select>
+        </div>
+        
+        <!-- Filtro por precio -->
+        <div>
+            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--verde-oscuro);">Precio Máximo</label>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="range" id="filtroPrecio" min="0" max="1000" step="10" value="1000" 
+                       style="flex-grow: 1; cursor: pointer;">
+                <span id="precioMaximo" style="background-color: var(--verde-principal); color: white; padding: 5px 10px; border-radius: var(--radio-sm); min-width: 80px; text-align: center; font-weight: bold;">
+                    $1000
+                </span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 5px; color: var(--gris-medio); font-size: 0.85rem;">
+                <span>$0</span>
+                <span>$1000</span>
+            </div>
+        </div>
+        
+        <!-- Filtro por stock -->
+        <div>
+            {% if not mostrar_solo_sin_stock %}
+            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--verde-oscuro);">Disponibilidad</label>
+            <select id="filtroStock" style="width: 100%; padding: 10px; border-radius: var(--radio-sm); border: 1px solid var(--gris-medio); background-color: white; cursor: pointer;">
+                <option value="">Todos</option>
+                <option value="con_stock">Con stock</option>
+                <option value="sin_stock">Sin stock</option>
+            </select>
+            {% endif %}
+            
+            <!-- Filtro por orden -->
+            <label style="display: block; margin-top: 15px; margin-bottom: 8px; font-weight: 600; color: var(--verde-oscuro);">Ordenar por</label>
+            <select id="filtroOrden" style="width: 100%; padding: 10px; border-radius: var(--radio-sm); border: 1px solid var(--gris-medio); background-color: white; cursor: pointer;">
+                <option value="default">Predeterminado</option>
+                <option value="precio_asc">Precio: Menor a Mayor</option>
+                <option value="precio_desc">Precio: Mayor a Menor</option>
+                <option value="titulo_asc">Título: A-Z</option>
+                <option value="titulo_desc">Título: Z-A</option>
+            </select>
+        </div>
+    </div>
+    
+    <!-- Botones de filtro rápido -->
+    <div style="display: flex; gap: 10px; margin-top: var(--espacio-sm); flex-wrap: wrap;">
+        <button onclick="filtrarPrecioRapido(100)" style="background-color: var(--gris-claro); border: 1px solid var(--gris-medio); padding: 8px 15px; border-radius: var(--radio-sm); cursor: pointer; transition: var(--transicion-rapida);">
+            ≤ $100
+        </button>
+        <button onclick="filtrarPrecioRapido(250)" style="background-color: var(--gris-claro); border: 1px solid var(--gris-medio); padding: 8px 15px; border-radius: var(--radio-sm); cursor: pointer; transition: var(--transicion-rapida);">
+            ≤ $250
+        </button>
+        <button onclick="filtrarPrecioRapido(500)" style="background-color: var(--gris-claro); border: 1px solid var(--gris-medio); padding: 8px 15px; border-radius: var(--radio-sm); cursor: pointer; transition: var(--transicion-rapida);">
+            ≤ $500
+        </button>
+        <button onclick="limpiarFiltros()" style="background-color: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: var(--radio-sm); cursor: pointer; transition: var(--transicion-rapida); margin-left: auto;">
+            🗑️ Limpiar Filtros
+        </button>
+    </div>
+</div>
+
+<!-- Lista de Libros -->
+<div class="libros-grid-4x4" id="lista-libros">
+    {% for libro in libros %}
+    <div class="libro-card-4x4 libro-item" 
+         data-genero="{{ libro.genero }}" 
+         data-precio="{{ libro.precioventa }}" 
+         data-stock="{{ libro.stock }}"
+         data-titulo="{{ libro.titulo|lower }}">
+        
+        <!-- Botones de administrador -->
+        {% if user.is_authenticated and user.is_staff %}
+        <div class="admin-actions">
+            <a href="{% url 'editar_libro' libro.libroid %}" class="admin-btn edit" title="Editar libro">
+                <i class="fas fa-edit"></i>
+            </a>
+            <a href="{% url 'eliminar_libro' libro.libroid %}" class="admin-btn delete" title="Eliminar libro" onclick="return confirm('¿Estás seguro de eliminar este libro?');">
+                <i class="fas fa-trash"></i>
+            </a>
+        </div>
+        {% endif %}
+        
+        <div class="libro-imagen-4x4">
+            {% if libro.portada %}
+            <img src="{{ libro.portada.url }}" alt="{{ libro.titulo }}" class="imagen-libro-4x4">
+            {% else %}
+            <div class="sin-imagen-4x4">
+                📚
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="libro-contenido-4x4">
+            <h3 class="libro-titulo-4x4">{{ libro.titulo }}</h3>
+            <p class="libro-autor-4x4">por {{ libro.autorid.nombre }} {{ libro.autorid.apellido }}</p>
+            
+            {% if libro.descripcion %}
+            <p class="libro-descripcion-4x4">{{ libro.descripcion|truncatechars:100 }}</p>
+            {% endif %}
+            
+            <div class="libro-info-4x4">
+                <div>
+                    <div class="libro-precio-4x4">${{ libro.precioventa }}</div>
+                    <div class="libro-stock-4x4" style="background-color: {% if libro.stock > 0 %}var(--verde-claro){% else %}#f8d7da{% endif %}; color: {% if libro.stock > 0 %}var(--verde-oscuro){% else %}#721c24{% endif %};">
+                        {% if libro.stock > 0 %}{{ libro.stock }} disponibles{% else %}AGOTADO{% endif %}
+                    </div>
+                </div>
+                
+                {% if user.is_authenticated and not user.is_staff %}
+                    {% if libro.stock > 0 %}
+                    <form method="post" action="{% url 'agregar_al_carrito' libro.libroid %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-agregar-carrito-4x4">
+                            <i class="fas fa-cart-plus"></i>
+                        </button>
+                    </form>
+                    {% else %}
+                    <button class="btn-agregar-carrito-4x4" disabled style="background-color: var(--gris-medio); cursor: not-allowed;">
+                        <i class="fas fa-ban"></i>
+                    </button>
+                    {% endif %}
+                {% elif user.is_authenticated and user.is_staff %}
+                    <button class="btn-agregar-carrito-4x4" disabled style="background-color: var(--gris-medio); cursor: not-allowed;">
+                        <i class="fas fa-user-shield"></i>
+                    </button>
+                {% else %}
+                    <a href="{% url 'login_selector' %}" class="btn-agregar-carrito-4x4" style="text-decoration: none;">
+                        <i class="fas fa-sign-in-alt"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div style="grid-column: 1 / -1; text-align: center; padding: var(--espacio-xl);">
+        <div style="background-color: var(--verde-muy-claro); padding: var(--espacio-lg); border-radius: var(--radio-md); border: 1px solid var(--verde-claro);">
+            <h3 style="color: var(--verde-oscuro); margin-bottom: var(--espacio-sm);">
+                {% if mostrar_solo_sin_stock %}
+                    No hay libros agotados en este momento
+                {% else %}
+                    No hay libros disponibles en este momento
+                {% endif %}
+            </h3>
+            <p style="color: var(--gris-medio); margin-bottom: var(--espacio-md);">
+                {% if mostrar_solo_sin_stock %}
+                    ¡Excelente! Todos nuestros libros tienen stock disponible.
+                {% else %}
+                    Estamos trabajando para agregar nuevos títulos a nuestro catálogo.
+                {% endif %}
+            </p>
+            <a href="{% url 'inicio' %}" style="background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro)); color: white; padding: 12px 24px; border-radius: var(--radio-md); text-decoration: none; display: inline-block;">
+                Volver al Inicio
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Contador de resultados -->
+<div style="text-align: center; margin-top: var(--espacio-xl);">
+    <div style="background-color: var(--blanco); border: 1px solid var(--gris-claro); padding: var(--espacio-md); border-radius: var(--radio-md); box-shadow: var(--sombra-suave);">
+        <p style="margin-bottom: var(--espacio-xs); font-size: 1.1rem; color: var(--gris-oscuro);">
+            Mostrando <span id="contador-libros" style="background-color: var(--verde-principal); color: white; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 1.2rem;">{{ libros.count }}</span> 
+            {% if mostrar_solo_sin_stock %}libros agotados{% else %}libros disponibles{% endif %}
+        </p>
+        <p style="margin: 0; color: var(--gris-medio); font-size: 0.95rem;" id="info-filtros">
+            Filtros activos: <span style="color: var(--verde-principal); font-weight: 600;">Ninguno</span>
+        </p>
+    </div>
+</div>
+
+<script>
+// Variables globales
+let librosData = [];
+let filtroGenero = '';
+let filtroPrecio = 1000;
+let filtroStock = '';
+let filtroOrden = 'default';
+
+// FUNCIÓN PARA MOSTRAR SOLO LIBROS SIN STOCK
+window.toggleLibrosSinStock = function() {
+    const checkbox = document.getElementById('toggleSinStock');
+    const url = new URL(window.location.href);
+    
+    if (checkbox.checked) {
+        url.searchParams.set('sin_stock', 'true');
+    } else {
+        url.searchParams.delete('sin_stock');
+    }
+    
+    window.location.href = url.toString();
+};
+
+// Inicializar datos de libros
+document.addEventListener('DOMContentLoaded', function() {
+    // Guardar datos originales de los libros
+    const libroItems = document.querySelectorAll('.libro-item');
+    libroItems.forEach(item => {
+        librosData.push({
+            element: item,
+            genero: item.getAttribute('data-genero'),
+            precio: parseFloat(item.getAttribute('data-precio')),
+            stock: parseInt(item.getAttribute('data-stock')),
+            titulo: item.getAttribute('data-titulo')
+        });
+    });
+    
+    // Inicializar elementos del DOM
+    const filtroGeneroEl = document.getElementById('filtroGenero');
+    const filtroPrecioEl = document.getElementById('filtroPrecio');
+    const filtroStockEl = document.getElementById('filtroStock');
+    const filtroOrdenEl = document.getElementById('filtroOrden');
+    const contador = document.getElementById('contador-libros');
+    const infoFiltros = document.getElementById('info-filtros');
+    const precioMaximo = document.getElementById('precioMaximo');
+
+    // Event listeners
+    if (filtroGeneroEl) {
+        filtroGeneroEl.addEventListener('change', function() {
+            filtroGenero = this.value;
+            actualizarFiltros();
+        });
+    }
+
+    if (filtroStockEl) {
+        filtroStockEl.addEventListener('change', function() {
+            filtroStock = this.value;
+            actualizarFiltros();
+        });
+    }
+
+    if (filtroOrdenEl) {
+        filtroOrdenEl.addEventListener('change', function() {
+            filtroOrden = this.value;
+            actualizarFiltros();
+        });
+    }
+
+    // Slider de precio
+    if (filtroPrecioEl) {
+        filtroPrecioEl.addEventListener('input', function() {
+            filtroPrecio = parseInt(this.value);
+            if (precioMaximo) {
+                precioMaximo.textContent = `$${filtroPrecio}`;
+            }
+            actualizarFiltros();
+        });
+    }
+
+    function actualizarFiltros() {
+        let visibles = 0;
+        let filtrosActivos = [];
+        
+        // Crear copia ordenable de los datos
+        let librosFiltrados = [...librosData];
+        
+        // Aplicar filtros
+        librosFiltrados = librosFiltrados.filter(libro => {
+            let mostrar = true;
+
+            // Filtro por género
+            if (filtroGenero && libro.genero !== filtroGenero) {
+                mostrar = false;
+            }
+
+            // Filtro por precio
+            if (libro.precio > filtroPrecio) {
+                mostrar = false;
+            }
+
+            // Filtro por stock (solo si no estamos en modo "solo sin stock")
+            {% if not mostrar_solo_sin_stock %}
+            if (filtroStock === 'con_stock' && libro.stock === 0) {
+                mostrar = false;
+            } else if (filtroStock === 'sin_stock' && libro.stock > 0) {
+                mostrar = false;
+            }
+            {% endif %}
+
+            return mostrar;
+        });
+
+        // Aplicar ordenamiento
+        librosFiltrados.sort((a, b) => {
+            switch (filtroOrden) {
+                case 'precio_asc':
+                    return a.precio - b.precio;
+                case 'precio_desc':
+                    return b.precio - a.precio;
+                case 'titulo_asc':
+                    return a.titulo.localeCompare(b.titulo);
+                case 'titulo_desc':
+                    return b.titulo.localeCompare(a.titulo);
+                default:
+                    return 0; // Mantener orden original
+            }
+        });
+
+        // Ocultar todos primero
+        librosData.forEach(libro => {
+            libro.element.style.display = 'none';
+        });
+
+        // Mostrar los filtrados en el orden correcto
+        const listaContainer = document.getElementById('lista-libros');
+        librosFiltrados.forEach(libro => {
+            // Mover el elemento al final para respetar el orden
+            listaContainer.appendChild(libro.element);
+            libro.element.style.display = 'block';
+            visibles++;
+        });
+
+        // Actualizar contador
+        if (contador) {
+            contador.textContent = visibles;
+        }
+
+        // Actualizar información de filtros activos
+        if (filtroGeneroEl && filtroGenero) {
+            const generoText = filtroGeneroEl.options[filtroGeneroEl.selectedIndex].text;
+            filtrosActivos.push(`Género: ${generoText}`);
+        }
+        
+        if (filtroPrecio < 1000) filtrosActivos.push(`Precio ≤ $${filtroPrecio}`);
+        
+        if (filtroStockEl && filtroStock) {
+            const stockText = filtroStockEl.options[filtroStockEl.selectedIndex].text;
+            filtrosActivos.push(`Stock: ${stockText}`);
+        }
+        
+        if (filtroOrdenEl && filtroOrden !== 'default') {
+            const ordenText = filtroOrdenEl.options[filtroOrdenEl.selectedIndex].text;
+            filtrosActivos.push(`Orden: ${ordenText}`);
+        }
+
+        if (infoFiltros) {
+            if (filtrosActivos.length > 0) {
+                infoFiltros.innerHTML = `Filtros activos: <span style="color: var(--verde-principal); font-weight: 600;">${filtrosActivos.join(', ')}</span>`;
+            } else {
+                infoFiltros.innerHTML = `Filtros activos: <span style="color: var(--verde-principal); font-weight: 600;">Ninguno</span>`;
+            }
+        }
+    }
+
+    // Funciones de filtros rápidos
+    window.filtrarPrecioRapido = function(precio) {
+        filtroPrecio = precio;
+        if (filtroPrecioEl) filtroPrecioEl.value = precio;
+        if (precioMaximo) precioMaximo.textContent = `$${precio}`;
+        actualizarFiltros();
+    };
+
+    // Función para limpiar filtros
+    window.limpiarFiltros = function() {
+        if (filtroGeneroEl) filtroGeneroEl.value = '';
+        if (filtroPrecioEl) filtroPrecioEl.value = 1000;
+        if (filtroStockEl) filtroStockEl.value = '';
+        if (filtroOrdenEl) filtroOrdenEl.value = 'default';
+        
+        filtroGenero = '';
+        filtroPrecio = 1000;
+        filtroStock = '';
+        filtroOrden = 'default';
+        
+        if (precioMaximo) precioMaximo.textContent = '$1000';
+        actualizarFiltros();
+    };
+
+    // Inicializar
+    actualizarFiltros();
+});
+
+// Estilos CSS adicionales para los filtros
+const style = document.createElement('style');
+style.textContent = `
+    #filtroPrecio {
+        height: 6px;
+        border-radius: 3px;
+        background: #dee2e6;
+        outline: none;
+    }
+    
+    #filtroPrecio::-webkit-slider-thumb {
+        background: var(--verde-principal);
+        border: 2px solid white;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    #filtroPrecio::-moz-range-thumb {
+        background: var(--verde-principal);
+        border: 2px solid white;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    button:hover {
+        background-color: var(--verde-principal) !important;
+        color: white !important;
+        border-color: var(--verde-principal) !important;
+        transform: translateY(-2px);
+        transition: var(--transicion-media);
+    }
+    
+    select:hover, select:focus {
+        border-color: var(--verde-principal) !important;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.2);
+    }
+    
+    #toggleSinStock:checked {
+        accent-color: var(--verde-principal);
+    }
+    
+    @media (max-width: 992px) {
+        .libros-grid-4x4 {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .libros-grid-4x4 {
+            grid-template-columns: 1fr !important;
+        }
+        
+        .filtros-container > div {
+            grid-template-columns: 1fr !important;
+        }
+        
+        .libro-imagen-4x4 {
+            height: 180px !important;
+        }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

@@ -1,0 +1,1891 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Librería AJMG 1194 - Tu Mundo Literario{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===== VARIABLES Y RESET ===== */
+        :root {
+            /* PALETA DE COLORES ORIGINAL - VERDE */
+            --verde-principal: #2e8b57;
+            --verde-claro: #90ee90;
+            --verde-oscuro: #1a5c1a;
+            --verde-muy-claro: #f0fff0;
+            --blanco: #ffffff;
+            --gris-claro: #f8f9fa;
+            --gris-medio: #6c757d;
+            --gris-oscuro: #212529;
+            --dorado: #DAA520;
+            
+            /* Tipografía */
+            --fuente-titulos: 'Merriweather', serif;
+            --fuente-texto: 'Open Sans', sans-serif;
+            
+            /* Espaciado */
+            --espacio-xs: 0.5rem;
+            --espacio-sm: 1rem;
+            --espacio-md: 2rem;
+            --espacio-lg: 3rem;
+            --espacio-xl: 4rem;
+            
+            /* Bordes */
+            --radio-sm: 4px;
+            --radio-md: 8px;
+            --radio-lg: 12px;
+            
+            /* Sombras */
+            --sombra-suave: 0 2px 15px rgba(0,0,0,0.08);
+            --sombra-mediana: 0 4px 20px rgba(0,0,0,0.12);
+            --sombra-fuerte: 0 8px 30px rgba(0,0,0,0.15);
+            
+            /* Transiciones */
+            --transicion-rapida: all 0.2s ease;
+            --transicion-media: all 0.3s ease;
+            --transicion-lenta: all 0.5s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: var(--fuente-texto);
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--gris-oscuro);
+            background-color: var(--blanco);
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--fuente-titulos);
+            font-weight: 700;
+            line-height: 1.3;
+            color: var(--verde-oscuro);
+            margin-bottom: var(--espacio-sm);
+        }
+        
+        h1 { font-size: 2.5rem; }
+        h2 { font-size: 2rem; }
+        h3 { font-size: 1.75rem; }
+        h4 { font-size: 1.5rem; }
+        h5 { font-size: 1.25rem; }
+        h6 { font-size: 1rem; }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.75rem; }
+            h3 { font-size: 1.5rem; }
+        }
+        
+        p {
+            margin-bottom: var(--espacio-sm);
+            color: var(--gris-medio);
+        }
+        
+        a {
+            color: var(--verde-principal);
+            text-decoration: none;
+            transition: var(--transicion-rapida);
+        }
+        
+        a:hover {
+            color: var(--verde-oscuro);
+        }
+        
+        ul, ol {
+            margin-left: var(--espacio-md);
+            margin-bottom: var(--espacio-sm);
+        }
+        
+        /* ===== LAYOUT ===== */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--espacio-sm);
+        }
+        
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 calc(var(--espacio-sm) * -1);
+        }
+        
+        .col-1 { width: 8.33%; }
+        .col-2 { width: 16.66%; }
+        .col-3 { width: 25%; }
+        .col-4 { width: 33.33%; }
+        .col-5 { width: 41.66%; }
+        .col-6 { width: 50%; }
+        .col-7 { width: 58.33%; }
+        .col-8 { width: 66.66%; }
+        .col-9 { width: 75%; }
+        .col-10 { width: 83.33%; }
+        .col-11 { width: 91.66%; }
+        .col-12 { width: 100%; }
+        
+        [class*="col-"] {
+            padding: 0 var(--espacio-sm);
+        }
+        
+        @media (max-width: 768px) {
+            [class*="col-"] {
+                width: 100%;
+                margin-bottom: var(--espacio-md);
+            }
+        }
+        
+        /* ===== HEADER Y NAVEGACIÓN ===== */
+        .header {
+            background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal));
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--sombra-mediana);
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--espacio-sm) 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--espacio-xs);
+        }
+        
+        .logo-icon {
+            font-size: 2rem;
+            color: var(--dorado);
+        }
+        
+        .logo-text {
+            font-family: var(--fuente-titulos);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--blanco);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        .logo-subtext {
+            font-size: 0.8rem;
+            color: var(--verde-claro);
+            display: block;
+            font-weight: 300;
+        }
+        
+        .nav-main {
+            display: flex;
+            gap: var(--espacio-sm);
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: var(--blanco);
+            padding: var(--espacio-xs) var(--espacio-sm);
+            border-radius: var(--radio-sm);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transicion-media);
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.15);
+            color: var(--dorado);
+            transform: translateY(-2px);
+        }
+        
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .nav-link.active {
+            background-color: var(--dorado);
+            color: var(--verde-oscuro);
+        }
+        
+        .user-menu {
+            position: relative;
+        }
+        
+        .user-toggle {
+            background: none;
+            border: none;
+            color: var(--blanco);
+            cursor: pointer;
+            padding: var(--espacio-xs);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255,255,255,0.1);
+            transition: var(--transicion-media);
+        }
+        
+        .user-toggle:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+        
+        .user-dropdown {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: var(--blanco);
+            min-width: 250px;
+            border-radius: var(--radio-md);
+            box-shadow: var(--sombra-fuerte);
+            padding: var(--espacio-sm);
+            margin-top: var(--espacio-xs);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: var(--transicion-media);
+            z-index: 1001;
+        }
+        
+        .user-menu:hover .user-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .user-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: var(--espacio-sm);
+            padding: var(--espacio-xs) 0;
+            color: var(--gris-oscuro);
+            border-bottom: 1px solid var(--gris-claro);
+        }
+        
+        .user-dropdown-item:hover {
+            color: var(--verde-principal);
+        }
+        
+        .user-dropdown-item i {
+            width: 20px;
+            color: var(--verde-principal);
+        }
+        
+        .user-dropdown-divider {
+            height: 1px;
+            background-color: var(--gris-claro);
+            margin: var(--espacio-xs) 0;
+        }
+        
+        .cart-badge {
+            background-color: var(--dorado);
+            color: var(--verde-oscuro);
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--blanco);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: var(--espacio-xs);
+        }
+        
+        /* ===== ALERTAS ===== */
+        .alerts-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .alert {
+            background-color: var(--blanco);
+            border-left: 4px solid;
+            padding: var(--espacio-sm);
+            margin-bottom: var(--espacio-xs);
+            border-radius: var(--radio-sm);
+            box-shadow: var(--sombra-suave);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .alert-success {
+            border-left-color: var(--verde-principal);
+            background-color: var(--verde-muy-claro);
+        }
+        
+        .alert-error, .alert-danger {
+            border-left-color: #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+        
+        .alert-warning {
+            border-left-color: #ffc107;
+            background-color: rgba(255, 193, 7, 0.1);
+        }
+        
+        .alert-info {
+            border-left-color: #17a2b8;
+            background-color: rgba(23, 162, 184, 0.1);
+        }
+        
+        .alert-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--gris-medio);
+            padding: 0 var(--espacio-xs);
+        }
+        
+        /* ===== CONTENIDO PRINCIPAL ===== */
+        .main-content {
+            min-height: calc(100vh - 200px);
+            padding: var(--espacio-lg) 0;
+            background-color: var(--blanco);
+        }
+        
+        .page-header {
+            text-align: center;
+            padding: var(--espacio-lg) 0;
+            background: linear-gradient(rgba(46, 139, 87, 0.05), rgba(46, 139, 87, 0.1));
+            margin-bottom: var(--espacio-lg);
+            border-bottom: 2px solid var(--verde-claro);
+        }
+        
+        .page-title {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--dorado);
+        }
+        
+        /* ===== SECCIÓN LIBROS - GRID CORREGIDO ===== */
+        /* Grid principal que ahora funciona perfectamente */
+        .libros-grid-4x4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--espacio-md);
+            padding: var(--espacio-md) 0;
+            align-items: stretch; /* Asegura que todas las tarjetas tengan la misma altura */
+        }
+        
+        /* Tarjeta de libro corregida */
+        .libro-card-4x4 {
+            background: var(--blanco);
+            border-radius: var(--radio-md);
+            overflow: hidden;
+            box-shadow: var(--sombra-suave);
+            transition: var(--transicion-media);
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Asegura que todas las tarjetas ocupen toda la altura de la celda */
+            position: relative;
+        }
+        
+        .libro-card-4x4:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--sombra-mediana);
+        }
+        
+        /* Contenedor de imagen FIJADO */
+        .libro-imagen-4x4 {
+            height: 200px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            background-color: var(--gris-claro);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0; /* Evita que la imagen se encoja */
+        }
+        
+        /* Imagen normalizada */
+        .imagen-libro-4x4 {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain; /* Mantiene proporciones sin recortar */
+            padding: 15px;
+            transition: var(--transicion-media);
+        }
+        
+        /* Para imágenes verticales u horizontales */
+        .imagen-libro-4x4.vertical {
+            width: auto;
+            height: 85%;
+        }
+        
+        .imagen-libro-4x4.horizontal {
+            width: 85%;
+            height: auto;
+        }
+        
+        .imagen-libro-4x4.cuadrada {
+            width: 85%;
+            height: 85%;
+        }
+        
+        /* Cuando no hay imagen */
+        .sin-imagen-4x4 {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--verde-claro), var(--verde-principal));
+            color: var(--blanco);
+            font-size: 3rem;
+        }
+        
+        /* Contenido de la tarjeta */
+        .libro-contenido-4x4 {
+            padding: var(--espacio-sm);
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .libro-titulo-4x4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--verde-oscuro);
+            margin-bottom: var(--espacio-xs);
+            line-height: 1.4;
+            height: 2.8em;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        
+        .libro-autor-4x4 {
+            color: var(--gris-medio);
+            font-size: 0.85rem;
+            margin-bottom: var(--espacio-xs);
+            font-style: italic;
+        }
+        
+        .libro-descripcion-4x4 {
+            color: var(--gris-medio);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin-bottom: var(--espacio-sm);
+            flex-grow: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        /* Información inferior (precio, stock, botón) */
+        .libro-info-4x4 {
+            margin-top: auto;
+            padding-top: var(--espacio-xs);
+            border-top: 1px solid var(--gris-claro);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .libro-precio-4x4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--verde-principal);
+        }
+        
+        .libro-stock-4x4 {
+            font-size: 0.8rem;
+            color: var(--gris-medio);
+            background-color: var(--gris-claro);
+            padding: 3px 8px;
+            border-radius: var(--radio-sm);
+        }
+        
+        /* Botón para agregar al carrito */
+        .btn-agregar-carrito-4x4 {
+            background-color: var(--verde-principal);
+            color: var(--blanco);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transicion-media);
+            flex-shrink: 0;
+        }
+        
+        .btn-agregar-carrito-4x4:hover {
+            background-color: var(--verde-oscuro);
+            transform: scale(1.1);
+        }
+        
+        .btn-agregar-carrito-4x4 i {
+            font-size: 0.9rem;
+        }
+        
+        /* Modo administrador en tarjetas */
+        .admin-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+            z-index: 2;
+        }
+        
+        .admin-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: var(--transicion-rapida);
+        }
+        
+        .admin-btn.edit {
+            background-color: rgba(255, 193, 7, 0.9);
+            color: var(--gris-oscuro);
+        }
+        
+        .admin-btn.delete {
+            background-color: rgba(220, 53, 69, 0.9);
+            color: var(--blanco);
+        }
+        
+        .admin-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        /* ===== SECCIÓN EVENTOS - REDISEÑO COMPLETO ===== */
+        .eventos-section {
+            padding: var(--espacio-lg) 0;
+        }
+        
+        .eventos-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--espacio-lg);
+            flex-wrap: wrap;
+            gap: var(--espacio-sm);
+        }
+        
+        .filtros-eventos {
+            display: flex;
+            gap: var(--espacio-sm);
+            flex-wrap: wrap;
+        }
+        
+        .filtro-btn {
+            padding: 10px 24px;
+            background: var(--gris-claro);
+            border: 2px solid transparent;
+            border-radius: var(--radio-md);
+            cursor: pointer;
+            transition: var(--transicion-media);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .filtro-btn:hover {
+            background: var(--verde-claro);
+            color: var(--verde-oscuro);
+            transform: translateY(-2px);
+        }
+        
+        .filtro-btn.active {
+            background: var(--verde-principal);
+            color: var(--blanco);
+            border-color: var(--verde-oscuro);
+            box-shadow: var(--sombra-suave);
+        }
+        
+        .eventos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: var(--espacio-lg);
+            padding: var(--espacio-md) 0;
+        }
+        
+        .evento-card {
+            background: var(--blanco);
+            border-radius: var(--radio-lg);
+            overflow: hidden;
+            box-shadow: var(--sombra-mediana);
+            transition: var(--transicion-media);
+            border: 1px solid var(--verde-claro);
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .evento-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--sombra-fuerte);
+            border-color: var(--verde-principal);
+        }
+        
+        .evento-imagen-container {
+            height: 220px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .evento-imagen {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transicion-lenta);
+        }
+        
+        .evento-card:hover .evento-imagen {
+            transform: scale(1.08);
+        }
+        
+        .evento-fecha-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(5px);
+            color: var(--verde-oscuro);
+            padding: 8px 16px;
+            border-radius: var(--radio-md);
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: var(--sombra-suave);
+            z-index: 2;
+        }
+        
+        .evento-categoria-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--verde-principal);
+            color: var(--blanco);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 2;
+        }
+        
+        .evento-contenido {
+            padding: var(--espacio-md);
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .evento-titulo {
+            font-size: 1.4rem;
+            margin-bottom: var(--espacio-xs);
+            color: var(--verde-oscuro);
+            line-height: 1.3;
+        }
+        
+        .evento-descripcion {
+            color: var(--gris-medio);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: var(--espacio-sm);
+            flex-grow: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .evento-detalles {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--espacio-sm);
+            margin-bottom: var(--espacio-md);
+            padding: var(--espacio-sm) 0;
+            border-top: 1px solid var(--gris-claro);
+            border-bottom: 1px solid var(--gris-claro);
+        }
+        
+        .evento-detalle-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .evento-detalle-item i {
+            color: var(--verde-principal);
+            width: 20px;
+            text-align: center;
+        }
+        
+        .evento-acciones {
+            display: flex;
+            gap: var(--espacio-sm);
+            margin-top: auto;
+        }
+        
+        .btn-ver-detalles {
+            flex: 1;
+            background: var(--verde-principal);
+            color: var(--blanco);
+            border: none;
+            padding: 12px;
+            border-radius: var(--radio-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transicion-media);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-ver-detalles:hover {
+            background: var(--verde-oscuro);
+            transform: translateY(-2px);
+            box-shadow: var(--sombra-suave);
+        }
+        
+        .btn-reservar {
+            background: var(--dorado);
+            color: var(--verde-oscuro);
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--radio-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transicion-media);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-reservar:hover {
+            background: #c69500;
+            transform: translateY(-2px);
+            box-shadow: var(--sombra-suave);
+        }
+        
+        /* ===== MODAL DE DETALLES DE EVENTO ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: var(--espacio-sm);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .modal-evento {
+            background: var(--blanco);
+            border-radius: var(--radio-lg);
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--sombra-fuerte);
+            animation: modalSlideUp 0.3s ease;
+        }
+        
+        @keyframes modalSlideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal));
+            color: var(--blanco);
+            padding: var(--espacio-md);
+            position: relative;
+            border-radius: var(--radio-lg) var(--radio-lg) 0 0;
+        }
+        
+        .modal-categoria {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: var(--espacio-xs);
+        }
+        
+        .modal-titulo {
+            font-size: 1.8rem;
+            margin-bottom: var(--espacio-xs);
+            color: var(--blanco);
+        }
+        
+        .modal-fecha {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-cerrar-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: var(--blanco);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: var(--transicion-media);
+        }
+        
+        .btn-cerrar-modal:hover {
+            background: rgba(255,255,255,0.3);
+            transform: rotate(90deg);
+        }
+        
+        .modal-body {
+            padding: var(--espacio-md);
+        }
+        
+        .modal-imagen-container {
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+            border-radius: var(--radio-md);
+            margin-bottom: var(--espacio-md);
+        }
+        
+        .modal-imagen {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .modal-descripcion {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--gris-oscuro);
+            margin-bottom: var(--espacio-lg);
+        }
+        
+        .modal-detalles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--espacio-md);
+            margin-bottom: var(--espacio-lg);
+        }
+        
+        .modal-detalle-card {
+            background: var(--verde-muy-claro);
+            padding: var(--espacio-sm);
+            border-radius: var(--radio-md);
+            border-left: 4px solid var(--verde-principal);
+        }
+        
+        .modal-detalle-titulo {
+            font-size: 0.9rem;
+            color: var(--gris-medio);
+            margin-bottom: 5px;
+        }
+        
+        .modal-detalle-valor {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--verde-oscuro);
+        }
+        
+        .modal-acciones {
+            display: flex;
+            gap: var(--espacio-sm);
+            justify-content: center;
+            padding-top: var(--espacio-md);
+            border-top: 1px solid var(--gris-claro);
+        }
+        
+        /* ===== FOOTER ===== */
+        .footer {
+            background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal));
+            color: var(--blanco);
+            padding: var(--espacio-xl) 0 var(--espacio-md);
+        }
+        
+        .footer-section {
+            margin-bottom: var(--espacio-lg);
+        }
+        
+        .footer-title {
+            color: var(--dorado);
+            font-size: 1.3rem;
+            margin-bottom: var(--espacio-md);
+            position: relative;
+            padding-bottom: var(--espacio-xs);
+        }
+        
+        .footer-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--dorado);
+        }
+        
+        .footer-links {
+            list-style: none;
+            margin: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: var(--espacio-xs);
+        }
+        
+        .footer-links a {
+            color: var(--verde-claro);
+            transition: var(--transicion-rapida);
+        }
+        
+        .footer-links a:hover {
+            color: var(--dorado);
+            padding-left: 5px;
+        }
+        
+        .contact-info {
+            list-style: none;
+            margin: 0;
+        }
+        
+        .contact-info li {
+            margin-bottom: var(--espacio-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--espacio-xs);
+        }
+        
+        .contact-info i {
+            color: var(--dorado);
+            width: 20px;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: var(--espacio-sm);
+            margin-top: var(--espacio-md);
+        }
+        
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--blanco);
+            transition: var(--transicion-media);
+        }
+        
+        .social-link:hover {
+            background-color: var(--dorado);
+            color: var(--verde-oscuro);
+            transform: translateY(-3px);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: var(--espacio-md);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: var(--verde-claro);
+            font-size: 0.9rem;
+        }
+        
+        /* ===== BOTONES ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--radio-md);
+            font-family: var(--fuente-texto);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transicion-media);
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro));
+            color: var(--blanco);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--sombra-mediana);
+        }
+        
+        .btn-secondary {
+            background-color: var(--verde-claro);
+            color: var(--verde-oscuro);
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: var(--blanco);
+        }
+        
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+        
+        .btn-lg {
+            padding: 16px 32px;
+            font-size: 1.1rem;
+        }
+        
+        /* ===== UTILIDADES ===== */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-left { text-align: left; }
+        
+        .mt-1 { margin-top: var(--espacio-xs); }
+        .mt-2 { margin-top: var(--espacio-sm); }
+        .mt-3 { margin-top: var(--espacio-md); }
+        .mt-4 { margin-top: var(--espacio-lg); }
+        .mt-5 { margin-top: var(--espacio-xl); }
+        
+        .mb-1 { margin-bottom: var(--espacio-xs); }
+        .mb-2 { margin-bottom: var(--espacio-sm); }
+        .mb-3 { margin-bottom: var(--espacio-md); }
+        .mb-4 { margin-bottom: var(--espacio-lg); }
+        .mb-5 { margin-bottom: var(--espacio-xl); }
+        
+        .py-3 { padding-top: var(--espacio-md); padding-bottom: var(--espacio-md); }
+        .py-4 { padding-top: var(--espacio-lg); padding-bottom: var(--espacio-lg); }
+        
+        .shadow-sm { box-shadow: var(--sombra-suave); }
+        .shadow-md { box-shadow: var(--sombra-mediana); }
+        .shadow-lg { box-shadow: var(--sombra-fuerte); }
+        
+        .rounded { border-radius: var(--radio-md); }
+        .rounded-lg { border-radius: var(--radio-lg); }
+        
+        .bg-light { background-color: var(--gris-claro); }
+        .bg-cream { background-color: var(--verde-muy-claro); }
+        .bg-white { background-color: var(--blanco); }
+        
+        /* ===== RESPONSIVE PARA LIBROS ===== */
+        @media (max-width: 1200px) {
+            .libros-grid-4x4 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .nav-main {
+                display: none;
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background-color: var(--verde-oscuro);
+                flex-direction: column;
+                padding: var(--espacio-md);
+                gap: var(--espacio-xs);
+                box-shadow: var(--sombra-fuerte);
+            }
+            
+            .nav-main.active {
+                display: flex;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .user-dropdown {
+                position: fixed;
+                right: var(--espacio-sm);
+                top: 70px;
+                width: calc(100% - var(--espacio-sm) * 2);
+            }
+            
+            .libros-grid-4x4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .eventos-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+            
+            .eventos-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .alerts-container {
+                left: 20px;
+                right: 20px;
+                max-width: none;
+            }
+            
+            .alert {
+                margin-bottom: var(--espacio-xs);
+            }
+            
+            .libros-grid-4x4 {
+                grid-template-columns: 1fr;
+                gap: var(--espacio-sm);
+            }
+            
+            .libro-imagen-4x4 {
+                height: 180px;
+            }
+            
+            .eventos-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .evento-detalles {
+                grid-template-columns: 1fr;
+            }
+            
+            .evento-acciones {
+                flex-direction: column;
+            }
+            
+            .modal-detalles-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-acciones {
+                flex-direction: column;
+            }
+            
+            .modal-imagen-container {
+                height: 200px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .libro-info-4x4 {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--espacio-xs);
+            }
+            
+            .btn-agregar-carrito-4x4 {
+                align-self: flex-end;
+                margin-top: -36px; /* Posiciona sobre el precio */
+            }
+        }
+        
+        /* ===== ANIMACIONES ===== */
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(46, 139, 87, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(46, 139, 87, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(46, 139, 87, 0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-container">
+            <a href="{% url 'inicio' %}" class="logo">
+                <div class="logo-icon">📚</div>
+                <div class="logo-text">
+                    Librería AJMG 1194
+                    <span class="logo-subtext">Tu Mundo Literario</span>
+                </div>
+            </a>
+            
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <nav class="nav-main" id="navMain">
+                <a href="{% url 'inicio' %}" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                    <i class="fas fa-home"></i>Inicio
+                </a>
+                <a href="{% url 'libros' %}" class="nav-link {% if 'libros' in request.path %}active{% endif %}">
+                    <i class="fas fa-book"></i>Libros
+                </a>
+                <a href="{% url 'eventos' %}" class="nav-link {% if 'eventos' in request.path %}active{% endif %}">
+                    <i class="fas fa-calendar-alt"></i>Eventos
+                </a>
+                <a href="{% url 'blog' %}" class="nav-link {% if 'blog' in request.path %}active{% endif %}">
+                    <i class="fas fa-blog"></i>Blog
+                </a>
+                <a href="{% url 'contacto' %}" class="nav-link {% if 'contacto' in request.path %}active{% endif %}">
+                    <i class="fas fa-envelope"></i>Contacto
+                </a>
+                
+                {% if user.is_authenticated and user.is_staff %}
+                <a href="{% url 'panel_admin' %}" class="nav-link">
+                    <i class="fas fa-cog"></i>Panel Admin
+                </a>
+                {% endif %}
+            </nav>
+            
+            <div class="user-menu">
+                {% if user.is_authenticated %}
+                <button class="user-toggle">
+                    <i class="fas fa-user"></i>
+                </button>
+                <div class="user-dropdown">
+                    <div class="user-dropdown-item">
+                        <i class="fas fa-user-circle"></i>
+                        <div>
+                            <strong>{{ user.username }}</strong>
+                            <small style="display: block; color: var(--gris-medio);">{{ user.email }}</small>
+                        </div>
+                    </div>
+                    
+                    <div class="user-dropdown-divider"></div>
+                    
+                    {% if not user.is_staff %}
+                    <a href="{% url 'ver_carrito' %}" class="user-dropdown-item">
+                        <i class="fas fa-shopping-cart"></i>Mi Carrito
+                        {% with cart_count=user.carrito_set.count %}
+                        {% if cart_count > 0 %}
+                        <span class="cart-badge">{{ cart_count }}</span>
+                        {% endif %}
+                        {% endwith %}
+                    </a>
+                    
+                    <a href="{% url 'mis_compras' %}" class="user-dropdown-item">
+                        <i class="fas fa-receipt"></i>Mis Compras
+                    </a>
+                    {% endif %}
+                    
+                    <div class="user-dropdown-divider"></div>
+                    
+                    <a href="{% url 'logout' %}" class="user-dropdown-item text-danger">
+                        <i class="fas fa-sign-out-alt"></i>Cerrar Sesión
+                    </a>
+                </div>
+                {% else %}
+                <a href="{% url 'login_selector' %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-sign-in-alt"></i>Ingresar
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Modal para detalles de evento -->
+    <div class="modal-overlay" id="modalEvento">
+        <div class="modal-evento">
+            <div class="modal-header">
+                <button class="btn-cerrar-modal" onclick="cerrarModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <span class="modal-categoria" id="modalCategoria"></span>
+                <h2 class="modal-titulo" id="modalTitulo"></h2>
+                <div class="modal-fecha">
+                    <i class="far fa-calendar-alt"></i>
+                    <span id="modalFecha"></span>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-imagen-container">
+                    <img id="modalImagen" src="" alt="" class="modal-imagen">
+                </div>
+                <div class="modal-descripcion" id="modalDescripcion"></div>
+                
+                <div class="modal-detalles-grid">
+                    <div class="modal-detalle-card">
+                        <div class="modal-detalle-titulo">Ubicación</div>
+                        <div class="modal-detalle-valor" id="modalUbicacion"></div>
+                    </div>
+                    <div class="modal-detalle-card">
+                        <div class="modal-detalle-titulo">Capacidad</div>
+                        <div class="modal-detalle-valor" id="modalCapacidad"></div>
+                    </div>
+                    <div class="modal-detalle-card">
+                        <div class="modal-detalle-titulo">Precio</div>
+                        <div class="modal-detalle-valor" id="modalPrecio"></div>
+                    </div>
+                    <div class="modal-detalle-card">
+                        <div class="modal-detalle-titulo">Estado</div>
+                        <div class="modal-detalle-valor" id="modalEstado"></div>
+                    </div>
+                </div>
+                
+                <div class="modal-acciones">
+                    <button class="btn btn-primary btn-lg" onclick="reservarEvento()">
+                        <i class="fas fa-ticket-alt"></i> Reservar Lugar
+                    </button>
+                    <button class="btn btn-secondary btn-lg" onclick="compartirEvento()">
+                        <i class="fas fa-share-alt"></i> Compartir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensajes -->
+    {% if messages %}
+    <div class="alerts-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} fade-in">
+            <div>
+                {% if message.tags == 'success' %}
+                <i class="fas fa-check-circle" style="color: var(--verde-principal); margin-right: 10px;"></i>
+                {% elif message.tags == 'error' or message.tags == 'danger' %}
+                <i class="fas fa-exclamation-circle" style="color: #dc3545; margin-right: 10px;"></i>
+                {% elif message.tags == 'warning' %}
+                <i class="fas fa-exclamation-triangle" style="color: #ffc107; margin-right: 10px;"></i>
+                {% elif message.tags == 'info' %}
+                <i class="fas fa-info-circle" style="color: #17a2b8; margin-right: 10px;"></i>
+                {% endif %}
+                {{ message }}
+            </div>
+            <button class="alert-close" onclick="this.parentElement.style.opacity='0'; setTimeout(() => this.parentElement.remove(), 300);">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+        {% block page_header %}
+        {% if not hide_page_header %}
+        <div class="page-header">
+            <div class="container">
+                <h1 class="page-title">{% block page_title %}{% endblock %}</h1>
+                {% block page_subtitle %}{% endblock %}
+            </div>
+        </div>
+        {% endif %}
+        {% endblock %}
+        
+        <div class="container">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-4">
+                    <div class="footer-section">
+                        <h3 class="footer-title">📚 Librería AJMG 1194</h3>
+                        <p>Tu destino literario favorito. Ofrecemos los mejores libros con servicio excepcional y un ambiente cálido para todos los amantes de la lectura.</p>
+                        <div class="social-links">
+                            <a href="#" class="social-link" title="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="social-link" title="Twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="social-link" title="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="social-link" title="YouTube">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-4">
+                    <div class="footer-section">
+                        <h3 class="footer-title">🔗 Enlaces Rápidos</h3>
+                        <ul class="footer-links">
+                            <li><a href="{% url 'inicio' %}">Inicio</a></li>
+                            <li><a href="{% url 'libros' %}">Catálogo de Libros</a></li>
+                            <li><a href="{% url 'eventos' %}">Eventos Literarios</a></li>
+                            <li><a href="{% url 'blog' %}">Blog Cultural</a></li>
+                            <li><a href="{% url 'contacto' %}">Contacto</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-4">
+                    <div class="footer-section">
+                        <h3 class="footer-title">📞 Contacto</h3>
+                        <ul class="contact-info">
+                            <li>
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Av. Librería 123, Col. Centro, CDMX</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-phone"></i>
+                                <span>+52 55 1234 5678</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-envelope"></i>
+                                <span>info@libreriaajmg.com</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-clock"></i>
+                                <span>Lun-Vie: 9am-8pm<br>Sáb-Dom: 10am-6pm</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>
+                    &copy; 2024 Librería AJMG 1194. Todos los derechos reservados. | 
+                    Desarrollado por Alfredo Martinez | 
+                    <span id="fecha-actual"></span>
+                </p>
+                <p class="mt-1" style="font-size: 0.8rem; opacity: 0.8;">
+                    📚 "Un libro abierto es un cerebro que habla; cerrado, un amigo que espera; olvidado, un alma que perdona; destruido, un corazón que llora." - Proverbio hindú
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mostrar fecha actual en el footer
+        document.getElementById('fecha-actual').textContent = new Date().toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        // Menu toggle para móviles
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const navMain = document.getElementById('navMain');
+        
+        if (mobileMenuToggle) {
+            mobileMenuToggle.addEventListener('click', () => {
+                navMain.classList.toggle('active');
+                const icon = mobileMenuToggle.querySelector('i');
+                if (navMain.classList.contains('active')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+        }
+        
+        // Cerrar menú al hacer clic en un enlace (móvil)
+        document.querySelectorAll('.nav-main a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 992) {
+                    navMain.classList.remove('active');
+                    mobileMenuToggle.querySelector('i').classList.remove('fa-times');
+                    mobileMenuToggle.querySelector('i').classList.add('fa-bars');
+                }
+            });
+        });
+        
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateX(100%)';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+        
+        // Cerrar alertas al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.alert')) {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(alert => {
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 300);
+                });
+            }
+        });
+        
+        // Smooth scrolling para enlaces internos
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Añadir clase activa a enlaces de navegación
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.nav-link').forEach(link => {
+            const linkPath = link.getAttribute('href');
+            if (currentPath === linkPath || (linkPath !== '/' && currentPath.startsWith(linkPath))) {
+                link.classList.add('active');
+            }
+        });
+        
+        // Efecto de carga suave
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.5s ease';
+                document.body.style.opacity = '1';
+            }, 100);
+            
+            // Normalizar imágenes de libros
+            normalizarImagenesLibros();
+        });
+        
+        // ===== SISTEMA DE NORMALIZACIÓN DE IMÁGENES DE LIBROS =====
+        function normalizarImagenesLibros() {
+            const contenedores = document.querySelectorAll('.libro-imagen-4x4');
+            
+            contenedores.forEach(contenedor => {
+                const imagen = contenedor.querySelector('img');
+                if (imagen) {
+                    // Si la imagen ya está cargada
+                    if (imagen.complete) {
+                        ajustarImagenLibro(imagen);
+                    } else {
+                        // Si aún no se carga
+                        imagen.onload = function() {
+                            ajustarImagenLibro(this);
+                        };
+                    }
+                }
+            });
+        }
+        
+        function ajustarImagenLibro(img) {
+            // Remover clases anteriores
+            img.classList.remove('vertical', 'horizontal', 'cuadrada');
+            
+            const ratio = img.naturalWidth / img.naturalHeight;
+            
+            // Determinar orientación
+            if (ratio < 0.7) {
+                // Vertical (más alta que ancha)
+                img.classList.add('vertical');
+            } else if (ratio > 1.3) {
+                // Horizontal (más ancha que alta)
+                img.classList.add('horizontal');
+            } else {
+                // Cuadrada o casi cuadrada
+                img.classList.add('cuadrada');
+            }
+        }
+        
+        // Re-normalizar al cambiar tamaño de ventana
+        window.addEventListener('resize', normalizarImagenesLibros);
+        
+        // ===== SISTEMA DE MODAL PARA EVENTOS =====
+        
+        // Datos de ejemplo para eventos (en producción vendrán de Django)
+        const eventosData = [
+            {
+                id: 1,
+                titulo: "Noche de Poesía: Versos en la Librería",
+                categoria: "PRESENTACION",
+                categoriaTexto: "Presentación de Libro",
+                fecha: "15 de Marzo, 2024 - 19:00 hrs",
+                descripcion: "Una velada mágica dedicada a la poesía contemporánea. Escritores locales compartirán sus obras más recientes en un ambiente íntimo y acogedor. Habrá lectura de poemas, sesión de preguntas y firma de libros. Incluye un brindis de bienvenida.",
+                imagen: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                ubicacion: "Sala Principal - Librería AJMG",
+                capacidad: "50 personas",
+                precio: "Gratuito",
+                estado: "Activo",
+                cuposDisponibles: 25
+            },
+            {
+                id: 2,
+                titulo: "Taller de Escritura Creativa",
+                categoria: "TALLER",
+                categoriaTexto: "Taller Literario",
+                fecha: "22 de Marzo, 2024 - 17:00 hrs",
+                descripcion: "Aprende las técnicas fundamentales de la escritura creativa con nuestro taller intensivo de 3 horas. Dirigido por la reconocida escritora María González, autora de 'Las sombras del olvido'. Incluye ejercicios prácticos, retroalimentación personalizada y materiales de trabajo.",
+                imagen: "https://images.unsplash.com/photo-1455390582262-044cdead277a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                ubicacion: "Aula de Talleres - Piso 2",
+                capacidad: "30 personas",
+                precio: "$350 MXN",
+                estado: "Activo",
+                cuposDisponibles: 12
+            },
+            {
+                id: 3,
+                titulo: "Club de Lectura: Cien Años de Soledad",
+                categoria: "CLUB_LECTURA",
+                categoriaTexto: "Club de Lectura",
+                fecha: "28 de Marzo, 2024 - 18:30 hrs",
+                descripcion: "Únete a nuestro club de lectura mensual donde analizaremos la obra maestra de Gabriel García Márquez. Discutiremos personajes, temas literarios y el realismo mágico. No es necesario haber terminado el libro para participar. Incluye guía de discusión y refrigerios.",
+                imagen: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                ubicacion: "Rincón de Lectura",
+                capacidad: "40 personas",
+                precio: "Gratuito",
+                estado: "Activo",
+                cuposDisponibles: 18
+            },
+            {
+                id: 4,
+                titulo: "Firma de Autores: Nuevas Voces Mexicanas",
+                categoria: "FIRMA",
+                categoriaTexto: "Firma de Autores",
+                fecha: "5 de Abril, 2024 - 16:00 hrs",
+                descripcion: "Conoce a los talentos emergentes de la literatura mexicana. Cinco autores presentarán sus obras más recientes y estarán disponibles para firmar ejemplares. Oportunidad única para conversar con los escritores y adquirir libros con dedicatorias personalizadas.",
+                imagen: "https://images.unsplash.com/photo-1532012197267-da84d127e765?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                ubicacion: "Área de Eventos Especiales",
+                capacidad: "100 personas",
+                precio: "Gratuito",
+                estado: "Próximamente",
+                cuposDisponibles: 100
+            }
+        ];
+        
+        // Función para abrir el modal con los detalles del evento
+        function verDetallesEvento(eventoId) {
+            const evento = eventosData.find(e => e.id === eventoId);
+            if (!evento) return;
+            
+            // Llenar el modal con la información del evento
+            document.getElementById('modalCategoria').textContent = evento.categoriaTexto;
+            document.getElementById('modalTitulo').textContent = evento.titulo;
+            document.getElementById('modalFecha').textContent = evento.fecha;
+            document.getElementById('modalDescripcion').textContent = evento.descripcion;
+            document.getElementById('modalUbicacion').textContent = evento.ubicacion;
+            document.getElementById('modalCapacidad').textContent = evento.capacidad;
+            document.getElementById('modalPrecio').textContent = evento.precio;
+            document.getElementById('modalEstado').textContent = evento.estado;
+            document.getElementById('modalImagen').src = evento.imagen;
+            document.getElementById('modalImagen').alt = evento.titulo;
+            
+            // Mostrar el modal
+            const modal = document.getElementById('modalEvento');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Guardar el ID del evento en el modal para usar después
+            modal.dataset.eventoId = eventoId;
+        }
+        
+        // Función para cerrar el modal
+        function cerrarModal() {
+            const modal = document.getElementById('modalEvento');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Función para reservar lugar en el evento
+        function reservarEvento() {
+            const modal = document.getElementById('modalEvento');
+            const eventoId = modal.dataset.eventoId;
+            const evento = eventosData.find(e => e.id === parseInt(eventoId));
+            
+            if (!evento) return;
+            
+            if (evento.cuposDisponibles > 0) {
+                alert(`¡Reserva confirmada para "${evento.titulo}"!\n\nRecibirás un correo con los detalles de tu reservación.`);
+                // Aquí en producción se haría una petición AJAX al backend
+                cerrarModal();
+            } else {
+                alert('Lo sentimos, ya no hay cupos disponibles para este evento.');
+            }
+        }
+        
+        // Función para compartir evento
+        function compartirEvento() {
+            const modal = document.getElementById('modalEvento');
+            const eventoId = modal.dataset.eventoId;
+            const evento = eventosData.find(e => e.id === parseInt(eventoId));
+            
+            if (!evento) return;
+            
+            const textoCompartir = `¡Te invito al evento "${evento.titulo}" en Librería AJMG!\n📅 ${evento.fecha}\n📍 ${evento.ubicacion}\n\nMás información en nuestra página web.`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: evento.titulo,
+                    text: textoCompartir,
+                    url: window.location.href
+                });
+            } else {
+                // Fallback para navegadores que no soportan Web Share API
+                navigator.clipboard.writeText(textoCompartir).then(() => {
+                    alert('Enlace copiado al portapapeles. ¡Compártelo con tus amigos!');
+                });
+            }
+        }
+        
+        // Cerrar modal al hacer clic fuera del contenido
+        document.getElementById('modalEvento').addEventListener('click', function(e) {
+            if (e.target === this) {
+                cerrarModal();
+            }
+        });
+        
+        // Cerrar modal con tecla ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                cerrarModal();
+            }
+        });
+        
+        // Filtros de eventos
+        function filtrarEventos(filtro) {
+            const cards = document.querySelectorAll('.evento-card');
+            const ahora = new Date();
+            
+            cards.forEach(card => {
+                const fechaEvento = new Date(card.dataset.fecha);
+                const esPasado = fechaEvento < ahora;
+                
+                switch(filtro) {
+                    case 'proximos':
+                        card.style.display = !esPasado ? 'block' : 'none';
+                        break;
+                    case 'pasados':
+                        card.style.display = esPasado ? 'block' : 'none';
+                        break;
+                    case 'todos':
+                        card.style.display = 'block';
+                        break;
+                }
+            });
+            
+            // Actualizar botones activos
+            document.querySelectorAll('.filtro-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.filtro === filtro) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+        
+        // Inicializar filtros si existen
+        document.addEventListener('DOMContentLoaded', () => {
+            const filtroBtns = document.querySelectorAll('.filtro-btn');
+            if (filtroBtns.length > 0) {
+                filtroBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        filtrarEventos(btn.dataset.filtro);
+                    });
+                });
+            }
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

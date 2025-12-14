@@ -1,0 +1,204 @@
+<!-- app_Libreria/templates/admin/ventas/detalle.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-verde">Detalle de Venta #{{ venta.ventaid }}</h1>
+        <a href="{% url 'admin_ventas' %}" class="btn btn-secondary">← Volver a Ventas</a>
+    </div>
+    
+    <div class="row">
+        <!-- Resumen de la Compra -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">💰 Resumen de la Compra</h5>
+                </div>
+                <div class="card-body">
+                    {% if venta.detalles.all %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Libro</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio Unitario</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for detalle in venta.detalles.all %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ detalle.libroid.titulo }}</strong><br>
+                                        <small class="text-muted">
+                                            por {{ detalle.libroid.autorid.nombre }} {{ detalle.libroid.autorid.apellido }}
+                                        </small>
+                                    </td>
+                                    <td>{{ detalle.cantidad }}</td>
+                                    <td>${{ detalle.preciounitario }}</td>
+                                    <td><strong>${{ detalle.subtotal }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="table-dark">
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                                    <td><strong>${{ venta.montototal }}</strong></td>
+                                </tr>
+                                {% if venta.descuentoaplicado and venta.descuentoaplicado > 0 %}
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Descuento:</strong></td>
+                                    <td><strong class="text-danger">- ${{ venta.descuentoaplicado }}</strong></td>
+                                </tr>
+                                {% endif %}
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Total Venta:</strong></td>
+                                    <td><strong class="text-success">${{ venta.montototal }}</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning text-center">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                        <h5>No hay detalles registrados para esta venta</h5>
+                        <p class="mb-0">Esta venta no tiene productos asociados.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Información de la Venta -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-verde text-white">
+                    <h5 class="mb-0">📋 Información de la Venta</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>ID Venta:</strong><br>
+                        <span class="text-muted">#{{ venta.ventaid }}</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Cliente:</strong><br>
+                        <span class="text-muted">{{ venta.clienteid.username }}</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Fecha:</strong><br>
+                        <span class="text-muted">{{ venta.fechaventa|date:"d M Y H:i" }}</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Método de Pago:</strong><br>
+                        <span class="badge 
+                            {% if venta.metodopago == 'EFECTIVO' %}bg-success
+                            {% elif venta.metodopago == 'TARJETA' %}bg-primary
+                            {% else %}bg-info{% endif %}">
+                            {{ venta.get_metodopago_display }}
+                        </span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Estado:</strong><br>
+                        <span class="badge 
+                            {% if venta.estadoventa == 'COMPLETADA' %}bg-success
+                            {% elif venta.estadoventa == 'CANCELADA' %}bg-danger
+                            {% else %}bg-warning text-dark{% endif %}">
+                            {{ venta.get_estadoventa_display }}
+                        </span>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="mb-2">
+                        <strong>Total Venta:</strong><br>
+                        <span class="h5 text-success">${{ venta.montototal }}</span>
+                    </div>
+                    
+                    {% if venta.descuentoaplicado and venta.descuentoaplicado > 0 %}
+                    <div class="mb-2">
+                        <strong>Descuento:</strong><br>
+                        <span class="text-danger">- ${{ venta.descuentoaplicado }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if venta.metodopago == 'EFECTIVO' %}
+                    <div class="mb-2">
+                        <strong>Pago Recibido:</strong><br>
+                        <span class="text-info">${{ venta.pagorecibido }}</span>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <strong>Cambio:</strong><br>
+                        <span class="text-warning">${{ venta.cambio }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            {% if venta.estadoventa == 'COMPLETADA' %}
+            <div class="card mt-3">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0">⚡ Acciones</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'cancelar_venta' venta.ventaid %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100" 
+                                onclick="return confirm('¿Estás seguro de cancelar esta venta? Se restaurará el stock de los libros.')">
+                            ❌ Cancelar Venta
+                        </button>
+                    </form>
+                    <div class="mt-2">
+                        <a href="{% url 'editar_venta' venta.ventaid %}" class="btn btn-outline-warning w-100">
+                            ✏️ Editar Venta
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Estadísticas Rápidas -->
+            <div class="card mt-3">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">📊 Estadísticas</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                        <h4>{{ venta.detalles.count }}</h4>
+                        <p class="text-muted mb-0">Productos Vendidos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+.card-header {
+    border-bottom: none;
+    font-weight: 600;
+}
+.table th {
+    background-color: var(--verde-principal);
+    color: white;
+    border: none;
+}
+.badge {
+    font-size: 0.75em;
+}
+.table-hover tbody tr:hover {
+    background-color: rgba(46, 139, 87, 0.1);
+}
+</style>
+{% endblock %}
